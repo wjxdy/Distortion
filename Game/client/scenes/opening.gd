@@ -108,6 +108,7 @@ func _wrap_label(s: String) -> Label:
 	return l
 
 func _go_interrogation() -> void:
+	Sfx.play_click()
 	get_tree().change_scene_to_file(INTERROGATION)
 
 func _input(event: InputEvent) -> void:
@@ -117,4 +118,5 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		go = true
 	if go:
+		Sfx.play_click()
 		_advance()

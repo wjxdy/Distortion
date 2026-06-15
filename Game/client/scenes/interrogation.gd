@@ -91,6 +91,7 @@ func _send() -> void:
 	if msg == "":
 		return
 	last_user_msg = msg
+	Sfx.play_click()
 	_append("[color=#8fd0ff]你：[/color]" + msg)
 	state.add_to_history("user", msg)
 	input.text = ""
@@ -114,6 +115,7 @@ func _on_reply(result: int, code: int, _headers: PackedStringArray, body: Packed
 		_append("[color=#ff6b6b]（出错 %d）%s[/color]" % [code, emsg])
 		return
 	_append("[color=#e8e1c8]周明远：[/color]" + str(data["reply"]))
+	Sfx.play_blip()
 	state.add_to_history("assistant", str(data["reply"]))
 	_check_truths()
 
@@ -121,6 +123,7 @@ func _check_truths() -> void:
 	for id in Triggers.evaluate(state, last_user_msg):
 		state.reveal(id)
 		_append("[color=#ffd166]💥 " + Triggers.fragment_of(id) + "[/color]")
+		Sfx.play_reveal()
 	if state.revealed.size() >= Content.TRUTHS.size():
 		_append("[color=#c792ea]=== " + Content.ENDING + " ===[/color]")
 		input.editable = false
@@ -130,6 +133,7 @@ func _on_explore() -> void:
 	var r := Explore.perform(state, "archive")
 	if not r.is_empty():
 		_append("[color=#a0e8a0]📂 " + str(r["text"]) + "[/color]")
+		Sfx.play_click()
 
 func _set_busy(b: bool) -> void:
 	send_btn.disabled = b

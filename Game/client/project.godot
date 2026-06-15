@@ -14,6 +14,10 @@ config/name="失真 Distortion"
 run/main_scene="res://scenes/opening.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 
+[autoload]
+
+Sfx="*res://autoload/sfx.gd"
+
 [display]
 
 window/size/viewport_width=1280
