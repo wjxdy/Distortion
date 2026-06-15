@@ -1,10 +1,17 @@
-; 《失真 Distortion》 Godot 4.6 项目配置
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
 config_version=5
 
 [application]
 
 config/name="失真 Distortion"
-run/main_scene="res://scenes/interrogation.tscn"
+run/main_scene="res://scenes/opening.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 
 [rendering]
