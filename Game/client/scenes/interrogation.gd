@@ -15,6 +15,7 @@ var log_label: RichTextLabel
 var input: LineEdit
 var send_btn: Button
 var explore_btn: Button
+var status_label: Label
 var last_user_msg := ""
 
 func _ready() -> void:
@@ -69,6 +70,10 @@ func _build_ui() -> void:
 	explore_btn.pressed.connect(_on_explore)
 	row.add_child(explore_btn)
 
+	status_label = Label.new()
+	status_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
+	vbox.add_child(status_label)
+
 	http = HTTPRequest.new()
 	add_child(http)
 	http.request_completed.connect(_on_reply)
@@ -96,8 +101,11 @@ func _send() -> void:
 		_append("[color=#ff6b6b]（无法连接后端，确认 server 已启动：cd Game/server && npm start）[/color]")
 		_set_busy(false)
 
-func _on_reply(_result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+func _on_reply(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	_set_busy(false)
+	if result != HTTPRequest.RESULT_SUCCESS or body.size() == 0:
+		_append("[color=#ff6b6b]（连不上后端，请先启动：cd Game/server && npm start）[/color]")
+		return
 	var data = JSON.parse_string(body.get_string_from_utf8())
 	if code != 200 or typeof(data) != TYPE_DICTIONARY or not data.has("reply"):
 		var emsg := ""
@@ -126,5 +134,6 @@ func _on_explore() -> void:
 func _set_busy(b: bool) -> void:
 	send_btn.disabled = b
 	input.editable = not b
+	status_label.text = "周明远正在回忆……" if b else ""
 	if not b:
 		input.grab_focus()
