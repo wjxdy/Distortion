@@ -17,7 +17,9 @@ export function extractReply(apiJson) {
 export async function callKimi(history) {
   const baseUrl = process.env.KIMI_BASE_URL || "https://api.moonshot.cn/v1";
   const apiKey = process.env.KIMI_API_KEY;
-  const model = process.env.KIMI_MODEL || "moonshot-v1-8k";
+  const model = process.env.KIMI_MODEL || "kimi-k2.6";
+  // kimi-k2.6 等推理模型只接受 temperature=1；默认 1，可用 KIMI_TEMPERATURE 覆盖。
+  const temperature = Number(process.env.KIMI_TEMPERATURE ?? 1);
   if (!apiKey) throw new Error("缺少环境变量 KIMI_API_KEY");
 
   // 月之暗面间歇性 429（引擎过载）/ 5xx 时自动重试，避免现场演示翻车。
@@ -32,7 +34,7 @@ export async function callKimi(history) {
         body: JSON.stringify({
           model,
           messages: buildMessages(history),
-          temperature: 0.8,
+          temperature,
         }),
       });
       if (!res.ok) {
