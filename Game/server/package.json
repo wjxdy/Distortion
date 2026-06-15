@@ -1,0 +1,10 @@
+{
+  "name": "distortion-server",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "《失真 Distortion》 LLM 代理后端（藏密钥，调月之暗面 Kimi）",
+  "scripts": {
+    "test": "node --test",
+    "start": "node src/server.js"
+  }
+}
