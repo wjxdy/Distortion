@@ -58,7 +58,6 @@ var zhou_wrap: Control
 var zhou_label: Label
 var last_user_msg := ""
 var type_tween: Tween
-var blip_timer: Timer
 var finished := false
 
 func _ready() -> void:
@@ -181,11 +180,6 @@ func _build_ui() -> void:
 	http = HTTPRequest.new()
 	add_child(http)
 	http.request_completed.connect(_on_reply)
-
-	blip_timer = Timer.new()
-	blip_timer.wait_time = 0.05
-	blip_timer.timeout.connect(func() -> void: Sfx.play_blip())
-	add_child(blip_timer)
 
 	input.grab_focus()
 
@@ -343,12 +337,10 @@ func _show_zhou_bubble(text: String) -> void:
 
 func _typewriter(label: Label, full: String) -> void:
 	var dur: float = clampf(full.length() * 0.04, 0.4, 2.6)
-	blip_timer.start()
 	if type_tween and type_tween.is_valid():
 		type_tween.kill()
 	type_tween = create_tween()
 	type_tween.tween_property(label, "visible_ratio", 1.0, dur)
-	type_tween.tween_callback(func() -> void: blip_timer.stop())
 
 # ---------- 对话流程 ----------
 

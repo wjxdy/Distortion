@@ -28,7 +28,6 @@ var text_label: Label
 var hint: Label
 var type_tween: Tween
 var kb_tween: Tween
-var blip_timer: Timer
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）：例如 Sfx.play_bgm("res://audio/opening_theme.ogg")
@@ -75,12 +74,6 @@ func _ready() -> void:
 	hint.offset_bottom = -22
 	add_child(hint)
 
-	# 打字机的 blip 节拍器（仅打字期间运行）
-	blip_timer = Timer.new()
-	blip_timer.wait_time = 0.11
-	blip_timer.timeout.connect(func() -> void: Sfx.play_blip())
-	add_child(blip_timer)
-
 	_advance()
 
 func _advance() -> void:
@@ -118,7 +111,6 @@ func _type(full: String) -> void:
 	typing = true
 	hint.modulate.a = 0.0
 	var dur: float = clampf(full.length() * 0.045, 0.5, 3.0)
-	blip_timer.start()
 	if type_tween and type_tween.is_valid():
 		type_tween.kill()
 	type_tween = create_tween()
@@ -129,7 +121,6 @@ func _finish_typing() -> void:
 	if type_tween and type_tween.is_valid():
 		type_tween.kill()
 	text_label.visible_ratio = 1.0
-	blip_timer.stop()
 	typing = false
 	create_tween().tween_property(hint, "modulate:a", 0.3, 0.4)
 
@@ -137,7 +128,6 @@ func _show_phone() -> void:
 	phase = "phone"
 	text_label.hide()
 	hint.hide()
-	blip_timer.stop()
 	if kb_tween and kb_tween.is_valid():
 		kb_tween.kill()
 	bg.scale = Vector2(1.06, 1.06)
