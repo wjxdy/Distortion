@@ -39,9 +39,9 @@ const server = createServer((req, res) => {
     req.on("end", async () => {
       try {
         const { history } = JSON.parse(body || "{}");
-        const reply = await callKimi(Array.isArray(history) ? history : []);
+        const result = await callKimi(Array.isArray(history) ? history : []);
         res.writeHead(200, { ...CORS, "Content-Type": "application/json" });
-        res.end(JSON.stringify({ reply }));
+        res.end(JSON.stringify(result)); // { reply, emotion }
       } catch (e) {
         res.writeHead(500, { ...CORS, "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: String(e?.message || e) }));

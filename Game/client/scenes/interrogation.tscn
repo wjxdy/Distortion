@@ -18,7 +18,7 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bubble"]
-bg_color = Color(0, 0, 0, 0)
+bg_color = Color(0, 0, 0, 0.35)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3

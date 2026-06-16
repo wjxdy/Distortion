@@ -6,11 +6,26 @@ export function buildMessages(history) {
   return [{ role: "system", content: SYSTEM_PROMPT }, ...history];
 }
 
-// 从 OpenAI 兼容的响应里取出模型回复文本（去首尾空白）。结构异常则抛错。
+const EMOTIONS = new Set(["calm", "angry", "sinister", "sad"]);
+
+// 解析句首情绪标签 [calm]/[sad]/[angry]/[sinister]（兼容中文【】、大小写），
+// 拆成 { reply, emotion }。无标签或非法标签时 emotion 兜底 "calm"。
+export function parseReply(content) {
+  let text = String(content).trim();
+  let emotion = "calm";
+  const m = text.match(/^[\[【]\s*([a-zA-Z]+)\s*[\]】]\s*/);
+  if (m && EMOTIONS.has(m[1].toLowerCase())) {
+    emotion = m[1].toLowerCase();
+    text = text.slice(m[0].length).trim();
+  }
+  return { reply: text, emotion };
+}
+
+// 从 OpenAI 兼容的响应里取出模型回复，返回 { reply, emotion }。结构异常则抛错。
 export function extractReply(apiJson) {
   const content = apiJson?.choices?.[0]?.message?.content;
   if (typeof content !== "string") throw new Error("无法解析模型响应");
-  return content.trim();
+  return parseReply(content);
 }
 
 // 真实调用月之暗面 Kimi（OpenAI 兼容接口）：传入对话历史，返回老人的下一句回复。
