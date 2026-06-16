@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cvl1c13xjxgyl"
-path="res://.godot/imported/zhou_portrait.png-e3d48082a54e4e1d6336e1cde5014864.ctex"
+uid="uid://dduikwp68llmd"
+path="res://.godot/imported/zhou_emotions.png-79d902c82b17f6ae2e95a5e58b4ad46b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/zhou_portrait.png"
-dest_files=["res://.godot/imported/zhou_portrait.png-e3d48082a54e4e1d6336e1cde5014864.ctex"]
+source_file="res://art/zhou_emotions.png"
+dest_files=["res://.godot/imported/zhou_emotions.png-79d902c82b17f6ae2e95a5e58b4ad46b.ctex"]
 
 [params]
 

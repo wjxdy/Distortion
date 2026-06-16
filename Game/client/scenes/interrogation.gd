@@ -15,6 +15,12 @@ const COL_PLAYER := Color(0.12, 0.30, 0.46, 0.92)   # 你的气泡：冷蓝
 const COL_ZHOU := Color(0.17, 0.16, 0.14, 0.95)     # 他的气泡：暖灰
 const BUBBLE_W := 470.0
 
+# 周明远情绪精灵图：4 行情绪 × 4 列帧(慢速 idle，乒乓播放)，每格 256×192
+const EMO_SHEET := "res://art/zhou_emotions.png"
+const EMO_CW := 256
+const EMO_CH := 192
+const EMO_ROW := {"calm": 0, "angry": 1, "sinister": 2, "sad": 3}
+
 # 带尖三角（气泡的"尖尖"，指向说话人）
 class Tail extends Control:
 	var dir := "down"
@@ -33,6 +39,11 @@ var state
 var http: HTTPRequest
 
 var portrait: TextureRect
+var emo_frames := []      # emo_frames[row][col] = AtlasTexture
+var emo_row := 0
+var emo_frame := 0
+var emo_dir := 1
+var emo_timer: Timer
 var crack: TextureRect
 var status_label: Label
 var input: LineEdit
@@ -73,15 +84,31 @@ func _build_ui() -> void:
 	shade.color = Color(0, 0, 0, 0.28)
 	add_child(shade)
 
-	# 周明远立绘（坐对面，上方居中）
+	# 周明远立绘（坐对面，居中聚光处）—— 情绪精灵图，按表情切行、idle 乒乓播放
+	var sheet := load(EMO_SHEET)
+	for r in 4:
+		var row := []
+		for c in 4:
+			var at := AtlasTexture.new()
+			at.atlas = sheet
+			at.region = Rect2(c * EMO_CW, r * EMO_CH, EMO_CW, EMO_CH)
+			row.append(at)
+		emo_frames.append(row)
+
 	portrait = TextureRect.new()
-	portrait.texture = load("res://art/zhou_portrait.png")
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-	portrait.custom_minimum_size = Vector2(225, 300)
-	portrait.size = Vector2(225, 300)
-	portrait.position = Vector2((1280 - 225) * 0.5, 16)
+	portrait.custom_minimum_size = Vector2(340, 255)
+	portrait.size = Vector2(340, 255)
+	portrait.position = Vector2((1280 - 340) * 0.5, 40)
 	add_child(portrait)
+	_apply_emo_frame()
+
+	emo_timer = Timer.new()
+	emo_timer.wait_time = 0.32
+	emo_timer.timeout.connect(_emo_tick)
+	add_child(emo_timer)
+	emo_timer.start()
 
 	# 真相裂痕特效（覆盖在立绘上，初始隐藏）
 	crack = TextureRect.new()
@@ -214,6 +241,30 @@ func _log(line: String) -> void:
 func _toggle_backlog() -> void:
 	Sfx.play_click()
 	backlog_panel.visible = not backlog_panel.visible
+
+# ---------- 情绪立绘 ----------
+
+func _apply_emo_frame() -> void:
+	portrait.texture = emo_frames[emo_row][emo_frame]
+
+func _emo_tick() -> void:
+	# 乒乓：0→1→2→3→2→1→0…（睁眼→闭眼来回，自然 idle）
+	emo_frame += emo_dir
+	if emo_frame >= 3:
+		emo_frame = 3
+		emo_dir = -1
+	elif emo_frame <= 0:
+		emo_frame = 0
+		emo_dir = 1
+	_apply_emo_frame()
+
+func _set_emotion(emo: String) -> void:
+	if not EMO_ROW.has(emo):
+		emo = "calm"
+	emo_row = EMO_ROW[emo]
+	emo_frame = 0
+	emo_dir = 1
+	_apply_emo_frame()
 
 # ---------- 气泡 ----------
 
@@ -348,6 +399,7 @@ func _check_truths() -> void:
 		state.reveal(id)
 		var frag := Triggers.fragment_of(id)
 		_log("[color=#ffd166]💥 " + frag + "[/color]")
+		_set_emotion("sad")   # 真相浮现 = 妻子之死，他陷入悲伤
 		_play_crack()
 		_banner("💥 " + frag, Color(1, 0.82, 0.4), 4.0)
 	if state.revealed.size() >= Content.TRUTHS.size():
@@ -422,3 +474,12 @@ func _play_crack() -> void:
 	tw.tween_interval(0.7)
 	tw.tween_property(crack, "modulate:a", 0.0, 0.8)
 	tw.tween_callback(func() -> void: crack.visible = false)
+
+func _input(event: InputEvent) -> void:
+	# 【临时调试】F1-F4 切换表情，方便验收效果；接好 LLM emotion 后可删
+	if event is InputEventKey and event.pressed and not event.echo:
+		match event.keycode:
+			KEY_F1: _set_emotion("calm")
+			KEY_F2: _set_emotion("angry")
+			KEY_F3: _set_emotion("sinister")
+			KEY_F4: _set_emotion("sad")

@@ -30,5 +30,6 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-16: 审讯室背景换成真·8 比特空房(`bg_police_room.png`，与立绘风格统一)；周明远改 4 情绪精灵图集 `zhou_emotions.png`(4 行 calm/angry/sinister/sad × 4 帧，256×192/格)，`interrogation.gd` 按行切表情、idle 乒乓播放、`_set_emotion()` 切换、真相浮现自动切"悲伤"；临时 F1-F4 调试键(验收后删)。删除被取代的旧 `zhou_portrait.png`。**待办**：让 LLM 输出 `{emotion,reply}` 驱动表情(后端那一小步)。
 - 2026-06-16: 接入 8 张像素美术（`Game/client/art/`）；重写 `opening.gd`（序幕接图 + Ken Burns 推镜 + 居中打字机 + 手机来电）与 `interrogation.gd`（Coffee Talk 式带尖气泡）。逻辑测试 12/12 通过，两场景无头加载无脚本错误，Godot 渲染截图自查开场/审讯/双气泡/手机屏均正常。
 - 2026-06-15: 读取项目文档和现有实现，初始化项目进度记忆。

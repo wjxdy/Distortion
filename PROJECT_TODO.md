@@ -7,6 +7,8 @@
 
 ## 进行中
 - [ ] MVP 核心审讯闭环打磨。
+- [ ] **让 AI 自己挑表情**：后端回复改 `{emotion,reply}`(枚举 calm/angry/sinister/sad + system prompt 规则)，客户端 `_set_emotion(data.emotion)` 接上(接口已备)，缺失兜底 calm。
+- [ ] 验收表情后删除 `interrogation.gd` 里的临时 F1-F4 调试键。
 
 ## 待确认
 - [ ] 赛事是否强制指定腾讯云产品、模型或部署方式。
