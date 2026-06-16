@@ -1,6 +1,6 @@
 # 审讯场景逻辑：Coffee Talk 式面对面对话。
-# 静态界面（背景/立绘/裂痕/标题/输入栏/回看面板/Timer/Http）在 interrogation.tscn 里，可在编辑器调。
-# 动态部分（带尖气泡、横幅、情绪精灵切换、真相演出）留在这里。
+# 静态界面（背景/立绘/裂痕/标题/输入栏/回看面板/两个气泡/Timer/Http）在 interrogation.tscn 里，
+# 可在编辑器里拖位置、拉大小。脚本只负责逻辑 + 往气泡填字 + 打字机 + 情绪/真相演出。
 # 游戏逻辑(钥匙/钩子/真相)沿用 game/*。
 extends Control
 
@@ -11,38 +11,17 @@ const Explore = preload("res://game/explore.gd")
 
 const BACKEND_URL := "http://localhost:8787/chat"
 
-const COL_PLAYER := Color(0.12, 0.30, 0.46, 0.92)   # 你的气泡：冷蓝
-const COL_ZHOU := Color(0.17, 0.16, 0.14, 0.95)     # 他的气泡：暖灰
-const BUBBLE_W := 470.0
-
 # 周明远情绪精灵图：4 行情绪 × 4 列帧(慢速 idle，乒乓播放)，每格 256×192
 const EMO_SHEET := "res://art/zhou_emotions.png"
 const EMO_CW := 256
 const EMO_CH := 192
 const EMO_ROW := {"calm": 0, "angry": 1, "sinister": 2, "sad": 3}
 
-# 带尖三角（气泡的"尖尖"，指向说话人）
-class Tail extends Control:
-	var dir := "down"
-	var col := Color.WHITE
-	func _draw() -> void:
-		var w := 22.0
-		var h := 14.0
-		var pts: PackedVector2Array
-		if dir == "down":
-			pts = PackedVector2Array([Vector2(0, 0), Vector2(w, 0), Vector2(w * 0.5, h)])
-		else:
-			pts = PackedVector2Array([Vector2(0, h), Vector2(w, h), Vector2(w * 0.5, 0)])
-		draw_colored_polygon(pts, col)
-
 var state
 var emo_frames := []      # emo_frames[row][col] = AtlasTexture
 var emo_row := 0
 var emo_frame := 0
 var emo_dir := 1
-var player_wrap: Control
-var zhou_wrap: Control
-var zhou_label: Label
 var last_user_msg := ""
 var type_tween: Tween
 var finished := false
@@ -57,6 +36,10 @@ var finished := false
 @onready var backlog_panel: Panel = $BacklogPanel
 @onready var backlog_label: RichTextLabel = $BacklogPanel/Margin/VBox/BacklogLabel
 @onready var close_btn: Button = $BacklogPanel/Margin/VBox/CloseBtn
+@onready var zhou_bubble: Panel = $ZhouBubble
+@onready var zhou_label: Label = $ZhouBubble/Margin/Label
+@onready var player_bubble: Panel = $PlayerBubble
+@onready var player_label: Label = $PlayerBubble/Margin/Label
 @onready var emo_timer: Timer = $EmoTimer
 @onready var http: HTTPRequest = $Http
 
@@ -122,79 +105,17 @@ func _set_emotion(emo: String) -> void:
 	emo_dir = 1
 	_apply_emo_frame()
 
-# ---------- 气泡 ----------
-
-func _new_bubble(tail_dir: String, col: Color) -> Dictionary:
-	var wrap := Control.new()
-	wrap.set_anchors_preset(Control.PRESET_FULL_RECT)
-	wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	var panel := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = col
-	sb.set_corner_radius_all(14)
-	sb.border_width_left = 2
-	sb.border_width_top = 2
-	sb.border_width_right = 2
-	sb.border_width_bottom = 2
-	sb.border_color = Color(1, 1, 1, 0.18)
-	sb.content_margin_left = 18
-	sb.content_margin_right = 18
-	sb.content_margin_top = 13
-	sb.content_margin_bottom = 13
-	panel.add_theme_stylebox_override("panel", sb)
-
-	var label := Label.new()
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.custom_minimum_size = Vector2(BUBBLE_W, 0)
-	label.add_theme_font_size_override("font_size", 22)
-	label.add_theme_color_override("font_color", Color(0.96, 0.96, 0.98))
-	label.add_theme_constant_override("line_spacing", 6)
-	panel.add_child(label)
-
-	var tail := Tail.new()
-	tail.dir = tail_dir
-	tail.col = col
-	tail.size = Vector2(22, 14)
-	tail.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	wrap.add_child(panel)
-	wrap.add_child(tail)
-	add_child(wrap)
-	return {"wrap": wrap, "panel": panel, "label": label, "tail": tail}
-
-func _place_bubble(b: Dictionary, mode: String) -> void:
-	var panel: PanelContainer = b["panel"]
-	var tail: Tail = b["tail"]
-	var sz := panel.get_combined_minimum_size()
-	panel.size = sz
-	var x := (1280.0 - sz.x) * 0.5
-	if mode == "top":
-		var y := 330.0
-		panel.position = Vector2(x, y)
-		tail.position = Vector2(x + sz.x * 0.5 - 11.0, y - 13.0)
-	else:
-		var y := 720.0 - 150.0 - sz.y
-		panel.position = Vector2(x, y)
-		tail.position = Vector2(x + sz.x * 0.5 - 11.0, y + sz.y - 1.0)
+# ---------- 气泡（位置/大小在 .tscn 里调，这里只填字 + 显隐 + 打字机） ----------
 
 func _show_player_bubble(text: String) -> void:
-	if is_instance_valid(player_wrap):
-		player_wrap.queue_free()
-	var b := _new_bubble("down", COL_PLAYER)
-	player_wrap = b["wrap"]
-	b["label"].text = text          # 玩家自己写的，整段直接显示
-	_place_bubble.call_deferred(b, "bottom")
+	player_bubble.visible = true
+	player_label.text = text          # 玩家自己写的，整段直接显示
+	player_label.visible_ratio = 1.0
 
 func _show_zhou_bubble(text: String) -> void:
-	if is_instance_valid(zhou_wrap):
-		zhou_wrap.queue_free()
-	var b := _new_bubble("up", COL_ZHOU)
-	zhou_wrap = b["wrap"]
-	zhou_label = b["label"]
+	zhou_bubble.visible = true
 	zhou_label.text = text
 	zhou_label.visible_ratio = 0.0
-	_place_bubble.call_deferred(b, "top")
 	_typewriter(zhou_label, text)
 
 func _typewriter(label: Label, full: String) -> void:
@@ -218,8 +139,7 @@ func _send() -> void:
 	last_user_msg = msg
 	Sfx.play_click()
 	_show_player_bubble(msg)
-	if is_instance_valid(zhou_wrap):
-		zhou_wrap.queue_free()        # 切到新一轮：清掉他上一句气泡
+	zhou_bubble.visible = false        # 切到新一轮：清掉他上一句气泡
 	_log("[color=#8fd0ff]你：[/color]" + msg)
 	state.add_to_history("user", msg)
 	input.text = ""
