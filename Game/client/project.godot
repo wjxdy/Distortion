@@ -25,6 +25,10 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
 
+[gui]
+
+theme/custom_font="res://fonts/zpix.ttf"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

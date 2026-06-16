@@ -30,6 +30,7 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-16: 全局换**像素字体**——接入 Zpix「最像素」(`fonts/zpix.ttf`，含中文 22238 字形)，`project.godot` 设 `gui/theme/custom_font` 为项目默认字体；字体导入关抗锯齿/子像素、过采样 1:1 保持锐利。整套 UI(标题/气泡/按钮/旁白)与 8 比特美术统一。
 - 2026-06-16: 审讯两个气泡(ZhouBubble/PlayerBubble)改为**场景节点**，可在编辑器拖位置/拉大小；尖尖用 `scenes/tail.gd`(@tool, dir/color 可调)。取舍：气泡不再随文字自动缩放，尺寸由编辑器设定。立绘位置用户已在编辑器下移。
 - 2026-06-16: 把开场/审讯两场景从「纯代码搭 UI」**重构为常规编辑器节点式**——静态结构(背景/立绘/裂痕/标题/输入栏/按钮/回看面板/手机任务屏/Timer/Http)写进 `.tscn`，编辑器里可见可拖可调；脚本只留逻辑 + 动态部分(气泡/横幅/情绪切换/打字机/Ken Burns)。行为与重构前一致(截图比对通过)，`_on_reply` 已预留 `emotion` 字段读取。另外去掉了打字机逐字 blip 音效。
 - 2026-06-16: 审讯室背景换成真·8 比特空房(`bg_police_room.png`，与立绘风格统一)；周明远改 4 情绪精灵图集 `zhou_emotions.png`(4 行 calm/angry/sinister/sad × 4 帧，256×192/格)，`interrogation.gd` 按行切表情、idle 乒乓播放、`_set_emotion()` 切换、真相浮现自动切"悲伤"；临时 F1-F4 调试键(验收后删)。删除被取代的旧 `zhou_portrait.png`。**待办**：让 LLM 输出 `{emotion,reply}` 驱动表情(后端那一小步)。
