@@ -1,0 +1,102 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/police.gd" id="1_police"]
+
+[node name="Police" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_police")
+
+[node name="Bg" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.098, 0.125, 0.149, 1)
+
+[node name="Ground" type="ColorRect" parent="."]
+layout_mode = 0
+offset_top = 600.0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.184, 0.196, 0.212, 1)
+
+[node name="Exit" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 70.0
+offset_top = 380.0
+offset_right = 200.0
+offset_bottom = 600.0
+color = Color(0.22, 0.22, 0.26, 1)
+
+[node name="ExitLabel" type="Label" parent="Exit"]
+layout_mode = 0
+offset_right = 130.0
+offset_bottom = 220.0
+theme_override_font_sizes/font_size = 22
+text = "← 街道"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Interrogation" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 300.0
+offset_right = 460.0
+offset_bottom = 600.0
+color = Color(0.298, 0.341, 0.502, 1)
+
+[node name="InterrogationLabel" type="Label" parent="Interrogation"]
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 28
+text = "审讯室
+[占位]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Terminal" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 320.0
+offset_right = 1000.0
+offset_bottom = 600.0
+color = Color(0.282, 0.4, 0.349, 1)
+
+[node name="TerminalLabel" type="Label" parent="Terminal"]
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 280.0
+theme_override_font_sizes/font_size = 28
+text = "终端室
+[占位]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 596.0
+offset_top = 504.0
+offset_right = 644.0
+offset_bottom = 600.0
+color = Color(0.298, 0.847, 0.847, 1)
+
+[node name="Hint" type="Label" parent="."]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 28.0
+offset_right = 1240.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 22
+text = "警局内部     ← → 移动     ↑ 进入门口 / 返回"
+horizontal_alignment = 1
+
+[node name="Prompt" type="Label" parent="."]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 32.0
+theme_override_font_sizes/font_size = 22
+text = "↑ 进入"
+horizontal_alignment = 1

@@ -91,10 +91,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = -90.0
-offset_right = -22.0
-offset_bottom = -66.0
+offset_left = 22.0
+offset_top = -138.0
+offset_right = -20.0
+offset_bottom = -114.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
@@ -281,6 +281,20 @@ scroll_following = true
 [node name="CloseBtn" type="Button" parent="BacklogPanel/Margin/VBox" unique_id=1170137289]
 layout_mode = 2
 text = "关闭"
+
+[node name="BackBtn" type="Button" parent="." unique_id=1540785089]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = -141.0
+offset_right = 147.0
+offset_bottom = -101.0
+grow_vertical = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "返回走廊"
 
 [node name="EmoTimer" type="Timer" parent="." unique_id=2038567360]
 wait_time = 0.32

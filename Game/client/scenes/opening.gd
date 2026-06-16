@@ -3,7 +3,7 @@
 # 动态部分（背景切换、逐字打字、Ken Burns）留在这里。
 extends Control
 
-const INTERROGATION := "res://scenes/interrogation.tscn"
+const WORLD := "res://scenes/world.tscn"
 
 # 序·谜。每条：text 文案；img 背景路径（连续同图则不重载，推镜延续）。
 var beats := [
@@ -32,7 +32,7 @@ var kb_tween: Tween
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）：例如 Sfx.play_bgm("res://audio/opening_theme.ogg")
-	go_btn.pressed.connect(_go_interrogation)
+	go_btn.pressed.connect(_go_world)
 	_advance()
 
 func _advance() -> void:
@@ -93,9 +93,9 @@ func _show_phone() -> void:
 	shade.color = Color(0, 0, 0, 0.62)
 	phone.visible = true
 
-func _go_interrogation() -> void:
+func _go_world() -> void:
 	Sfx.play_click()
-	get_tree().change_scene_to_file(INTERROGATION)
+	get_tree().change_scene_to_file(WORLD)
 
 func _input(event: InputEvent) -> void:
 	if phase != "slides":

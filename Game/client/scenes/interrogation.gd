@@ -10,6 +10,7 @@ const Triggers = preload("res://game/triggers.gd")
 const Explore = preload("res://game/explore.gd")
 
 const BACKEND_URL := "http://localhost:8787/chat"
+const POLICE := "res://scenes/police.tscn"
 
 # 周明远情绪精灵图：4 行情绪 × 4 列帧(慢速 idle，乒乓播放)，每格 256×192
 const EMO_SHEET := "res://art/zhou_emotions.png"
@@ -42,6 +43,7 @@ var finished := false
 @onready var player_label: Label = $PlayerBubble/Margin/Content
 @onready var emo_timer: Timer = $EmoTimer
 @onready var http: HTTPRequest = $Http
+@onready var back_btn: Button = $BackBtn
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）：例如 Sfx.play_bgm("res://audio/interrogation_theme.ogg")
@@ -67,6 +69,7 @@ func _ready() -> void:
 	input.text_submitted.connect(_on_submit)
 	emo_timer.timeout.connect(_emo_tick)
 	http.request_completed.connect(_on_reply)
+	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
 	input.grab_focus()
 
 	_log("[color=#888][案情] 老人周明远，行为异常，疑似 AI 被劫持。问出真相。[/color]")
@@ -253,7 +256,15 @@ func _play_crack() -> void:
 	tw.tween_property(crack, "modulate:a", 0.0, 0.8)
 	tw.tween_callback(func() -> void: crack.visible = false)
 
+func _back() -> void:
+	Sfx.play_click()
+	get_tree().change_scene_to_file(POLICE)
+
 func _input(event: InputEvent) -> void:
+	# Esc 返回警局走廊
+	if event.is_action_pressed("ui_cancel"):
+		_back()
+		return
 	# 【临时调试】F1-F4 切换表情，方便验收效果；接好 LLM emotion 后可删
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:

@@ -1,0 +1,97 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/world.gd" id="1_world"]
+
+[node name="World" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_world")
+
+[node name="Bg" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.082, 0.094, 0.137, 1)
+
+[node name="Ground" type="ColorRect" parent="."]
+layout_mode = 0
+offset_top = 600.0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.157, 0.157, 0.204, 1)
+
+[node name="Police" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 240.0
+offset_top = 300.0
+offset_right = 440.0
+offset_bottom = 600.0
+color = Color(0.298, 0.341, 0.502, 1)
+
+[node name="PoliceLabel" type="Label" parent="Police"]
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 28
+text = "警察局
+[占位]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Community" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 840.0
+offset_top = 320.0
+offset_right = 1060.0
+offset_bottom = 600.0
+color = Color(0.4, 0.341, 0.282, 1)
+
+[node name="CommunityLabel" type="Label" parent="Community"]
+layout_mode = 0
+offset_right = 220.0
+offset_bottom = 280.0
+theme_override_font_sizes/font_size = 28
+text = "小区
+[占位·暂未开放]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 616.0
+offset_top = 504.0
+offset_right = 664.0
+offset_bottom = 600.0
+color = Color(0.298, 0.847, 0.847, 1)
+
+[node name="Hint" type="Label" parent="."]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 28.0
+offset_right = 1240.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 22
+text = "← → 移动     ↑ 进入门口"
+horizontal_alignment = 1
+
+[node name="Prompt" type="Label" parent="."]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 32.0
+theme_override_font_sizes/font_size = 22
+text = "↑ 进入"
+horizontal_alignment = 1
+
+[node name="Toast" type="Label" parent="."]
+layout_mode = 0
+offset_left = 340.0
+offset_top = 150.0
+offset_right = 940.0
+offset_bottom = 200.0
+theme_override_colors/font_color = Color(1, 0.82, 0.4, 1)
+theme_override_font_sizes/font_size = 26
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
