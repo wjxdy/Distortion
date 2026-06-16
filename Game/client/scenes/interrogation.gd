@@ -1,7 +1,7 @@
-# 审讯场景：Coffee Talk 式面对面对话。
-# 背景(审讯室) + 周明远立绘(坐对面) + 带尖气泡(你的尖朝下 / 他的尖朝上)
-# + 右下角自由输入框 + 回看记录(backlog) + fx_crack 真相演出。
-# 游戏逻辑(钥匙/钩子/真相)沿用 game/*，UI 全代码创建。
+# 审讯场景逻辑：Coffee Talk 式面对面对话。
+# 静态界面（背景/立绘/裂痕/标题/输入栏/回看面板/Timer/Http）在 interrogation.tscn 里，可在编辑器调。
+# 动态部分（带尖气泡、横幅、情绪精灵切换、真相演出）留在这里。
+# 游戏逻辑(钥匙/钩子/真相)沿用 game/*。
 extends Control
 
 const GameState = preload("res://game/game_state.gd")
@@ -36,23 +36,10 @@ class Tail extends Control:
 		draw_colored_polygon(pts, col)
 
 var state
-var http: HTTPRequest
-
-var portrait: TextureRect
 var emo_frames := []      # emo_frames[row][col] = AtlasTexture
 var emo_row := 0
 var emo_frame := 0
 var emo_dir := 1
-var emo_timer: Timer
-var crack: TextureRect
-var status_label: Label
-var input: LineEdit
-var send_btn: Button
-var explore_btn: Button
-var backlog_btn: Button
-var backlog_panel: Panel
-var backlog_label: RichTextLabel
-
 var player_wrap: Control
 var zhou_wrap: Control
 var zhou_label: Label
@@ -60,30 +47,24 @@ var last_user_msg := ""
 var type_tween: Tween
 var finished := false
 
+@onready var portrait: TextureRect = $Portrait
+@onready var crack: TextureRect = $Crack
+@onready var status_label: Label = $Status
+@onready var input: LineEdit = $Bar/Input
+@onready var send_btn: Button = $Bar/SendBtn
+@onready var explore_btn: Button = $Bar/ExploreBtn
+@onready var backlog_btn: Button = $Bar/BacklogBtn
+@onready var backlog_panel: Panel = $BacklogPanel
+@onready var backlog_label: RichTextLabel = $BacklogPanel/Margin/VBox/BacklogLabel
+@onready var close_btn: Button = $BacklogPanel/Margin/VBox/CloseBtn
+@onready var emo_timer: Timer = $EmoTimer
+@onready var http: HTTPRequest = $Http
+
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）：例如 Sfx.play_bgm("res://audio/interrogation_theme.ogg")
 	state = GameState.new()
-	_build_ui()
-	_log("[color=#888][案情] 老人周明远，行为异常，疑似 AI 被劫持。问出真相。[/color]")
-	_log("[color=#888][提示] 直接打字盘问。撞墙了？点【查档案】拿线索，再回来追问。[/color]")
-	# 审讯开场：周明远本人喃喃自语（记忆错乱当场可见）
-	_show_zhou_bubble("今天……是几号了。\n她出门有一会儿了，怎么还不回来。")
 
-func _build_ui() -> void:
-	# 背景（审讯室）
-	var bg := TextureRect.new()
-	bg.texture = load("res://art/bg_police_room.png")
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	add_child(bg)
-
-	var shade := ColorRect.new()
-	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
-	shade.color = Color(0, 0, 0, 0.28)
-	add_child(shade)
-
-	# 周明远立绘（坐对面，居中聚光处）—— 情绪精灵图，按表情切行、idle 乒乓播放
+	# 情绪精灵图切片：emo_frames[row][col]
 	var sheet := load(EMO_SHEET)
 	for r in 4:
 		var row := []
@@ -93,141 +74,22 @@ func _build_ui() -> void:
 			at.region = Rect2(c * EMO_CW, r * EMO_CH, EMO_CW, EMO_CH)
 			row.append(at)
 		emo_frames.append(row)
-
-	portrait = TextureRect.new()
-	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-	portrait.custom_minimum_size = Vector2(340, 255)
-	portrait.size = Vector2(340, 255)
-	portrait.position = Vector2((1280 - 340) * 0.5, 40)
-	add_child(portrait)
 	_apply_emo_frame()
 
-	emo_timer = Timer.new()
-	emo_timer.wait_time = 0.32
-	emo_timer.timeout.connect(_emo_tick)
-	add_child(emo_timer)
-	emo_timer.start()
-
-	# 真相裂痕特效（覆盖在立绘上，初始隐藏）
-	crack = TextureRect.new()
-	crack.texture = load("res://art/fx_crack.png")
-	crack.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	crack.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-	crack.custom_minimum_size = Vector2(360, 360)
-	crack.size = Vector2(360, 360)
-	crack.position = Vector2(640 - 180, 200 - 180)
-	crack.pivot_offset = Vector2(180, 180)
-	crack.visible = false
-	add_child(crack)
-
-	# 顶部标题
-	var title := Label.new()
-	title.text = "审讯室 · 周明远"
-	title.add_theme_color_override("font_color", Color(0.85, 0.88, 0.95))
-	title.position = Vector2(24, 18)
-	add_child(title)
-
-	# 状态行（右下，输入框上方）
-	status_label = Label.new()
-	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	status_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	status_label.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	status_label.offset_left = 20
-	status_label.offset_right = -22
-	status_label.offset_top = -90
-	status_label.offset_bottom = -66
-	add_child(status_label)
-
-	# 底部操作栏：[查档案][回看记录] …… [输入框][盘问]（输入框在右下角）
-	var bar := HBoxContainer.new()
-	bar.add_theme_constant_override("separation", 8)
-	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	bar.offset_left = 20
-	bar.offset_right = -20
-	bar.offset_top = -56
-	bar.offset_bottom = -14
-	add_child(bar)
-
-	explore_btn = Button.new()
-	explore_btn.text = "查档案"
+	# 连信号
 	explore_btn.pressed.connect(_on_explore)
-	bar.add_child(explore_btn)
-
-	backlog_btn = Button.new()
-	backlog_btn.text = "📜 回看记录"
 	backlog_btn.pressed.connect(_toggle_backlog)
-	bar.add_child(backlog_btn)
-
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bar.add_child(spacer)
-
-	input = LineEdit.new()
-	input.placeholder_text = "盘问他……（回车发送）"
-	input.custom_minimum_size = Vector2(440, 0)
-	input.text_submitted.connect(_on_submit)
-	bar.add_child(input)
-
-	send_btn = Button.new()
-	send_btn.text = "盘问"
+	close_btn.pressed.connect(_toggle_backlog)
 	send_btn.pressed.connect(_send)
-	bar.add_child(send_btn)
-
-	# 回看记录面板（初始隐藏）
-	_build_backlog_panel()
-
-	http = HTTPRequest.new()
-	add_child(http)
+	input.text_submitted.connect(_on_submit)
+	emo_timer.timeout.connect(_emo_tick)
 	http.request_completed.connect(_on_reply)
-
 	input.grab_focus()
 
-func _build_backlog_panel() -> void:
-	backlog_panel = Panel.new()
-	backlog_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backlog_panel.offset_left = 120
-	backlog_panel.offset_right = -120
-	backlog_panel.offset_top = 60
-	backlog_panel.offset_bottom = -80
-	backlog_panel.visible = false
-	add_child(backlog_panel)
-
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.03, 0.04, 0.06, 0.97)
-	sb.set_corner_radius_all(10)
-	sb.border_width_left = 2
-	sb.border_width_top = 2
-	sb.border_width_right = 2
-	sb.border_width_bottom = 2
-	sb.border_color = Color(0.4, 0.6, 0.8, 0.6)
-	backlog_panel.add_theme_stylebox_override("panel", sb)
-
-	var m := MarginContainer.new()
-	m.set_anchors_preset(Control.PRESET_FULL_RECT)
-	for k in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
-		m.add_theme_constant_override(k, 20)
-	backlog_panel.add_child(m)
-
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 10)
-	m.add_child(v)
-
-	var head := Label.new()
-	head.text = "📜 对话记录（找出他前后矛盾的话）"
-	head.add_theme_color_override("font_color", Color(0.8, 0.88, 1.0))
-	v.add_child(head)
-
-	backlog_label = RichTextLabel.new()
-	backlog_label.bbcode_enabled = true
-	backlog_label.scroll_following = true
-	backlog_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	v.add_child(backlog_label)
-
-	var close := Button.new()
-	close.text = "关闭"
-	close.pressed.connect(_toggle_backlog)
-	v.add_child(close)
+	_log("[color=#888][案情] 老人周明远，行为异常，疑似 AI 被劫持。问出真相。[/color]")
+	_log("[color=#888][提示] 直接打字盘问。撞墙了？点【查档案】拿线索，再回来追问。[/color]")
+	# 审讯开场：周明远本人喃喃自语（记忆错乱当场可见）
+	_show_zhou_bubble("今天……是几号了。\n她出门有一会儿了，怎么还不回来。")
 
 func _log(line: String) -> void:
 	backlog_label.append_text(line + "\n\n")
@@ -380,6 +242,9 @@ func _on_reply(result: int, code: int, _headers: PackedStringArray, body: Packed
 			emsg = str(data["error"])
 		_banner("出错 %d %s" % [code, emsg], Color(1, 0.45, 0.45))
 		return
+	# 表情：后端若返回 emotion 则按它切，缺省 calm（接 LLM emotion 即生效）
+	if typeof(data) == TYPE_DICTIONARY and data.has("emotion"):
+		_set_emotion(str(data["emotion"]))
 	var reply := str(data["reply"])
 	_show_zhou_bubble(reply)
 	_log("[color=#e8e1c8]周明远：[/color]" + reply)
@@ -421,6 +286,7 @@ func _banner(text: String, col: Color, hold: float = 3.0) -> void:
 	var cc := CenterContainer.new()
 	cc.set_anchors_preset(Control.PRESET_FULL_RECT)
 	cc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cc.z_index = 60
 	add_child(cc)
 
 	var panel := PanelContainer.new()
