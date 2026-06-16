@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>失真 · 外部世界横版街区 Mock</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0b0d10;
+      color: #e7edf5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 28px; }
+    h1 { margin: 0 0 8px; font-size: 26px; }
+    p { color: #9aa6b2; line-height: 1.6; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-top: 22px; }
+    .card { border: 1px solid #29313a; background: #12161b; border-radius: 10px; overflow: hidden; }
+    .card h2 { margin: 16px 18px 4px; font-size: 20px; }
+    .card p { margin: 0 18px 18px; }
+    .scene {
+      height: 260px;
+      margin: 16px 18px;
+      border: 3px solid #050608;
+      position: relative;
+      overflow: hidden;
+      background: #101318;
+      image-rendering: pixelated;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .sky { position:absolute; left:0; right:0; top:0; height:78px; background:#080b11; }
+    .street { position:absolute; left:0; right:0; bottom:0; height:58px; background:#23262a; border-top:6px solid #050608; }
+    .building { position:absolute; bottom:58px; background:#1a1f25; border:5px solid #050608; box-sizing:border-box; }
+    .door { position:absolute; bottom:58px; width:24px; height:38px; background:#d8dde2; box-shadow: 0 0 0 5px #050608; }
+    .label { position:absolute; color:#dce8f0; font-size:14px; letter-spacing:1px; text-shadow: 2px 2px 0 #050608; }
+    .player { position:absolute; bottom:62px; width:18px; height:34px; background:#d8dde2; box-shadow: 0 0 0 4px #050608; }
+    .neon-cyan { color:#6fe7ef; }
+    .neon-violet { color:#b68cff; }
+    .neon-amber { color:#d2a45d; }
+    .hint { position:absolute; bottom:8px; left:18px; color:#7f8994; font-size:13px; }
+    .enter { position:absolute; bottom:104px; color:#7be1e8; font-size:13px; }
+    .rain { position:absolute; inset:0; opacity:.22; background: repeating-linear-gradient(110deg, transparent 0 18px, #6f8490 19px 21px, transparent 22px 36px); }
+    .panel { position:absolute; background:#080a0d; border:4px solid #050608; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>《失真》外部世界：2D 横版街区 Hub</h1>
+  <p>主角只能左右走。走到门/入口前，按“上”进入调查点。下面是结构 mock，不是最终美术。</p>
+
+  <div class="grid">
+    <section class="card">
+      <h2>A. 警局一条街：最小 MVP</h2>
+      <div class="scene">
+        <div class="sky"></div><div class="rain"></div><div class="street"></div>
+        <div class="building" style="left:24px;width:190px;height:140px"></div>
+        <div class="label neon-cyan" style="left:54px;bottom:150px">第七区警局</div>
+        <div class="door" style="left:104px"></div><div class="enter" style="left:70px">↑ 进入大厅</div>
+
+        <div class="building" style="left:286px;width:180px;height:108px;background:#151a1e"></div>
+        <div class="label neon-amber" style="left:326px;bottom:132px">证物室</div>
+        <div class="door" style="left:426px"></div><div class="enter" style="left:342px">↑ 查档案</div>
+
+        <div class="building" style="left:540px;width:210px;height:126px;background:#1b1e25"></div>
+        <div class="label neon-violet" style="left:578px;bottom:142px">审讯室入口</div>
+        <div class="door" style="left:700px"></div><div class="enter" style="left:602px">↑ 审讯</div>
+
+        <div class="building" style="left:830px;width:205px;height:104px;background:#11161a"></div>
+        <div class="label neon-cyan" style="left:870px;bottom:130px">警局终端</div>
+        <div class="door" style="left:984px"></div><div class="enter" style="left:876px">↑ 调记录</div>
+        <div class="player" style="left:520px"></div>
+        <div class="hint">短、稳、闭环强：所有调查都发生在警局附近。</div>
+      </div>
+      <p>优点：开发量最小，最容易服务“审讯-取证-再审讯”的 MVP 闭环。缺点：世界感稍弱。</p>
+    </section>
+
+    <section class="card">
+      <h2>B. 城市调查街：推荐方向</h2>
+      <div class="scene" style="background:#0b1018">
+        <div class="sky" style="height:96px;background:#080b13"></div><div class="rain"></div><div class="street"></div>
+        <div class="building" style="left:24px;width:170px;height:112px;background:#151c24"></div>
+        <div class="label neon-cyan" style="left:52px;bottom:134px">AI 便利站</div>
+        <div class="door" style="left:156px"></div><div class="enter" style="left:58px">↑ 问系统</div>
+
+        <div class="building" style="left:270px;width:210px;height:148px;background:#171b22"></div>
+        <div class="label neon-violet" style="left:304px;bottom:158px">记忆维修铺</div>
+        <div class="door" style="left:438px"></div><div class="enter" style="left:318px">↑ 查莫忘</div>
+
+        <div class="building" style="left:560px;width:206px;height:132px;background:#22262b"></div>
+        <div class="label" style="left:602px;bottom:150px">第七区警局</div>
+        <div class="door" style="left:726px"></div><div class="enter" style="left:618px">↑ 审讯</div>
+
+        <div class="building" style="left:850px;width:200px;height:104px;background:#151719"></div>
+        <div class="label neon-amber" style="left:894px;bottom:132px">旧新闻亭</div>
+        <div class="door" style="left:1010px"></div><div class="enter" style="left:890px">↑ 查旧闻</div>
+        <div class="player" style="left:536px"></div>
+        <div class="hint">一条短街，但有城市感：警局、维修铺、新闻亭、AI 服务点。</div>
+      </div>
+      <p>优点：最像“外面的世界”，也能自然产生线索。缺点：比 A 多 2-3 张室内/外立绘素材。</p>
+    </section>
+
+    <section class="card">
+      <h2>C. 记忆裂隙街：更悬疑</h2>
+      <div class="scene" style="background:#0d0c12">
+        <div class="sky" style="background:#050507"></div><div class="street"></div>
+        <div class="panel" style="left:40px;bottom:126px;width:120px;height:8px;background:#824cff"></div>
+        <div class="building" style="left:34px;width:200px;height:124px;background:#1c2023"></div>
+        <div class="label" style="left:66px;bottom:144px">周明远住处</div>
+        <div class="door" style="left:190px"></div><div class="enter" style="left:72px">↑ 旧家</div>
+
+        <div class="building" style="left:322px;width:214px;height:130px;background:#10171b"></div>
+        <div class="label neon-cyan" style="left:366px;bottom:150px">莫忘终端</div>
+        <div class="door" style="left:494px"></div><div class="enter" style="left:374px">↑ 记忆库</div>
+
+        <div class="building" style="left:620px;width:230px;height:154px;background:#19151f"></div>
+        <div class="label neon-violet" style="left:672px;bottom:166px">记忆裂隙</div>
+        <div class="door" style="left:810px"></div><div class="enter" style="left:684px">↑ 进入异常</div>
+
+        <div class="building" style="left:930px;width:170px;height:106px;background:#202226"></div>
+        <div class="label" style="left:986px;bottom:132px">警局</div>
+        <div class="door" style="left:1066px"></div>
+        <div class="player" style="left:578px"></div>
+        <div class="hint">现实街区和记忆空间混合，氛围最强，但最抽象。</div>
+      </div>
+      <p>优点：很有《失真》的题眼。缺点：玩家可能不如 B 那么快理解“我要去哪找线索”。</p>
+    </section>
+  </div>
+</main>
+</body>
+</html>
