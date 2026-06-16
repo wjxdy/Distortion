@@ -37,9 +37,9 @@ var finished := false
 @onready var backlog_label: RichTextLabel = $BacklogPanel/Margin/VBox/BacklogLabel
 @onready var close_btn: Button = $BacklogPanel/Margin/VBox/CloseBtn
 @onready var zhou_bubble: Panel = $ZhouBubble
-@onready var zhou_label: Label = $ZhouBubble/Margin/Label
+@onready var zhou_label: Label = $ZhouBubble/Margin/VBox/Content
 @onready var player_bubble: Panel = $PlayerBubble
-@onready var player_label: Label = $PlayerBubble/Margin/Label
+@onready var player_label: Label = $PlayerBubble/Margin/Content
 @onready var emo_timer: Timer = $EmoTimer
 @onready var http: HTTPRequest = $Http
 
