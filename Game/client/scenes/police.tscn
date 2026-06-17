@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://b5i8kt7cg0ncr"]
 
 [ext_resource type="Script" uid="uid://c5q8ihm2egv18" path="res://scenes/police.gd" id="1_police"]
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="Texture2D" uid="uid://cxkq2en183yca" path="res://art/bg_police_corridor.png" id="3_bg"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
-size = Vector2(1300, 130)
+size = Vector2(1300, 120)
 
 [sub_resource type="RectangleShape2D" id="WallTall"]
 size = Vector2(70, 760)
@@ -33,11 +33,11 @@ texture = ExtResource("3_bg")
 [node name="Walls" type="StaticBody2D" parent="." unique_id=638362346]
 
 [node name="Top" type="CollisionShape2D" parent="Walls" unique_id=1689712092]
-position = Vector2(640, 550)
+position = Vector2(640, 526)
 shape = SubResource("WallWide")
 
 [node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=815100703]
-position = Vector2(640, 775)
+position = Vector2(640, 772)
 shape = SubResource("WallWide")
 
 [node name="Left" type="CollisionShape2D" parent="Walls" unique_id=584255393]
@@ -48,26 +48,27 @@ shape = SubResource("WallTall")
 position = Vector2(1255, 360)
 shape = SubResource("WallTall")
 
-[node name="ExitArea" type="Area2D" parent="."]
+[node name="ExitArea" type="Area2D" parent="." unique_id=1174620442]
 position = Vector2(130, 640)
 
-[node name="Col" type="CollisionShape2D" parent="ExitArea"]
+[node name="Col" type="CollisionShape2D" parent="ExitArea" unique_id=823731173]
 shape = SubResource("ExitZone")
 
-[node name="InterrogationArea" type="Area2D" parent="."]
+[node name="InterrogationArea" type="Area2D" parent="." unique_id=635523579]
 position = Vector2(420, 640)
 
-[node name="Col" type="CollisionShape2D" parent="InterrogationArea"]
+[node name="Col" type="CollisionShape2D" parent="InterrogationArea" unique_id=1857610201]
 shape = SubResource("DoorZone")
 
-[node name="TerminalArea" type="Area2D" parent="."]
+[node name="TerminalArea" type="Area2D" parent="." unique_id=1220408478]
 position = Vector2(1035, 640)
 
-[node name="Col" type="CollisionShape2D" parent="TerminalArea"]
+[node name="Col" type="CollisionShape2D" parent="TerminalArea" unique_id=1602348458]
 shape = SubResource("DoorZone")
 
 [node name="Player" parent="." unique_id=414641871 instance=ExtResource("2_player")]
-position = Vector2(150, 625)
+position = Vector2(150, 576)
+scale = Vector2(1.4, 1.4)
 
 [node name="Hint" type="Label" parent="." unique_id=1750110365]
 layout_mode = 0
