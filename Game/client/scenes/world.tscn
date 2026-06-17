@@ -55,11 +55,11 @@ texture = ExtResource("4_street")
 [node name="Walls" type="StaticBody2D" parent="."]
 
 [node name="Top" type="CollisionShape2D" parent="Walls"]
-position = Vector2(1280, 485)
+position = Vector2(1280, 410)
 shape = SubResource("WallWide")
 
 [node name="Bottom" type="CollisionShape2D" parent="Walls"]
-position = Vector2(1280, 780)
+position = Vector2(1280, 790)
 shape = SubResource("WallWide")
 
 [node name="Left" type="CollisionShape2D" parent="Walls"]
