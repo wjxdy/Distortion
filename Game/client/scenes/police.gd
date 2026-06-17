@@ -11,10 +11,14 @@ const TERMINAL := "res://scenes/terminal.tscn"
 @onready var exit_area: Area2D = $ExitArea
 @onready var interrogation_area: Area2D = $InterrogationArea
 @onready var terminal_area: Area2D = $TerminalArea
+@onready var phone: CanvasLayer = $Phone   # 走廊也能点开手机
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）
 	prompt.visible = false
+	# 看手机时锁住走动（与 world 一致）
+	phone.opened.connect(func() -> void: player.locked = true)
+	phone.closed.connect(func() -> void: player.locked = false)
 	_update_prompt()
 
 func _process(_delta: float) -> void:
