@@ -43,6 +43,15 @@ export function parseReply(content) {
     text = (text.slice(0, hm.index) + text.slice(hm.index + hm[0].length)).trim();
   }
 
+  // 提取并剥离隐藏结局标签 end:ID（仅四个合法值，非法当普通文本）。
+  let end = "";
+  const VALID_END = new Set(["ready", "reveal", "comfort", "leave"]);
+  const em = text.match(/[\[【]{1,2}\s*end\s*:\s*([A-Za-z]+)\s*[\]】]{1,2}/i);
+  if (em && VALID_END.has(em[1].toLowerCase())) {
+    end = em[1].toLowerCase();
+    text = (text.slice(0, em.index) + text.slice(em.index + em[0].length)).trim();
+  }
+
   // 句首情绪标签
   let emotion = "calm";
   const m = text.match(/^[\[【]\s*([a-zA-Z]+)\s*[\]】]\s*/);
@@ -51,7 +60,7 @@ export function parseReply(content) {
     text = text.slice(m[0].length).trim();
   }
 
-  return { reply: text, emotion, hint };
+  return { reply: text, emotion, hint, end };
 }
 
 // 从 OpenAI 兼容的响应里取出模型回复，返回 { reply, emotion }。结构异常则抛错。
