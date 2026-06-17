@@ -196,9 +196,7 @@ func _handle_hint(data) -> void:
 		return
 	var text := str(Content.MOWANG_HINTS[id])
 	if state.fire_hint(id, text):   # 只有首次触发才提示
-		Sfx.play_notify()           # 手机弹消息音效
-		phone.refresh_badge()
-		_banner("💬 莫忘：" + text, Color(0.55, 0.85, 1), 4.5)
+		phone.notify_hint()         # 响声 + 红点 + 右上角小字(详情在手机莫忘 app)
 
 func _check_truths() -> void:
 	for id in Triggers.evaluate(state, last_user_msg):

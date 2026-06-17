@@ -19,6 +19,9 @@ signal closed
 @onready var mowang_dot: ColorRect = $Screen/Body/AppList/MowangBtn/Dot
 @onready var close_btn: Button = $Screen/Body/AppList/CloseBtn
 @onready var display: Label = $Screen/Body/DisplayBg/Display
+@onready var toast: Label = $Toast
+
+var _toast_tween: Tween
 
 func _ready() -> void:
 	screen.visible = false
@@ -27,6 +30,25 @@ func _ready() -> void:
 	task_btn.pressed.connect(_show_task)
 	mowang_btn.pressed.connect(_show_mowang)
 	refresh_badge()
+
+# 新莫忘提醒来了：响一声 + 刷红点 + 右上角弹一条小字(只勾人去看手机，详情在莫忘 app)。
+func notify_hint() -> void:
+	Sfx.play_notify()
+	refresh_badge()
+	_show_toast("💬 莫忘：我想到点东西——看看手机")
+
+# 右上角小字提示：淡入→停留→淡出。纯文字带描边，不用气泡框。
+func _show_toast(msg: String) -> void:
+	toast.text = msg
+	toast.visible = true
+	toast.modulate.a = 0.0
+	if _toast_tween and _toast_tween.is_valid():
+		_toast_tween.kill()
+	_toast_tween = create_tween()
+	_toast_tween.tween_property(toast, "modulate:a", 1.0, 0.3)
+	_toast_tween.tween_interval(2.6)
+	_toast_tween.tween_property(toast, "modulate:a", 0.0, 0.6)
+	_toast_tween.tween_callback(func() -> void: toast.visible = false)
 
 # 外部(场景)在触发新提醒后调用，刷新红点。📱 红点 = 任务或莫忘任一未读。
 func refresh_badge() -> void:
