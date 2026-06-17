@@ -1,14 +1,17 @@
-# 主世界 · 街道。移动/动画由 Player.tscn(player.gd) 负责；本脚本只管门口提示与切场景。
-# 门口交互：走到 PoliceDoor / CommunityDoor 标记附近按 ↑ 进入（标记可在编辑器拖到门上）。
+# 主世界 · 宽幅滚动街道(2560 宽) HD-2D：相机跟随玩家横向滚动，远景/雾视差。
+# 移动/动画由 Player.tscn 负责；本脚本管相机跟随、雾漂移、门口提示与切场景。
+# 门口交互：人物碰撞体叠到 PoliceDoor / CommunityDoor 触发区(Area2D) + 按 W/↑ 进入。
 extends Control
 
 const POLICE := "res://scenes/police.tscn"
+const LEVEL_WIDTH := 2560.0
 
 @onready var player: CharacterBody2D = $Player
+@onready var camera: Camera2D = $Camera2D
 @onready var police_door: Area2D = $PoliceDoor
 @onready var community_door: Area2D = $CommunityDoor
 @onready var prompt: Label = $Prompt
-@onready var toast: Label = $Toast
+@onready var toast: Label = $UI/Toast
 
 var toast_tween: Tween
 
@@ -19,9 +22,12 @@ func _ready() -> void:
 	_update_prompt()
 
 func _process(_delta: float) -> void:
+	# 相机跟随玩家(水平)，夹在关卡两端不露边
+	camera.position.x = clampf(player.position.x, 640.0, LEVEL_WIDTH - 640.0)
+	camera.position.y = 360.0
 	if player.locked:
 		return
-	# 走到警局门口且按住 ↑/W → 进入
+	# 走到警局门口且按住 W/↑ → 进入
 	if _near(police_door) and Input.is_action_pressed("move_up"):
 		_enter_door(POLICE)
 		return
@@ -41,7 +47,8 @@ func _update_prompt() -> void:
 	else:
 		prompt.visible = false
 	if prompt.visible:
-		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 130.0)
+		# 提示是世界空间 Control，跟随玩家头顶(随相机一起滚)
+		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
 func _input(event: InputEvent) -> void:
 	if player.locked:

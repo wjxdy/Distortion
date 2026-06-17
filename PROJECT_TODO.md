@@ -1,6 +1,8 @@
 # 项目待办
 
 ## 下一步
+- [ ] 主世界街道 HD-2D 接入：待用户用 ChatGPT 生成 3 张分层图（`world_street_wide` 宽主街+上半透明 / `world_far_city` 远景 / `world_fog_overlay` 透明可平铺雾），放进 `art/` 后接 Camera2D 跟随 + ParallaxBackground(远景0.2/雾0.08) + 雨/霓虹 + 沿宽街重摆墙体/门位。
+- [ ] F5 调开场 2D 假 HD-2D 氛围：辉光阈值(Compatibility 下可能需调 `glow_hdr_threshold`)、暗角强度、雨/尘密度；不满意可关某节点。
 - [ ] 用 Godot 实机跑通新版完整流程（需后端在跑）：序幕 4 幕 -> 手机来电 -> 审讯气泡对话 -> 查档案 -> 追问蓝裙子/林秀兰 -> 真相裂痕 -> 结尾。重点看：气泡/尖尖位置、打字机手感、Ken Burns、真相 fx_crack 演出、回看记录。
 - [ ] 确认最终模型/云产品路线：继续用 Kimi/OpenAI 兼容接口，还是改回腾讯云大模型 + SCF。
 - [ ] 音乐（BGM）：用户后期实现，`opening.gd`/`interrogation.gd` 已留挂载点注释。

@@ -1,19 +1,31 @@
 [gd_scene format=3 uid="uid://di8h8ul0o4g6q"]
 
 [ext_resource type="Script" uid="uid://fbpg08dgif8k" path="res://scenes/world.gd" id="1_world"]
-[ext_resource type="Texture2D" uid="uid://cd3kqv4x7c0vk" path="res://art/bg_street.png" id="3_bg"]
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="Texture2D" path="res://art/world_main_composite.png" id="3_bg"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
-size = Vector2(1300, 130)
+size = Vector2(2600, 130)
 
 [sub_resource type="RectangleShape2D" id="WallTall"]
-size = Vector2(70, 760)
+size = Vector2(80, 760)
 
 [sub_resource type="RectangleShape2D" id="DoorZone"]
-size = Vector2(170, 150)
+size = Vector2(192, 152)
 
-[node name="World" type="Control" unique_id=1618754072]
+[sub_resource type="Environment" id="Env"]
+background_mode = 3
+glow_enabled = true
+glow_levels/2 = 1.0
+glow_levels/4 = 1.0
+glow_intensity = 0.7
+glow_bloom = 0.1
+glow_hdr_threshold = 0.85
+adjustment_enabled = true
+adjustment_contrast = 1.06
+adjustment_saturation = 1.1
+
+[node name="World" type="Control" unique_id=1984173572]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,56 +34,67 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_world")
 
-[node name="Bg" type="TextureRect" parent="." unique_id=61827909]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1088192215]
+position = Vector2(640, 360)
+limit_left = 0
+limit_top = 0
+limit_right = 2560
+limit_bottom = 720
+
+[node name="MainStreet" type="Sprite2D" parent="." unique_id=408857560]
 texture_filter = 1
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+position = Vector2(1280, 360)
 texture = ExtResource("3_bg")
-expand_mode = 1
-stretch_mode = 6
 
-[node name="Walls" type="StaticBody2D" parent="." unique_id=40925347]
+[node name="Walls" type="StaticBody2D" parent="." unique_id=1231853188]
 
-[node name="Top" type="CollisionShape2D" parent="Walls" unique_id=398878200]
-position = Vector2(644, 507)
+[node name="Top" type="CollisionShape2D" parent="Walls" unique_id=1524052133]
+position = Vector2(1280, 410)
 shape = SubResource("WallWide")
 
-[node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=1572841589]
-position = Vector2(640, 787)
+[node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=87927585]
+position = Vector2(1283, 780)
 shape = SubResource("WallWide")
 
-[node name="Left" type="CollisionShape2D" parent="Walls" unique_id=333835320]
-position = Vector2(-33, 346)
+[node name="Left" type="CollisionShape2D" parent="Walls" unique_id=1381188315]
+position = Vector2(0, 360)
 shape = SubResource("WallTall")
 
-[node name="Right" type="CollisionShape2D" parent="Walls" unique_id=826667912]
-position = Vector2(1314, 345)
+[node name="Right" type="CollisionShape2D" parent="Walls" unique_id=1520010464]
+position = Vector2(2560, 360)
 shape = SubResource("WallTall")
 
-[node name="PoliceDoor" type="Area2D" parent="." unique_id=179999328]
-position = Vector2(247, 572)
+[node name="PoliceDoor" type="Area2D" parent="." unique_id=23451448]
+position = Vector2(270, 590)
 
-[node name="Col" type="CollisionShape2D" parent="PoliceDoor" unique_id=1334467883]
-position = Vector2(-2, -34)
+[node name="Col" type="CollisionShape2D" parent="PoliceDoor" unique_id=742256544]
+position = Vector2(103, 1)
 shape = SubResource("DoorZone")
 
-[node name="CommunityDoor" type="Area2D" parent="." unique_id=893187412]
-position = Vector2(979, 571)
+[node name="CommunityDoor" type="Area2D" parent="." unique_id=597259479]
+position = Vector2(2080, 590)
 
-[node name="Col" type="CollisionShape2D" parent="CommunityDoor" unique_id=1282775074]
-position = Vector2(-5, -38)
+[node name="Col" type="CollisionShape2D" parent="CommunityDoor" unique_id=1737318806]
 shape = SubResource("DoorZone")
 
-[node name="Player" parent="." unique_id=160999783 instance=ExtResource("4_player")]
-position = Vector2(111, 600)
+[node name="Player" parent="." unique_id=1308207582 instance=ExtResource("2_player")]
+position = Vector2(470, 520)
 scale = Vector2(1.2734375, 1.3828121)
 
-[node name="Hint" type="Label" parent="." unique_id=829236912]
+[node name="Prompt" type="Label" parent="." unique_id=1635353780]
 layout_mode = 0
+offset_right = 240.0
+offset_bottom = 32.0
+theme_override_font_sizes/font_size = 22
+text = "↑ 进入"
+horizontal_alignment = 1
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1041149799]
+environment = SubResource("Env")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1589434367]
+
+[node name="Hint" type="Label" parent="UI" unique_id=408239850]
 offset_left = 40.0
 offset_top = 28.0
 offset_right = 1240.0
@@ -81,20 +104,11 @@ theme_override_font_sizes/font_size = 22
 text = "WASD / ↑↓←→ 移动     走到门口按 W/↑ 进入"
 horizontal_alignment = 1
 
-[node name="Prompt" type="Label" parent="." unique_id=1933503766]
-layout_mode = 0
-offset_right = 240.0
-offset_bottom = 32.0
-theme_override_font_sizes/font_size = 22
-text = "↑ 进入"
-horizontal_alignment = 1
-
-[node name="Toast" type="Label" parent="." unique_id=873774975]
-layout_mode = 0
-offset_left = 340.0
-offset_top = 150.0
-offset_right = 940.0
-offset_bottom = 200.0
+[node name="Toast" type="Label" parent="UI" unique_id=1793421689]
+offset_left = 992.0
+offset_top = 13.0
+offset_right = 1592.0
+offset_bottom = 63.0
 theme_override_colors/font_color = Color(1, 0.82, 0.4, 1)
 theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
