@@ -95,5 +95,16 @@ func _initialize() -> void:
 		s4.read_mowang()
 		_check(not s4.mowang_unread, "读过莫忘后转已读")
 
+	# --- 调查进展摘要（喂给模型，让老头知道玩家查到了什么） ---
+	var s5 = GameState.new()
+	_check(s5.has_method("investigation_summary"), "GameState 有 investigation_summary")
+	if s5.has_method("investigation_summary"):
+		_check(s5.investigation_summary() == "", "无线索时进展摘要为空")
+		s5.add_key("linxiulan")
+		s5.add_key("no_accident")
+		var summ = s5.investigation_summary()
+		_check(("林秀兰" in summ) or ("自然" in summ), "摘要含林秀兰死因")
+		_check(("查无" in summ) or ("事故" in summ), "摘要含医疗事故查无")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

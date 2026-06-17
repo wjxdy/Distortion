@@ -68,10 +68,16 @@ func _ready() -> void:
 	phone.closed.connect(func() -> void: _bar_enabled(not finished))
 	input.grab_focus()
 
-	_log("[color=#888][案情] 老人周明远，行为异常，疑似 AI 被劫持。问出真相。[/color]")
-	_log("[color=#888][提示] 直接打字盘问。撞墙了？点【查档案】拿线索，再回来追问。[/color]")
-	# 审讯开场：周明远本人喃喃自语（记忆错乱当场可见）
-	_show_zhou_bubble("今天……是几号了。\n她出门有一会儿了，怎么还不回来。")
+	# 开场：首次进来 → 周明远喃喃自语(记忆错乱)；带着历史回访 → 接上他上一句，不重置
+	var last_zhou := ""
+	for i in range(state.history.size() - 1, -1, -1):
+		if str(state.history[i].get("role")) == "assistant":
+			last_zhou = str(state.history[i].get("content"))
+			break
+	if last_zhou == "":
+		_show_zhou_bubble("今天……是几号了。\n她出门有一会儿了，怎么还不回来。")
+	else:
+		_show_zhou_bubble(last_zhou)
 
 func _log(_line: String) -> void:
 	pass   # 回看记录功能已移除；保留调用点为空操作，不影响其它逻辑
@@ -145,7 +151,13 @@ func _send() -> void:
 	state.add_to_history("user", msg)
 	input.text = ""
 	_set_busy(true)
-	var body := JSON.stringify({"history": state.history})
+	# 把"调查进展"系统旁白拼在历史最前发给模型(让老头知道你查到了什么)；不写进持久化历史
+	var to_send: Array = []
+	var prog = state.investigation_summary()
+	if prog != "":
+		to_send.append({"role": "system", "content": prog})
+	to_send.append_array(state.history)
+	var body := JSON.stringify({"history": to_send})
 	var err := http.request(BACKEND_URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if err != OK:
 		_banner("连不上后端，请先启动：cd Game/server && npm start", Color(1, 0.45, 0.45))
