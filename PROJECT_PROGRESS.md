@@ -3,7 +3,7 @@
 ## 基本信息
 - 项目名称：《失真 Distortion》
 - 当前阶段：开发早期 / MVP 垂直切片
-- 最后更新：2026-06-16
+- 最后更新：2026-06-17
 
 ## 当前状态
 - 项目目标是做一个 5-8 分钟的赛博朋克像素叙事侦探 demo：开场世界观、自由审讯、探索取证、揭示第一块真相、结尾钩子。
@@ -32,6 +32,7 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-17: **剧情去邪教版【后端人设】落地**（本次提交）：按桌面文档 `失真_游戏流程_去邪教版.md` 第七节，重写 `Game/server/src/oldman.js` 的 `SYSTEM_PROMPT`——① 去掉"AI 之父"光环，周明远改**普通退休老人**；② 莫忘从"他亲手造的"改为**手机上的商业陪伴/记忆助手 App**（患阿尔茨海默后离不开它）；③ 强化**记忆缺失+混乱**（连"有没有家人"都答不上，支撑线索 1「我没有家人」）；④ 加**第二层真相伏笔**：他其实是"选择相信"（有恨的对象比"谁也救不回"好受）+ 被追问"为什么天天对手机说话"时回避护着手机（支撑线索 7）；⑤ 假记忆(医院 AI 误诊害死林秀兰)、漏真相触发(蓝裙子/红烧肉/生日)、`[calm/sad/angry/sinister]` 情绪标签系统均保留；新增"绝不承认莫忘在骗你"约束。后端测试 11/11 通过。**莫忘日志滑坡终端 UI、对峙脚本、三分支结局仍是客户端待办（见 TODO）。**
 - 2026-06-17: **主角精灵 + 移动系统成型**（用户已提交 63bec4d）：接入 `art/detective.png` 图集(6×5,128px) → `detective_frames.tres`(idle/walk_right/walk_up/adjust_glasses/smoke)；抽出**独立 `Player.tscn`**(`CharacterBody2D`)被各场景实例化；四向移动 + 动画映射(左右/下=walk_right翻转,上=walk_up,久站随机扶眼镜/抽烟)；可走区从矩形夹取改为**碰撞体 Walls**；门口触发从距离改为 **Area2D `overlaps_body`**(脚底碰撞体叠到才算)；加 **WASD**(`move_*` action,不碰 ui_*)；街道换真背景 `bg_street.png`。
 - 2026-06-17: **开场加 2D 假 HD-2D 氛围**（本次提交）：`opening.tscn` 加 WorldEnvironment(辉光+调色)、Rain/Dust 粒子、Vignette 暗角(`shaders/vignette.gdshader`)，全是可在编辑器调的独立节点。**未实机看,辉光在 Compatibility 下待 F5 调阈值。**
 - 2026-06-17: **定下主世界街道 HD-2D 路线 = 2D 假**（非真 3D，避免换 Forward+/破坏网页导出）：宽幅可滚动街道 + Camera2D 跟随 + ParallaxBackground(远景 0.2 / 雾 0.08) + 雨/霓虹。**待用户用 ChatGPT 生成 3 张分层图**(world_street_wide 宽主街上半透明 / world_far_city 远景 / world_fog_overlay 透明可平铺雾)后,我一次接入滚动+相机+视差+门位。AI 出的是平面图,纵深交给 Godot。
