@@ -83,5 +83,17 @@ func _initialize() -> void:
 		_check(not g.state.has_key("linxiulan"), "reset 后清空(新游戏)")
 		g.free()
 
+	# --- 莫忘提醒去重（同一提醒整局只触发一次） ---
+	var s4 = GameState.new()
+	_check(s4.has_method("fire_hint"), "GameState 有 fire_hint")
+	if s4.has_method("fire_hint"):
+		_check(s4.fire_hint("investigate_death", "去查死因") == true, "首次触发提醒=true")
+		_check(s4.mowang_log.size() == 1 and s4.mowang_unread, "触发后记一条+标未读")
+		_check(s4.fire_hint("investigate_death", "去查死因") == false, "同一提醒重复触发=false(去重)")
+		_check(s4.mowang_log.size() == 1, "重复触发不再追加")
+		_check(s4.fire_hint("", "x") == false, "空ID不触发")
+		s4.read_mowang()
+		_check(not s4.mowang_unread, "读过莫忘后转已读")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

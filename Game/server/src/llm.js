@@ -27,17 +27,30 @@ export function buildMessages(history) {
 
 const EMOTIONS = new Set(["calm", "angry", "sinister", "sad"]);
 
-// 解析句首情绪标签 [calm]/[sad]/[angry]/[sinister]（兼容中文【】、大小写），
-// 拆成 { reply, emotion }。无标签或非法标签时 emotion 兜底 "calm"。
+// 解析模型回复，拆成 { reply, emotion, hint }：
+//  - 句首情绪标签 [calm]/[sad]/[angry]/[sinister]（兼容中文【】、大小写）→ emotion，无/非法兜底 "calm"
+//  - 末尾(或任意处)隐藏的莫忘提醒标签 [[hint:某ID]] → hint，剥离不显示；无则 hint=""
+// 提醒由模型自行决定何时输出；客户端再按 ID 去重(同一提醒只触发一次)。
 export function parseReply(content) {
   let text = String(content).trim();
+
+  // 提取并剥离隐藏提醒标签 [[hint:ID]]（ID 为字母/数字/下划线）
+  let hint = "";
+  const hm = text.match(/\[\[\s*hint\s*:\s*([A-Za-z0-9_]+)\s*\]\]/i);
+  if (hm) {
+    hint = hm[1];
+    text = (text.slice(0, hm.index) + text.slice(hm.index + hm[0].length)).trim();
+  }
+
+  // 句首情绪标签
   let emotion = "calm";
   const m = text.match(/^[\[【]\s*([a-zA-Z]+)\s*[\]】]\s*/);
   if (m && EMOTIONS.has(m[1].toLowerCase())) {
     emotion = m[1].toLowerCase();
     text = text.slice(m[0].length).trim();
   }
-  return { reply: text, emotion };
+
+  return { reply: text, emotion, hint };
 }
 
 // 从 OpenAI 兼容的响应里取出模型回复，返回 { reply, emotion }。结构异常则抛错。

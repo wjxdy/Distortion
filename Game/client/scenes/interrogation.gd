@@ -171,6 +171,19 @@ func _on_reply(result: int, code: int, _headers: PackedStringArray, body: Packed
 	_log("[color=#e8e1c8]周明远：[/color]" + reply)
 	state.add_to_history("assistant", reply)
 	_check_truths()
+	_handle_hint(data)
+
+# 莫忘提醒：模型在 hint 字段给出节点ID → 去重(整局只一次)后弹提示条 + 手机红点。
+func _handle_hint(data) -> void:
+	if typeof(data) != TYPE_DICTIONARY or not data.has("hint"):
+		return
+	var id := str(data["hint"])
+	if id == "" or not Content.MOWANG_HINTS.has(id):
+		return
+	var text := str(Content.MOWANG_HINTS[id])
+	if state.fire_hint(id, text):   # 只有首次触发才提示
+		phone.refresh_badge()
+		_banner("💬 莫忘：" + text, Color(0.55, 0.85, 1), 4.5)
 
 func _check_truths() -> void:
 	for id in Triggers.evaluate(state, last_user_msg):

@@ -54,6 +54,13 @@ const EXPLORE_ACTIONS := [
 	}
 ]
 
+# 莫忘 AI 助手的提醒文案（手机里"莫忘"app 显示）。由模型在对话中输出 [[hint:ID]] 触发，
+# 经 Game 去重(同一提醒整局只一次)。ID 要和后端 oldman.js 里指示模型输出的一致。
+const MOWANG_HINTS := {
+	"investigate_death": "他一口咬定是医院的 AI 害死了妻子。死因存疑——去【警局电脑终端】查林秀兰的真正死因，核实一下。",
+	"protecting_app": "他在回避那个手机里的 App。也许该弄清楚：他天天对着它，到底在说什么。"
+}
+
 # 警局电脑终端的案卷（终端室场景左侧列表）。点开看内容；带 grants_key 的查完会发线索钥匙
 # (经全局 Game 跨场景保留)，回审讯室追问即可触发真相。现阶段不做门控、不做 AI 问询。
 const TERMINAL_FILES := {
