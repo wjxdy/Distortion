@@ -200,15 +200,26 @@ func _handle_hint(data) -> void:
 	if typeof(data) == TYPE_DICTIONARY and data.has("hint"):
 		_fire_hint(str(data["hint"]))
 
+# 玩家这一句是否在「当面质疑 AI 说法 / 亮证据对质」(用于 visit_community 闸门)：
+# 要么质问 AI 的确定性，要么主张她是自然病逝/查无事故。措辞放宽，尽量覆盖自由输入。
+func _challenges_ai(m: String) -> bool:
+	var mentions_ai: bool = ("AI" in m) or ("Ａｉ" in m) or ("人工智能" in m)
+	var doubts: bool = ("为什么" in m) or ("凭什么" in m) or ("确定" in m) or ("怎么知道" in m) or ("怎么确定" in m) or ("真的" in m)
+	if mentions_ai and doubts:
+		return true
+	return ("病死" in m) or ("病逝" in m) or ("自然" in m) or ("不是AI" in m) or ("不是 AI" in m) \
+		or ("诊断" in m) or ("没有事故" in m) or ("查无" in m) or ("没事故" in m) or ("证据" in m)
+
 # 兜底：模型没吐标签(过载/漏吐/被去重)时，按老头这轮回复 + 玩家问话 + 调查进度确定性补发。
 # fire_hint 自带去重，所以和模型不会重复触发。
 func _hint_fallback(reply: String) -> void:
 	var blames_ai: bool = ("AI" in reply) or ("Ａｉ" in reply) or ("误诊" in reply)
 	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("no_accident")
 	if blames_ai:
-		if has_evidence:
-			_fire_hint("visit_community")     # 查过死因还咬定 → 去小区
-		else:
+		# 去小区要等你「当面质问 AI 说法」而他仍咬定时才弹——否则你刚查完回来他随口提 AI 就提早触发。
+		if has_evidence and _challenges_ai(last_user_msg):
+			_fire_hint("visit_community")     # 查过死因 + 当面质问仍咬定 → 去小区
+		elif not has_evidence:
 			_fire_hint("investigate_death")   # 还没查 → 去终端查死因
 	var m := last_user_msg
 	if ("莫忘" in m) or ("手机" in m) or ("app" in m) or ("APP" in m) or ("为什么用" in m) or ("天天" in m):
