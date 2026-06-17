@@ -13,21 +13,12 @@ const Content = preload("res://game/content.gd")
 @onready var photo_area: Area2D = $PhotoArea
 @onready var phone_area: Area2D = $PhoneArea
 @onready var exit_area: Area2D = $ExitArea
-@onready var log_view: Control = $LogView
-@onready var log_label: Label = $LogView/Panel/Line
-@onready var next_btn: Button = $LogView/Panel/NextBtn
-@onready var log_close: Button = $LogView/Panel/CloseBtn
-
-var log_idx := 0
 
 func _ready() -> void:
 	prompt.visible = false
 	info.visible = false
-	log_view.visible = false
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
-	next_btn.pressed.connect(_log_next)
-	log_close.pressed.connect(_close_log)
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -60,7 +51,7 @@ func _input(event: InputEvent) -> void:
 	if _at(photo_area):
 		_examine("photo")
 	elif _at(phone_area):
-		_open_log()
+		_take_phone()
 	elif _at(exit_area):
 		Sfx.play_door()
 		get_tree().change_scene_to_file(CORRIDOR)
@@ -74,35 +65,12 @@ func _examine(id: String) -> void:
 	if k != "":
 		Game.state.add_key(k)
 
-# 查老人手机 → 拿到手机 + 打开莫忘日志滑坡
-func _open_log() -> void:
+# 查老人手机 → 只拿到手机道具 + 莫忘提醒去警局终端解锁日志(日志在终端看)
+func _take_phone() -> void:
 	Sfx.play_click()
-	Game.state.add_key("phone")
-	Game.state.add_item("oldman_phone")   # 老人手机进道具栏(可在道具界面回看)
+	Game.state.add_item("oldman_phone")   # 老人手机进道具栏
 	Inv.refresh()
-	log_idx = 0
-	log_label.text = str(Content.MOWANG_LOG_LINES[0])
-	next_btn.text = "下一条 ▼"
-	next_btn.disabled = false
-	log_view.visible = true
-	player.locked = true
-
-func _log_next() -> void:
-	Sfx.play_click()
-	if log_idx < Content.MOWANG_LOG_LINES.size() - 1:
-		log_idx += 1
-		log_label.text = str(Content.MOWANG_LOG_LINES[log_idx])
-		if log_idx >= Content.MOWANG_LOG_LINES.size() - 1:
-			next_btn.text = "（已看完）"
-			next_btn.disabled = true
-			_finish_log()
-
-func _finish_log() -> void:
-	Game.state.add_key("molog")   # 第二层真相钥匙
-	if Game.state.fire_hint("confront_molog", str(Content.MOWANG_HINTS["confront_molog"])):
+	info.text = "你拿起床头的手机——屏幕还亮着「莫忘」。它锁着，得回警局用终端接进去才能看里面的对话。"
+	info.visible = true
+	if Game.state.fire_hint("unlock_log", str(Content.MOWANG_HINTS["unlock_log"])):
 		phone.notify_hint()
-
-func _close_log() -> void:
-	Sfx.play_click()
-	log_view.visible = false
-	player.locked = false
