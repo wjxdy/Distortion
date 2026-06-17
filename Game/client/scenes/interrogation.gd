@@ -9,10 +9,19 @@ const Content = preload("res://game/content.gd")
 const Triggers = preload("res://game/triggers.gd")
 const Explore = preload("res://game/explore.gd")
 
-# 网页导出版连服务器后端(同源,经 nginx /game/chat 反代)；本地原生版仍连 localhost。
-const BACKEND_URL_WEB := "http://8.140.63.245/game/chat"
+# 后端地址：本地原生版连 localhost；网页版按【页面自身 origin】推导(同源 /game/chat)，
+# 这样无论 https://xuleii.cn/game/ 还是别的域名/协议都自动正确，免混合内容、免写死。
 const BACKEND_URL_LOCAL := "http://localhost:8787/chat"
-@onready var backend_url: String = BACKEND_URL_WEB if OS.has_feature("web") else BACKEND_URL_LOCAL
+const BACKEND_URL_WEB_FALLBACK := "https://xuleii.cn/game/chat"
+@onready var backend_url: String = _resolve_backend_url()
+
+func _resolve_backend_url() -> String:
+	if not OS.has_feature("web"):
+		return BACKEND_URL_LOCAL
+	var origin := str(JavaScriptBridge.eval("window.location.origin", true))
+	if origin.begins_with("http"):
+		return origin + "/game/chat"
+	return BACKEND_URL_WEB_FALLBACK
 const POLICE := "res://scenes/police.tscn"
 
 # 周明远情绪精灵图：4 行情绪 × 4 列帧(慢速 idle，乒乓播放)，每格 256×192
