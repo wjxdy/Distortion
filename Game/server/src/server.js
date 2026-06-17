@@ -54,6 +54,9 @@ const server = createServer((req, res) => {
   res.end();
 });
 
-server.listen(PORT, () => {
-  console.log(`《失真》后端已启动: http://localhost:${PORT}  (POST /chat)`);
+// 默认只绑 127.0.0.1：本地开发够用，生产经 nginx 反代、不对公网暴露 8787(更安全)。
+// 需要对外直连时设 HOST=0.0.0.0。
+const HOST = process.env.HOST || "127.0.0.1";
+server.listen(PORT, HOST, () => {
+  console.log(`《失真》后端已启动: http://${HOST}:${PORT}  (POST /chat)`);
 });
