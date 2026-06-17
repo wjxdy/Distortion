@@ -42,7 +42,12 @@ limit_top = 0
 limit_right = 2560
 limit_bottom = 720
 
-[node name="FarCity" type="AnimatedSprite2D" parent="." unique_id=255398878]
+[node name="ParallaxBackground" type="ParallaxBackground" parent="." unique_id=255398878]
+
+[node name="RainLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.3, 1)
+
+[node name="FarCity" type="AnimatedSprite2D" parent="ParallaxBackground/RainLayer"]
 texture_filter = 1
 position = Vector2(1280, 360)
 sprite_frames = ExtResource("3_far")
