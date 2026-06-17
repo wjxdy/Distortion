@@ -9,7 +9,10 @@ const Content = preload("res://game/content.gd")
 const Triggers = preload("res://game/triggers.gd")
 const Explore = preload("res://game/explore.gd")
 
-const BACKEND_URL := "http://localhost:8787/chat"
+# 网页导出版连服务器后端(同源,经 nginx /game/chat 反代)；本地原生版仍连 localhost。
+const BACKEND_URL_WEB := "http://8.140.63.245/game/chat"
+const BACKEND_URL_LOCAL := "http://localhost:8787/chat"
+@onready var backend_url: String = BACKEND_URL_WEB if OS.has_feature("web") else BACKEND_URL_LOCAL
 const POLICE := "res://scenes/police.tscn"
 
 # 周明远情绪精灵图：4 行情绪 × 4 列帧(慢速 idle，乒乓播放)，每格 256×192
@@ -172,7 +175,7 @@ func _send() -> void:
 			to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)
 	var body := JSON.stringify({"history": to_send, "finale": state.in_finale()})
-	var err := http.request(BACKEND_URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	var err := http.request(backend_url, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if err != OK:
 		_banner("连不上后端，请先启动：cd Game/server && npm start", Color(1, 0.45, 0.45))
 		_set_busy(false)
