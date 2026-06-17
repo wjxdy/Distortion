@@ -2,11 +2,12 @@ import { SYSTEM_PROMPT, pickSilence } from "./oldman.js";
 import { retryAsync } from "./retry.js";
 
 // 调模型的健壮性参数（可按现场情况调）：
-// 总尝试次数=1次初试+1次重试。瞬时抖动重试1次基本能救回；持续过载则尽快保底沉默，
-// 不让玩家干等(全过载时约 2×超时 ≈ 12s 出"……")。想多重试可调大，但过载时等待会变长。
+// 总尝试次数=1次初试+1次重试（针对网络抖动/5xx）。
 const TRIES = 2;
 const RETRY_SLEEP_MS = 500; // 每次重试间隔
-const REQUEST_TIMEOUT_MS = 6000; // 单次请求超时；超过即放弃这次、计为可重试失败
+// 单次请求超时：Moonshot 正常 TTFB 约 4~6s，超时必须明显高于它，否则会把本来会成功的
+// 回复误杀成"超时→沉默"(之前 6s 就踩了这个坑)。给到 14s 让正常回复落地、只砍真挂起。
+const REQUEST_TIMEOUT_MS = 14000;
 
 // 调模型失败(过载/超时/网络/重试耗尽)时，不抛错给玩家，而是返回周明远的「沉默」保底，
 // 让前端永远有回应、不卡死。真实错误打到服务器日志便于排查。
@@ -91,7 +92,9 @@ export async function callKimi(history) {
     }
     if (!res.ok) {
       const err = new Error(`模型调用失败 ${res.status}: ${await res.text()}`);
-      err.retryable = res.status === 429 || res.status >= 500;
+      // 429(engine_overloaded)=上游过载，重试也是继续撞墙、纯浪费玩家时间 → 不重试，直接快速保底沉默。
+      // 只有 5xx(偶发服务端错误)才值得重试一次。
+      err.retryable = res.status >= 500;
       throw err;
     }
     return extractReply(await res.json());
