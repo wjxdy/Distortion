@@ -123,23 +123,16 @@ func _initialize() -> void:
 		_check(s7.has_item("home_key"), "拿到钥匙后 has_item 为真")
 	_check(Content.ITEMS.has("home_key"), "道具表含 home_key")
 
-	# --- 终局旁白切换：拿到 molog 后改发 FINALE_NARRATION ---
+	# --- 终局判定：拿到 molog 即进入终局(客户端据此发 finale 标志切后端提示) ---
 	var s8 = GameState.new()
 	_check(s8.has_method("in_finale") and not s8.in_finale(), "未拿日志不在终局")
-	_check(s8.system_narration() == "", "未查任何线索时 system_narration 为空")
-	s8.add_key("linxiulan")
-	_check("林秀兰" in s8.system_narration() or "自然" in s8.system_narration(), "查到死因→system_narration 给调查进展")
 	s8.add_key("molog")
 	_check(s8.in_finale(), "拿到 molog → 进入终局")
-	_check("终局" in s8.system_narration(), "终局 → system_narration 换成 FINALE_NARRATION")
 
-	# --- 终局：日志蒙太奇 + 新提醒 + 终局旁白 + 三分支结局文案 ---
+	# --- 终局：日志蒙太奇 + 新提醒 + 三分支结局文案 ---
 	_check(Content.MOWANG_HINTS.has("unlock_log"), "新增提醒 unlock_log(拿到手机→去终端解锁)")
 	_check(Content.MOWANG_HINTS.has("go_confront"), "新增提醒 go_confront(解锁日志→回审讯对峙)")
 	_check(not Content.MOWANG_HINTS.has("confront_molog"), "废弃提醒 confront_molog 已移除")
-	_check("终局" in Content.FINALE_NARRATION, "FINALE_NARRATION 终局旁白存在")
-	_check("[[end:ready]]" in Content.FINALE_NARRATION, "终局旁白含 [[end:ready]] 指令")
-	_check("[[end:reveal]]" in Content.FINALE_NARRATION and "[[end:comfort]]" in Content.FINALE_NARRATION, "终局旁白含 reveal/comfort 指令")
 	_check(Content.ENDING_SLIDES.size() >= 3, "ENDING_SLIDES 三分支文案存在")
 	for b in ["reveal", "comfort", "leave"]:
 		_check(Content.ENDING_SLIDES.has(b) and str(Content.ENDING_SLIDES[b]) != "", "结局幻灯片有 " + b)

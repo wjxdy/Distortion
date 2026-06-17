@@ -163,13 +163,15 @@ func _send() -> void:
 	state.add_to_history("user", msg)
 	input.text = ""
 	_set_busy(true)
-	# 把"调查进展"系统旁白拼在历史最前发给模型(让老头知道你查到了什么)；不写进持久化历史
+	# 非终局：把"调查进展"系统旁白拼在历史最前发给模型(让老头知道你查到了什么)；不写进持久化历史。
+	# 终局：发 finale=true，后端整套换成 FINALE_SYSTEM_PROMPT，这里不再注入旁白。
 	var to_send: Array = []
-	var prog = state.system_narration()   # 终局自动换成 FINALE_NARRATION
-	if prog != "":
-		to_send.append({"role": "system", "content": prog})
+	if not state.in_finale():
+		var prog = state.investigation_summary()
+		if prog != "":
+			to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)
-	var body := JSON.stringify({"history": to_send})
+	var body := JSON.stringify({"history": to_send, "finale": state.in_finale()})
 	var err := http.request(BACKEND_URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if err != OK:
 		_banner("连不上后端，请先启动：cd Game/server && npm start", Color(1, 0.45, 0.45))
@@ -236,8 +238,8 @@ func _hint_fallback(reply: String) -> void:
 	if ("莫忘" in m) or ("手机" in m) or ("app" in m) or ("APP" in m) or ("为什么用" in m) or ("天天" in m):
 		_fire_hint("protecting_app")
 
-# 终局：模型在终局旁白指引下吐 [[end:xxx]]。ready=刚卸防(不收尾,继续对话);
-# reveal/comfort=玩家最后的态度 → 触发对应结局。leave 由"起身离开"按钮走 _on_leave。
+# 终局：后端用 FINALE_SYSTEM_PROMPT 时模型按玩家态度吐 [[end:reveal/comfort]] → 触发对应结局。
+# leave 由"起身离开"按钮走 _on_leave。(ready 已弃用;若模型偶吐别的值,这里不处理即忽略。)
 func _handle_end(data) -> void:
 	if typeof(data) != TYPE_DICTIONARY:
 		return
