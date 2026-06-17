@@ -38,10 +38,10 @@ const server = createServer((req, res) => {
     req.on("data", (c) => (body += c));
     req.on("end", async () => {
       try {
-        const { history } = JSON.parse(body || "{}");
-        const result = await callKimi(Array.isArray(history) ? history : []);
+        const { history, finale } = JSON.parse(body || "{}");
+        const result = await callKimi(Array.isArray(history) ? history : [], Boolean(finale));
         res.writeHead(200, { ...CORS, "Content-Type": "application/json" });
-        res.end(JSON.stringify(result)); // { reply, emotion }
+        res.end(JSON.stringify(result)); // { reply, emotion, hint, end }
       } catch (e) {
         res.writeHead(500, { ...CORS, "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: String(e?.message || e) }));

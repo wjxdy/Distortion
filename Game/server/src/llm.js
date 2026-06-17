@@ -1,4 +1,4 @@
-import { SYSTEM_PROMPT, pickSilence } from "./oldman.js";
+import { SYSTEM_PROMPT, FINALE_SYSTEM_PROMPT, pickSilence } from "./oldman.js";
 import { retryAsync } from "./retry.js";
 
 // 调模型的健壮性参数（可按现场情况调）：
@@ -21,8 +21,10 @@ export async function withSilenceFallback(fn) {
 }
 
 // 把对话历史拼成 OpenAI 兼容的 messages：system 提示在最前，历史顺序不变。
-export function buildMessages(history) {
-  return [{ role: "system", content: SYSTEM_PROMPT }, ...history];
+// finale=true(终局对峙)时换成 FINALE_SYSTEM_PROMPT 替换人设主提示，避免旧规则压制终局演法。
+export function buildMessages(history, finale = false) {
+  const sys = finale ? FINALE_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  return [{ role: "system", content: sys }, ...history];
 }
 
 const EMOTIONS = new Set(["calm", "angry", "sinister", "sad"]);
@@ -43,15 +45,32 @@ export function parseReply(content) {
     text = (text.slice(0, hm.index) + text.slice(hm.index + hm[0].length)).trim();
   }
 
-  // 句首情绪标签
-  let emotion = "calm";
-  const m = text.match(/^[\[【]\s*([a-zA-Z]+)\s*[\]】]\s*/);
-  if (m && EMOTIONS.has(m[1].toLowerCase())) {
-    emotion = m[1].toLowerCase();
-    text = text.slice(m[0].length).trim();
+  // 提取并剥离隐藏结局标签 end:ID（仅四个合法值，非法当普通文本）。
+  let end = "";
+  const VALID_END = new Set(["ready", "reveal", "comfort", "leave"]);
+  const em = text.match(/[\[【]{1,2}\s*end\s*:\s*([A-Za-z]+)\s*[\]】]{1,2}/i);
+  if (em && VALID_END.has(em[1].toLowerCase())) {
+    end = em[1].toLowerCase();
+    text = (text.slice(0, em.index) + text.slice(em.index + em[0].length)).trim();
   }
 
-  return { reply: text, emotion, hint };
+  // 情绪标签：句首通常有一个，但模型偶尔把"否认+卸防"挤进一条回复、中段再插一个 [calm]。
+  // 因此剥掉【文本里任意位置】的合法情绪标签，第一个出现的作为 emotion；非法标签(如[happy])原样保留。
+  let emotion = "calm";
+  let foundEmotion = false;
+  text = text.replace(/[\[【]\s*([a-zA-Z]+)\s*[\]】]/g, (whole, name) => {
+    if (EMOTIONS.has(name.toLowerCase())) {
+      if (!foundEmotion) {
+        emotion = name.toLowerCase();
+        foundEmotion = true;
+      }
+      return "";
+    }
+    return whole;
+  });
+  text = text.trim();
+
+  return { reply: text, emotion, hint, end };
 }
 
 // 从 OpenAI 兼容的响应里取出模型回复，返回 { reply, emotion }。结构异常则抛错。
@@ -64,7 +83,7 @@ export function extractReply(apiJson) {
 // 真实调用月之暗面 Kimi（OpenAI 兼容接口）：传入对话历史，返回老人的下一句回复。
 // 默认模型用非推理的 moonshot-v1-32k（快，~1s）；可用 KIMI_MODEL 覆盖。
 // 过载/超时/网络失败重试 TRIES 次后仍不行 → 返回周明远「沉默」保底，绝不把错误抛给玩家。
-export async function callKimi(history) {
+export async function callKimi(history, finale = false) {
   const baseUrl = process.env.KIMI_BASE_URL || "https://api.moonshot.cn/v1";
   const apiKey = process.env.KIMI_API_KEY;
   const model = process.env.KIMI_MODEL || "moonshot-v1-32k";
@@ -87,7 +106,7 @@ export async function callKimi(history) {
         },
         body: JSON.stringify({
           model,
-          messages: buildMessages(history),
+          messages: buildMessages(history, finale),
           temperature,
         }),
         signal: ctrl.signal,

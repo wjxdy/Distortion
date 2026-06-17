@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { buildMessages } from "../src/llm.js";
-import { SYSTEM_PROMPT } from "../src/oldman.js";
+import { SYSTEM_PROMPT, FINALE_SYSTEM_PROMPT } from "../src/oldman.js";
 
 test("空历史时只含 system 提示", () => {
   const msgs = buildMessages([]);
@@ -17,4 +17,20 @@ test("把历史接在 system 之后，顺序不变", () => {
   assert.equal(msgs.length, 3);
   assert.equal(msgs[0].role, "system");
   assert.deepEqual(msgs.slice(1), history);
+});
+
+test("默认(非终局)用人设主提示 SYSTEM_PROMPT", () => {
+  assert.equal(buildMessages([])[0].content, SYSTEM_PROMPT);
+});
+
+test("finale=true 时换成终局专用提示 FINALE_SYSTEM_PROMPT", () => {
+  const msgs = buildMessages([{ role: "user", content: "我查清楚了" }], true);
+  assert.equal(msgs[0].content, FINALE_SYSTEM_PROMPT);
+  assert.notEqual(msgs[0].content, SYSTEM_PROMPT);
+});
+
+test("终局提示指示 reveal/comfort 两个收尾标签，并禁止 hint", () => {
+  assert.ok(FINALE_SYSTEM_PROMPT.includes("[[end:reveal]]"), "缺 reveal");
+  assert.ok(FINALE_SYSTEM_PROMPT.includes("[[end:comfort]]"), "缺 comfort");
+  assert.ok(FINALE_SYSTEM_PROMPT.includes("绝不"), "应明确禁止(ready/hint)");
 });

@@ -16,6 +16,13 @@ const FILE_HINTS := {
 @onready var display: Label = $DisplayBg/Display
 @onready var back_btn: Button = $BackBtn
 @onready var phone: CanvasLayer = $Phone
+@onready var submit_phone_btn: Button = $FileList/SubmitPhoneBtn
+@onready var log_view: Control = $LogView
+@onready var log_label: Label = $LogView/Panel/Line
+@onready var next_btn: Button = $LogView/Panel/NextBtn
+@onready var log_close: Button = $LogView/Panel/CloseBtn
+
+var log_idx := 0
 
 func _ready() -> void:
 	back_btn.pressed.connect(_back)
@@ -25,6 +32,13 @@ func _ready() -> void:
 	($FileList/AddressBtn as Button).pressed.connect(_show.bind("address"))
 	($FileList/WifeBtn as Button).pressed.connect(_show.bind("wife"))
 	($FileList/MedicalBtn as Button).pressed.connect(_show.bind("medical"))
+	# 接入老人手机解锁日志
+	log_view.visible = false
+	submit_phone_btn.pressed.connect(_submit_phone)
+	next_btn.pressed.connect(_log_next)
+	log_close.pressed.connect(_close_log)
+	# 没拿到老人手机就别显示"接入手机"(也防止已解锁后重复解锁)
+	submit_phone_btn.visible = Game.state.has_item("oldman_phone") and not Game.state.has_key("molog")
 
 func _show(file_id: String) -> void:
 	var f = Content.TERMINAL_FILES.get(file_id)
@@ -40,6 +54,37 @@ func _show(file_id: String) -> void:
 		var hid: String = FILE_HINTS[file_id]
 		if Content.MOWANG_HINTS.has(hid) and Game.state.fire_hint(hid, str(Content.MOWANG_HINTS[hid])):
 			phone.notify_hint()
+
+# 接入老人的手机 → 打开莫忘日志逐条翻(取证解锁)
+func _submit_phone() -> void:
+	if not Game.state.has_item("oldman_phone"):
+		return
+	Sfx.play_click()
+	log_idx = 0
+	log_label.text = str(Content.MOWANG_LOG_LINES[0])
+	next_btn.text = "下一条 ▼"
+	next_btn.disabled = false
+	log_view.visible = true
+
+func _log_next() -> void:
+	Sfx.play_click()
+	if log_idx < Content.MOWANG_LOG_LINES.size() - 1:
+		log_idx += 1
+		log_label.text = str(Content.MOWANG_LOG_LINES[log_idx])
+		if log_idx >= Content.MOWANG_LOG_LINES.size() - 1:
+			next_btn.text = "（已看完）"
+			next_btn.disabled = true
+			_finish_log()
+
+func _finish_log() -> void:
+	Game.state.add_key("molog")   # 第二层真相钥匙
+	submit_phone_btn.visible = false
+	if Game.state.fire_hint("go_confront", str(Content.MOWANG_HINTS["go_confront"])):
+		phone.notify_hint()
+
+func _close_log() -> void:
+	Sfx.play_click()
+	log_view.visible = false
 
 func _back() -> void:
 	Sfx.play_door()

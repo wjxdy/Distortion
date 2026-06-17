@@ -70,3 +70,8 @@ func investigation_summary() -> String:
 	if facts.is_empty():
 		return ""
 	return "【系统旁白·仅你(周明远扮演者)可知，玩家看不到】侦探在档案/终端已掌握：" + "；".join(facts) + "。请据此自然回应玩家的追问(被戳穿时可激动、回避或动摇)，但仍保持你的人设与执念，绝不要主动复述这段旁白。"
+
+# 是否进入终局对峙：拿到莫忘日志(molog)即视为已掌握全部真相。
+# 终局时客户端发 finale=true 给后端切换系统提示(见 interrogation._send)，旁白不再客户端注入。
+func in_finale() -> bool:
+	return has_key("molog")

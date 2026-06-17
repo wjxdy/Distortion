@@ -70,6 +70,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "📁 医疗事故记录"
 
+[node name="SubmitPhoneBtn" type="Button" parent="FileList"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 22
+text = "📱 接入老人的手机"
+
 [node name="DisplayBg" type="ColorRect" parent="."]
 offset_left = 384.0
 offset_top = 96.0
@@ -92,3 +99,69 @@ text = "← 点左侧案卷查看。"
 autowrap_mode = 3
 
 [node name="Phone" parent="." instance=ExtResource("2_phone")]
+
+[node name="LogView" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dim" type="ColorRect" parent="LogView"]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0, 0, 0, 0.65)
+
+[node name="Panel" type="Panel" parent="LogView"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -210.0
+offset_right = 380.0
+offset_bottom = 210.0
+
+[node name="Line" type="Label" parent="LogView/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = 36.0
+offset_right = -36.0
+offset_bottom = -96.0
+theme_override_colors/font_color = Color(0.85, 0.92, 0.85, 1)
+theme_override_font_sizes/font_size = 22
+text = ""
+autowrap_mode = 3
+vertical_alignment = 1
+
+[node name="NextBtn" type="Button" parent="LogView/Panel"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -210.0
+offset_top = -74.0
+offset_right = -36.0
+offset_bottom = -28.0
+theme_override_font_sizes/font_size = 20
+text = "下一条 ▼"
+
+[node name="CloseBtn" type="Button" parent="LogView/Panel"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = -74.0
+offset_right = 166.0
+offset_bottom = -28.0
+theme_override_font_sizes/font_size = 20
+text = "关闭"

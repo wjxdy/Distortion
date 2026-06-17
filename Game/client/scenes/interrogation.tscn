@@ -4,28 +4,16 @@
 [ext_resource type="Texture2D" uid="uid://dkj88kkl1roo" path="res://art/bg_police_room.png" id="2"]
 [ext_resource type="Texture2D" uid="uid://rjp07451e8ol" path="res://art/fx_crack.png" id="3"]
 [ext_resource type="Script" uid="uid://eeldnvd1delh" path="res://scenes/tail.gd" id="4"]
-[ext_resource type="PackedScene" uid="uid://c8phone0distort" path="res://scenes/phone.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bubble"]
-bg_color = Color(0, 0, 0, 0.35)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.85, 0.88, 0.92, 0.95)
-anti_aliasing = false
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_backlog"]
-bg_color = Color(0.03, 0.04, 0.06, 0.97)
+bg_color = Color(0, 0, 0, 0)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.4, 0.6, 0.8, 0.6)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+border_color = Color(0.86, 0.88, 0.9, 0.95)
+anti_aliasing = false
 
 [node name="Interrogation" type="Control" unique_id=603040810]
 layout_mode = 3
@@ -152,7 +140,7 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("4")
-color = Color(0.85, 0.88, 0.92, 0.95)
+color = Color(0.86, 0.88, 0.9, 0.95)
 
 [node name="Margin" type="MarginContainer" parent="ZhouBubble" unique_id=357766759]
 layout_mode = 1
@@ -161,10 +149,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
 
 [node name="VBox" type="VBoxContainer" parent="ZhouBubble/Margin" unique_id=1733340111]
 layout_mode = 2
@@ -207,7 +195,7 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("4")
-color = Color(0.85, 0.88, 0.92, 0.95)
+color = Color(0.86, 0.88, 0.9, 0.95)
 
 [node name="Margin" type="MarginContainer" parent="PlayerBubble" unique_id=1428714922]
 layout_mode = 1
@@ -216,10 +204,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
 
 [node name="Content" type="Label" parent="PlayerBubble/Margin" unique_id=717979267]
 custom_minimum_size = Vector2(300, 0)
@@ -234,10 +222,9 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 7.0
-offset_top = -141.0
-offset_right = 147.0
-offset_bottom = -101.0
+offset_top = -188.0
+offset_right = 140.0
+offset_bottom = -148.0
 grow_vertical = 0
 focus_mode = 0
 theme_override_font_sizes/font_size = 20
@@ -249,4 +236,78 @@ autostart = true
 
 [node name="Http" type="HTTPRequest" parent="." unique_id=1172747138]
 
-[node name="Phone" parent="." instance=ExtResource("5")]
+[node name="Phone" parent="." unique_id=64375825 instance=ExtResource("5")]
+
+[node name="LeaveBtn" type="Button" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -106.0
+offset_right = -20.0
+offset_bottom = -66.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "起身，什么都不说地离开"
+
+[node name="FadeOverlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+z_index = 100
+color = Color(0, 0, 0, 1)
+
+[node name="EndSlide" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+z_index = 101
+
+[node name="Bg" type="ColorRect" parent="EndSlide"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 1)
+
+[node name="VBox" type="VBoxContainer" parent="EndSlide"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -440.0
+offset_top = -160.0
+offset_right = 440.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Body" type="Label" parent="EndSlide/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
+theme_override_constants/line_spacing = 10
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Subtitle" type="Label" parent="EndSlide/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.57, 0.92, 1)
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+autowrap_mode = 3

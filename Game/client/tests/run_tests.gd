@@ -123,5 +123,23 @@ func _initialize() -> void:
 		_check(s7.has_item("home_key"), "拿到钥匙后 has_item 为真")
 	_check(Content.ITEMS.has("home_key"), "道具表含 home_key")
 
+	# --- 终局判定：拿到 molog 即进入终局(客户端据此发 finale 标志切后端提示) ---
+	var s8 = GameState.new()
+	_check(s8.has_method("in_finale") and not s8.in_finale(), "未拿日志不在终局")
+	s8.add_key("molog")
+	_check(s8.in_finale(), "拿到 molog → 进入终局")
+
+	# --- 终局：日志蒙太奇 + 新提醒 + 三分支结局文案 ---
+	_check(Content.MOWANG_HINTS.has("unlock_log"), "新增提醒 unlock_log(拿到手机→去终端解锁)")
+	_check(Content.MOWANG_HINTS.has("go_confront"), "新增提醒 go_confront(解锁日志→回审讯对峙)")
+	_check(not Content.MOWANG_HINTS.has("confront_molog"), "废弃提醒 confront_molog 已移除")
+	_check(Content.ENDING_SLIDES.size() >= 3, "ENDING_SLIDES 三分支文案存在")
+	for b in ["reveal", "comfort", "leave"]:
+		_check(Content.ENDING_SLIDES.has(b) and str(Content.ENDING_SLIDES[b]) != "", "结局幻灯片有 " + b)
+	# 日志蒙太奇：那条无理由跳变的"是 AI 害死的" + 点破空白的旁白
+	var molog_blob := "\n".join(Content.MOWANG_LOG_LINES)
+	_check("是 AI 害死的" in molog_blob, "日志含突兀跳变的'是 AI 害死的'")
+	_check(("没有前一天" in molog_blob) or ("没有任何理由" in molog_blob), "日志含点破空白的旁白")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

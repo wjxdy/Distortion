@@ -40,6 +40,11 @@ var finished := false
 @onready var emo_timer: Timer = $EmoTimer
 @onready var http: HTTPRequest = $Http
 @onready var back_btn: Button = $BackBtn
+@onready var leave_btn: Button = $LeaveBtn
+@onready var fade_overlay: ColorRect = $FadeOverlay
+@onready var end_slide: Control = $EndSlide
+@onready var end_body: Label = $EndSlide/VBox/Body
+@onready var end_subtitle: Label = $EndSlide/VBox/Subtitle
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）：例如 Sfx.play_bgm("res://audio/interrogation_theme.ogg")
@@ -63,6 +68,11 @@ func _ready() -> void:
 	emo_timer.timeout.connect(_emo_tick)
 	http.request_completed.connect(_on_reply)
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
+	leave_btn.pressed.connect(_on_leave)
+	end_slide.visible = false
+	fade_overlay.visible = false
+	# 进入终局对峙(已拿莫忘日志) → 显示"起身离开"(C 分支)
+	leave_btn.visible = state.in_finale()
 	# 看手机时禁用盘问输入栏（查档案在手机里）
 	phone.opened.connect(func() -> void: _bar_enabled(false))
 	phone.closed.connect(func() -> void: _bar_enabled(not finished))
@@ -153,13 +163,15 @@ func _send() -> void:
 	state.add_to_history("user", msg)
 	input.text = ""
 	_set_busy(true)
-	# 把"调查进展"系统旁白拼在历史最前发给模型(让老头知道你查到了什么)；不写进持久化历史
+	# 非终局：把"调查进展"系统旁白拼在历史最前发给模型(让老头知道你查到了什么)；不写进持久化历史。
+	# 终局：发 finale=true，后端整套换成 FINALE_SYSTEM_PROMPT，这里不再注入旁白。
 	var to_send: Array = []
-	var prog = state.investigation_summary()
-	if prog != "":
-		to_send.append({"role": "system", "content": prog})
+	if not state.in_finale():
+		var prog = state.investigation_summary()
+		if prog != "":
+			to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)
-	var body := JSON.stringify({"history": to_send})
+	var body := JSON.stringify({"history": to_send, "finale": state.in_finale()})
 	var err := http.request(BACKEND_URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if err != OK:
 		_banner("连不上后端，请先启动：cd Game/server && npm start", Color(1, 0.45, 0.45))
@@ -187,6 +199,7 @@ func _on_reply(result: int, code: int, _headers: PackedStringArray, body: Packed
 	_check_truths()
 	_handle_hint(data)          # 优先：模型吐的标签
 	_hint_fallback(reply)       # 兜底：模型沉默/漏吐时，按对话内容+进度确定性补发
+	_handle_end(data)           # 终局：模型吐 [[end:xxx]] → 触发结局
 
 # 统一发提醒：去重(整局只一次)后弹右上角小字 + 手机响声红点。
 func _fire_hint(id: String) -> void:
@@ -200,30 +213,73 @@ func _handle_hint(data) -> void:
 	if typeof(data) == TYPE_DICTIONARY and data.has("hint"):
 		_fire_hint(str(data["hint"]))
 
+# 玩家这一句是否在「当面质疑 AI 说法 / 亮证据对质」(用于 visit_community 闸门)：
+# 要么质问 AI 的确定性，要么主张她是自然病逝/查无事故。措辞放宽，尽量覆盖自由输入。
+func _challenges_ai(m: String) -> bool:
+	var mentions_ai: bool = ("AI" in m) or ("Ａｉ" in m) or ("人工智能" in m)
+	var doubts: bool = ("为什么" in m) or ("凭什么" in m) or ("确定" in m) or ("怎么知道" in m) or ("怎么确定" in m) or ("真的" in m)
+	if mentions_ai and doubts:
+		return true
+	return ("病死" in m) or ("病逝" in m) or ("自然" in m) or ("不是AI" in m) or ("不是 AI" in m) \
+		or ("诊断" in m) or ("没有事故" in m) or ("查无" in m) or ("没事故" in m) or ("证据" in m)
+
 # 兜底：模型没吐标签(过载/漏吐/被去重)时，按老头这轮回复 + 玩家问话 + 调查进度确定性补发。
 # fire_hint 自带去重，所以和模型不会重复触发。
 func _hint_fallback(reply: String) -> void:
 	var blames_ai: bool = ("AI" in reply) or ("Ａｉ" in reply) or ("误诊" in reply)
 	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("no_accident")
 	if blames_ai:
-		if has_evidence:
-			_fire_hint("visit_community")     # 查过死因还咬定 → 去小区
-		else:
+		# 去小区要等你「当面质问 AI 说法」而他仍咬定时才弹——否则你刚查完回来他随口提 AI 就提早触发。
+		if has_evidence and _challenges_ai(last_user_msg):
+			_fire_hint("visit_community")     # 查过死因 + 当面质问仍咬定 → 去小区
+		elif not has_evidence:
 			_fire_hint("investigate_death")   # 还没查 → 去终端查死因
 	var m := last_user_msg
 	if ("莫忘" in m) or ("手机" in m) or ("app" in m) or ("APP" in m) or ("为什么用" in m) or ("天天" in m):
 		_fire_hint("protecting_app")
 
+# 终局：后端用 FINALE_SYSTEM_PROMPT 时模型按玩家态度吐 [[end:reveal/comfort]] → 触发对应结局。
+# leave 由"起身离开"按钮走 _on_leave。(ready 已弃用;若模型偶吐别的值,这里不处理即忽略。)
+func _handle_end(data) -> void:
+	if typeof(data) != TYPE_DICTIONARY:
+		return
+	var e := str(data.get("end", ""))
+	if e == "reveal" or e == "comfort":
+		_trigger_ending(e)
+
+func _on_leave() -> void:
+	if finished:
+		return
+	Sfx.play_click()
+	_trigger_ending("leave")
+
+# 渐黑 → 幻灯片(分支正文 + 统一字幕)。结局唯一入口；结束在此锁死。
+func _trigger_ending(branch: String) -> void:
+	if finished:
+		return
+	finished = true
+	input.editable = false
+	send_btn.disabled = true
+	leave_btn.visible = false
+	# 渐黑
+	fade_overlay.visible = true
+	fade_overlay.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(fade_overlay, "modulate:a", 1.0, 1.4)
+	tw.tween_callback(func() -> void: _show_end_slide(branch))
+
+func _show_end_slide(branch: String) -> void:
+	end_body.text = str(Content.ENDING_SLIDES.get(branch, ""))
+	end_subtitle.text = str(Content.ENDING)
+	end_slide.visible = true
+	end_slide.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(end_slide, "modulate:a", 1.0, 1.2)
+
 func _check_truths() -> void:
-	# 静默记录真相(供后续结局判定)。去掉了刺耳的"邦"音 + 裂痕特效 + 横幅，引导改由莫忘提醒承担。
+	# 静默记录真相(供结局/存档判定)。结束不再绑定"集齐真相"——只由终局对峙的玩家选择触发。
 	for id in Triggers.evaluate(state, last_user_msg):
 		state.reveal(id)
-	if state.revealed.size() >= Content.TRUTHS.size():
-		finished = true
-		_banner(Content.ENDING, Color(0.78, 0.57, 0.92), 6.0)
-		_log("[color=#c792ea]=== " + Content.ENDING + " ===[/color]")
-		input.editable = false
-		send_btn.disabled = true
 
 func _set_busy(b: bool) -> void:
 	send_btn.disabled = b or finished
