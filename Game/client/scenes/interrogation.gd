@@ -8,20 +8,9 @@ const GameState = preload("res://game/game_state.gd")
 const Content = preload("res://game/content.gd")
 const Triggers = preload("res://game/triggers.gd")
 const Explore = preload("res://game/explore.gd")
+const LLM = preload("res://game/llm.gd")   # 客户端直连大模型(提示词+调用+解析,替代后端)
 
-# 后端地址：本地原生版连 localhost；网页版按【页面自身 origin】推导(同源 /game/chat)，
-# 这样无论 https://xuleii.cn/game/ 还是别的域名/协议都自动正确，免混合内容、免写死。
-const BACKEND_URL_LOCAL := "http://localhost:8787/chat"
-const BACKEND_URL_WEB_FALLBACK := "https://xuleii.cn/game/chat"
-@onready var backend_url: String = _resolve_backend_url()
-
-func _resolve_backend_url() -> String:
-	if not OS.has_feature("web"):
-		return BACKEND_URL_LOCAL
-	var origin := str(JavaScriptBridge.eval("window.location.origin", true))
-	if origin.begins_with("http"):
-		return origin + "/game/chat"
-	return BACKEND_URL_WEB_FALLBACK
+# 直连大模型：地址/密钥/提示词/解析都在 LLM(game/llm.gd)，不再走自建后端。
 const POLICE := "res://scenes/police.tscn"
 
 # 周明远情绪精灵图：4 行情绪 × 4 列帧(慢速 idle，乒乓播放)，每格 256×192
@@ -79,6 +68,7 @@ func _ready() -> void:
 	input.text_submitted.connect(_on_submit)
 	emo_timer.timeout.connect(_emo_tick)
 	http.request_completed.connect(_on_reply)
+	http.timeout = 25.0   # 超时→保底沉默(原后端 14s,直连放宽到 25s 容 Moonshot 偶发慢)
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
 	leave_btn.pressed.connect(_on_leave)
 	end_slide.visible = false
@@ -175,43 +165,41 @@ func _send() -> void:
 	state.add_to_history("user", msg)
 	input.text = ""
 	_set_busy(true)
-	# 非终局：把"调查进展"系统旁白拼在历史最前发给模型(让老头知道你查到了什么)；不写进持久化历史。
-	# 终局：发 finale=true，后端整套换成 FINALE_SYSTEM_PROMPT，这里不再注入旁白。
+	# 直连大模型：非终局把"调查进展"系统旁白拼在历史最前(让老头知道你查到了什么,不写进持久化历史)；
+	# 终局由 LLM.build_messages 自动换成 FINALE 提示，这里不注入旁白。
 	var to_send: Array = []
 	if not state.in_finale():
 		var prog = state.investigation_summary()
 		if prog != "":
 			to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)
-	var body := JSON.stringify({"history": to_send, "finale": state.in_finale()})
-	var err := http.request(backend_url, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	var body := LLM.request_body(to_send, state.in_finale())
+	var err := http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, body)
 	if err != OK:
-		_banner("连不上后端，请先启动：cd Game/server && npm start", Color(1, 0.45, 0.45))
+		_show_zhou_bubble("……")   # 请求都发不出去→保底沉默(演成装糊涂)
 		_set_busy(false)
 
 func _on_reply(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	_set_busy(false)
-	if result != HTTPRequest.RESULT_SUCCESS or body.size() == 0:
-		_banner("连不上后端，请先启动：cd Game/server && npm start", Color(1, 0.45, 0.45))
-		return
-	var data = JSON.parse_string(body.get_string_from_utf8())
-	if code != 200 or typeof(data) != TYPE_DICTIONARY or not data.has("reply"):
-		var emsg := ""
-		if typeof(data) == TYPE_DICTIONARY and data.has("error"):
-			emsg = str(data["error"])
-		_banner("出错 %d %s" % [code, emsg], Color(1, 0.45, 0.45))
-		return
-	# 表情：后端若返回 emotion 则按它切，缺省 calm（接 LLM emotion 即生效）
-	if typeof(data) == TYPE_DICTIONARY and data.has("emotion"):
-		_set_emotion(str(data["emotion"]))
-	var reply := str(data["reply"])
+	# 直连大模型：成功则取 choices[0].message.content 解析；任何失败(超时/网络/结构异常/非200)
+	# 都不报错给玩家，而是「保底沉默」演成周明远装糊涂(阿尔茨海默)。
+	var parsed: Dictionary = {}
+	if result == HTTPRequest.RESULT_SUCCESS and code == 200 and body.size() > 0:
+		var data = JSON.parse_string(body.get_string_from_utf8())
+		var content := LLM.extract_content(data)
+		if content != "":
+			parsed = LLM.parse_reply(content)
+	if parsed.is_empty():
+		parsed = LLM.pick_silence()
+	_set_emotion(str(parsed.get("emotion", "calm")))
+	var reply := str(parsed.get("reply", "……"))
 	_show_zhou_bubble(reply)
 	_log("[color=#e8e1c8]周明远：[/color]" + reply)
 	state.add_to_history("assistant", reply)
 	_check_truths()
-	_handle_hint(data)          # 优先：模型吐的标签
-	_hint_fallback(reply)       # 兜底：模型沉默/漏吐时，按对话内容+进度确定性补发
-	_handle_end(data)           # 终局：模型吐 [[end:xxx]] → 触发结局
+	_handle_hint(parsed)        # 模型吐的 hint 标签
+	_hint_fallback(reply)       # 兜底：按对话内容+进度确定性补发
+	_handle_end(parsed)         # 终局：[[end:reveal/comfort]] → 触发结局
 
 # 统一发提醒：去重(整局只一次)后弹右上角小字 + 手机响声红点。
 func _fire_hint(id: String) -> void:

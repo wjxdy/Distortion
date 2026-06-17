@@ -6,6 +6,7 @@ const GameState = preload("res://game/game_state.gd")
 const Content = preload("res://game/content.gd")
 const Triggers = preload("res://game/triggers.gd")
 const Explore = preload("res://game/explore.gd")
+const LLM = preload("res://game/llm.gd")
 
 var _pass := 0
 var _fail := 0
@@ -140,6 +141,27 @@ func _initialize() -> void:
 	var molog_blob := "\n".join(Content.MOWANG_LOG_LINES)
 	_check("是 AI 害死的" in molog_blob, "日志含突兀跳变的'是 AI 害死的'")
 	_check(("没有前一天" in molog_blob) or ("没有任何理由" in molog_blob), "日志含点破空白的旁白")
+
+	# --- LLM.parse_reply（客户端直连版，移植自后端 llm.js parseReply） ---
+	var r1 = LLM.parse_reply("[sad] 她……只是出门买点菜。 ")
+	_check(r1["reply"] == "她……只是出门买点菜。" and r1["emotion"] == "sad" and r1["hint"] == "" and r1["end"] == "", "解析句首情绪+去空白")
+	var r2 = LLM.parse_reply("[angry]是 AI 害死她的！[[hint:investigate_death]]")
+	_check(r2["reply"] == "是 AI 害死她的！" and r2["emotion"] == "angry" and r2["hint"] == "investigate_death", "剥 [[hint:ID]]")
+	var r3 = LLM.parse_reply("[sad]她就那么走了。[[end:reveal]]")
+	_check(r3["reply"] == "她就那么走了。" and r3["end"] == "reveal", "剥 [[end:reveal]]")
+	_check(LLM.parse_reply("[[end:boom]]你好")["end"] == "", "非法 end 不当标签")
+	var r5 = LLM.parse_reply("[angry]是 AI 害的！[[hint:visit_community]][[end:ready]]")
+	_check(r5["reply"] == "是 AI 害的！" and r5["hint"] == "visit_community" and r5["end"] == "ready", "hint+end 共存且都剥")
+	var r6 = LLM.parse_reply("[angry]你们懂什么！\n\n[calm]好吧，我承认。")
+	_check(r6["reply"] == "你们懂什么！\n\n好吧，我承认。" and r6["emotion"] == "angry", "中段情绪标签也剥,取第一个")
+	_check(LLM.parse_reply("[happy]你好")["reply"] == "[happy]你好", "非法情绪标签原样保留")
+	var r8 = LLM.parse_reply("我就……记记日常。   [[hint:protecting_app]]")
+	_check(r8["reply"] == "我就……记记日常。" and r8["hint"] == "protecting_app", "尾部 hint 剥净不残留")
+	# build_messages：终局换 FINALE，系统提示在最前
+	var msgs = LLM.build_messages([{"role": "user", "content": "hi"}], false)
+	_check(msgs.size() == 2 and msgs[0]["role"] == "system" and "周明远" in msgs[0]["content"], "build_messages 非终局用人设提示")
+	var msgs_f = LLM.build_messages([], true)
+	_check("终局" in msgs_f[0]["content"], "build_messages 终局换 FINALE")
 
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
