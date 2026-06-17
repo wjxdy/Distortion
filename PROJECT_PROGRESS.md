@@ -32,6 +32,9 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-17: **主角精灵 + 移动系统成型**（用户已提交 63bec4d）：接入 `art/detective.png` 图集(6×5,128px) → `detective_frames.tres`(idle/walk_right/walk_up/adjust_glasses/smoke)；抽出**独立 `Player.tscn`**(`CharacterBody2D`)被各场景实例化；四向移动 + 动画映射(左右/下=walk_right翻转,上=walk_up,久站随机扶眼镜/抽烟)；可走区从矩形夹取改为**碰撞体 Walls**；门口触发从距离改为 **Area2D `overlaps_body`**(脚底碰撞体叠到才算)；加 **WASD**(`move_*` action,不碰 ui_*)；街道换真背景 `bg_street.png`。
+- 2026-06-17: **开场加 2D 假 HD-2D 氛围**（本次提交）：`opening.tscn` 加 WorldEnvironment(辉光+调色)、Rain/Dust 粒子、Vignette 暗角(`shaders/vignette.gdshader`)，全是可在编辑器调的独立节点。**未实机看,辉光在 Compatibility 下待 F5 调阈值。**
+- 2026-06-17: **定下主世界街道 HD-2D 路线 = 2D 假**（非真 3D，避免换 Forward+/破坏网页导出）：宽幅可滚动街道 + Camera2D 跟随 + ParallaxBackground(远景 0.2 / 雾 0.08) + 雨/霓虹。**待用户用 ChatGPT 生成 3 张分层图**(world_street_wide 宽主街上半透明 / world_far_city 远景 / world_fog_overlay 透明可平铺雾)后,我一次接入滚动+相机+视差+门位。AI 出的是平面图,纵深交给 Godot。
 - 2026-06-16: **剧情去邪教重写定稿**（仅文档，桌面 `失真_游戏流程_去邪教版.md`）——反派从"邪教控制 AI"改为"莫忘 AI 为留存故意迎合、喂老人假记忆"；两层真相（事实=妻子病逝/情感=老人是同谋）；结局做真分支选择；周明远降为普通老人（非 AI 之父），莫忘=商业陪伴 AI 产品；莫忘日志走终端 UI。后端 `oldman.js` 待按此微调（去 AI 之父 + 莫忘改商业产品）。
 - 2026-06-16: **新增主世界横版结构**（魂斗罗式：只左右走、没有跳、门口按 ↑ 进入），全用纯色 `ColorRect` 方块占位，后期替换真图：
   - `scenes/world.tscn/.gd`：主世界街道，警局/小区两入口；小区按↑提示"暂未开放"（先锁）。
