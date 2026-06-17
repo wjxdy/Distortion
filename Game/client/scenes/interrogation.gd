@@ -32,11 +32,7 @@ var finished := false
 @onready var status_label: Label = $Status
 @onready var input: LineEdit = $Bar/Input
 @onready var send_btn: Button = $Bar/SendBtn
-@onready var explore_btn: Button = $Bar/ExploreBtn
-@onready var backlog_btn: Button = $Bar/BacklogBtn
-@onready var backlog_panel: Panel = $BacklogPanel
-@onready var backlog_label: RichTextLabel = $BacklogPanel/Margin/VBox/BacklogLabel
-@onready var close_btn: Button = $BacklogPanel/Margin/VBox/CloseBtn
+@onready var phone: CanvasLayer = $Phone   # 可复用手机 UI(查档案在这里)
 @onready var zhou_bubble: Panel = $ZhouBubble
 @onready var zhou_label: Label = $ZhouBubble/Margin/VBox/Content
 @onready var player_bubble: Panel = $PlayerBubble
@@ -62,14 +58,14 @@ func _ready() -> void:
 	_apply_emo_frame()
 
 	# 连信号
-	explore_btn.pressed.connect(_on_explore)
-	backlog_btn.pressed.connect(_toggle_backlog)
-	close_btn.pressed.connect(_toggle_backlog)
 	send_btn.pressed.connect(_send)
 	input.text_submitted.connect(_on_submit)
 	emo_timer.timeout.connect(_emo_tick)
 	http.request_completed.connect(_on_reply)
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
+	# 看手机时禁用盘问输入栏（查档案在手机里）
+	phone.opened.connect(func() -> void: _bar_enabled(false))
+	phone.closed.connect(func() -> void: _bar_enabled(not finished))
 	input.grab_focus()
 
 	_log("[color=#888][案情] 老人周明远，行为异常，疑似 AI 被劫持。问出真相。[/color]")
@@ -77,12 +73,14 @@ func _ready() -> void:
 	# 审讯开场：周明远本人喃喃自语（记忆错乱当场可见）
 	_show_zhou_bubble("今天……是几号了。\n她出门有一会儿了，怎么还不回来。")
 
-func _log(line: String) -> void:
-	backlog_label.append_text(line + "\n\n")
+func _log(_line: String) -> void:
+	pass   # 回看记录功能已移除；保留调用点为空操作，不影响其它逻辑
 
-func _toggle_backlog() -> void:
-	Sfx.play_click()
-	backlog_panel.visible = not backlog_panel.visible
+func _bar_enabled(b: bool) -> void:
+	input.editable = b
+	send_btn.disabled = not b
+	if b:
+		input.grab_focus()
 
 # ---------- 情绪立绘 ----------
 
@@ -188,13 +186,6 @@ func _check_truths() -> void:
 		_log("[color=#c792ea]=== " + Content.ENDING + " ===[/color]")
 		input.editable = false
 		send_btn.disabled = true
-
-func _on_explore() -> void:
-	var r := Explore.perform(state, "archive")
-	if not r.is_empty():
-		Sfx.play_click()
-		_log("[color=#a0e8a0]📂 " + str(r["text"]) + "[/color]")
-		_banner("📂 " + str(r["text"]), Color(0.63, 0.91, 0.63), 4.5)
 
 func _set_busy(b: bool) -> void:
 	send_btn.disabled = b or finished

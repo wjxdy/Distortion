@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="SpriteFrames" uid="uid://5yedbaha40to" path="res://art/world_rain_city.tres" id="3_far"]
 [ext_resource type="Texture2D" uid="uid://d1jbfumvndfwb" path="res://art/world_street_road.png" id="4_street"]
+[ext_resource type="PackedScene" uid="uid://c8phone0distort" path="res://scenes/phone.tscn" id="5_phone"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
 size = Vector2(2600, 130)
@@ -127,87 +128,4 @@ theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PhoneUI" type="CanvasLayer" parent="."]
-layer = 5
-
-[node name="PhoneBtn" type="Button" parent="PhoneUI"]
-offset_left = 36.0
-offset_top = 596.0
-offset_right = 132.0
-offset_bottom = 684.0
-theme_override_font_sizes/font_size = 40
-text = "📱"
-
-[node name="Screen" type="Control" parent="PhoneUI"]
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[node name="Dim" type="ColorRect" parent="PhoneUI/Screen"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.7)
-
-[node name="Body" type="ColorRect" parent="PhoneUI/Screen"]
-offset_left = 360.0
-offset_top = 80.0
-offset_right = 920.0
-offset_bottom = 640.0
-color = Color(0.12, 0.14, 0.2, 1)
-
-[node name="Header" type="Label" parent="PhoneUI/Screen/Body"]
-offset_left = 20.0
-offset_top = 14.0
-offset_right = 540.0
-offset_bottom = 52.0
-theme_override_font_sizes/font_size = 24
-text = "📱 手机"
-
-[node name="AppList" type="VBoxContainer" parent="PhoneUI/Screen/Body"]
-offset_left = 24.0
-offset_top = 72.0
-offset_right = 200.0
-offset_bottom = 540.0
-theme_override_constants/separation = 16
-
-[node name="TaskBtn" type="Button" parent="PhoneUI/Screen/Body/AppList"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "📋 任务"
-
-[node name="ArchiveBtn" type="Button" parent="PhoneUI/Screen/Body/AppList"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "🗂 档案"
-
-[node name="CloseBtn" type="Button" parent="PhoneUI/Screen/Body/AppList"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "✕ 关闭"
-
-[node name="DisplayBg" type="ColorRect" parent="PhoneUI/Screen/Body"]
-offset_left = 216.0
-offset_top = 72.0
-offset_right = 540.0
-offset_bottom = 540.0
-color = Color(0.06, 0.07, 0.1, 1)
-
-[node name="Display" type="Label" parent="PhoneUI/Screen/Body/DisplayBg"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = -16.0
-theme_override_font_sizes/font_size = 18
-text = "点左侧 app 查看。"
-autowrap_mode = 3
+[node name="Phone" parent="." instance=ExtResource("5_phone")]

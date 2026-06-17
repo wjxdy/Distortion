@@ -5,7 +5,6 @@ extends Control
 
 const POLICE := "res://scenes/police.tscn"
 const LEVEL_WIDTH := 2560.0
-const Content = preload("res://game/content.gd")
 
 @onready var player: CharacterBody2D = $Player
 @onready var camera: Camera2D = $Camera2D
@@ -13,13 +12,7 @@ const Content = preload("res://game/content.gd")
 @onready var community_door: Area2D = $CommunityDoor
 @onready var prompt: Label = $Prompt
 @onready var toast: Label = $UI/Toast
-# 手机 UI（色块占位，节点都在 world.tscn 里可拖；脚本只管显隐与填字）
-@onready var phone_btn: Button = $PhoneUI/PhoneBtn
-@onready var phone_screen: Control = $PhoneUI/Screen
-@onready var phone_task_btn: Button = $PhoneUI/Screen/Body/AppList/TaskBtn
-@onready var phone_archive_btn: Button = $PhoneUI/Screen/Body/AppList/ArchiveBtn
-@onready var phone_close_btn: Button = $PhoneUI/Screen/Body/AppList/CloseBtn
-@onready var phone_display: Label = $PhoneUI/Screen/Body/DisplayBg/Display
+@onready var phone: CanvasLayer = $Phone   # 可复用手机 UI 实例(phone.tscn)
 
 var toast_tween: Tween
 
@@ -27,23 +20,10 @@ func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）
 	toast.modulate.a = 0.0
 	prompt.visible = false
-	phone_screen.visible = false
-	phone_btn.pressed.connect(_open_phone)
-	phone_close_btn.pressed.connect(_close_phone)
-	phone_task_btn.pressed.connect(func() -> void: phone_display.text = Content.BOSS_TASK)
-	phone_archive_btn.pressed.connect(func() -> void: phone_display.text = "（档案功能下一步接入手机）")
+	# 看手机时锁住走动（手机自身管显隐/填字，这里只联动锁人）
+	phone.opened.connect(func() -> void: player.locked = true)
+	phone.closed.connect(func() -> void: player.locked = false)
 	_update_prompt()
-
-func _open_phone() -> void:
-	Sfx.play_click()
-	phone_display.text = Content.BOSS_TASK   # 打开默认显示任务
-	phone_screen.visible = true
-	player.locked = true                     # 看手机时不让走动
-
-func _close_phone() -> void:
-	Sfx.play_click()
-	phone_screen.visible = false
-	player.locked = false
 
 func _process(_delta: float) -> void:
 	# 相机跟随玩家(水平)，夹在关卡两端不露边

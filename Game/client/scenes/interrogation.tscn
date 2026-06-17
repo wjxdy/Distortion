@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dkj88kkl1roo" path="res://art/bg_police_room.png" id="2"]
 [ext_resource type="Texture2D" uid="uid://rjp07451e8ol" path="res://art/fx_crack.png" id="3"]
 [ext_resource type="Script" uid="uid://eeldnvd1delh" path="res://scenes/tail.gd" id="4"]
+[ext_resource type="PackedScene" uid="uid://c8phone0distort" path="res://scenes/phone.tscn" id="5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bubble"]
 bg_color = Color(0, 0, 0, 0.35)
@@ -113,14 +114,6 @@ offset_bottom = -14.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 8
-
-[node name="ExploreBtn" type="Button" parent="Bar" unique_id=2015815193]
-layout_mode = 2
-text = "查档案"
-
-[node name="BacklogBtn" type="Button" parent="Bar" unique_id=1750578018]
-layout_mode = 2
-text = "📜 回看记录"
 
 [node name="Spacer" type="Control" parent="Bar" unique_id=1860727513]
 layout_mode = 2
@@ -236,52 +229,6 @@ theme_override_constants/line_spacing = 6
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="BacklogPanel" type="Panel" parent="." unique_id=832575634]
-visible = false
-z_index = 50
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 120.0
-offset_top = 60.0
-offset_right = -120.0
-offset_bottom = -80.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_backlog")
-
-[node name="Margin" type="MarginContainer" parent="BacklogPanel" unique_id=77548183]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
-
-[node name="VBox" type="VBoxContainer" parent="BacklogPanel/Margin" unique_id=37087350]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Head" type="Label" parent="BacklogPanel/Margin/VBox" unique_id=337031533]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.88, 1, 1)
-text = "📜 对话记录（找出他前后矛盾的话）"
-
-[node name="BacklogLabel" type="RichTextLabel" parent="BacklogPanel/Margin/VBox" unique_id=465325002]
-layout_mode = 2
-size_flags_vertical = 3
-bbcode_enabled = true
-scroll_following = true
-
-[node name="CloseBtn" type="Button" parent="BacklogPanel/Margin/VBox" unique_id=1170137289]
-layout_mode = 2
-text = "关闭"
-
 [node name="BackBtn" type="Button" parent="." unique_id=1540785089]
 layout_mode = 1
 anchors_preset = 2
@@ -301,3 +248,5 @@ wait_time = 0.32
 autostart = true
 
 [node name="Http" type="HTTPRequest" parent="." unique_id=1172747138]
+
+[node name="Phone" parent="." instance=ExtResource("5")]
