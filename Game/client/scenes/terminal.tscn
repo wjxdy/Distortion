@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/terminal.gd" id="1_terminal"]
+[ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="2_phone"]
 
 [node name="Terminal" type="Control"]
 layout_mode = 3
@@ -83,3 +84,5 @@ theme_override_colors/font_color = Color(0.75, 0.92, 0.8, 1)
 theme_override_font_sizes/font_size = 20
 text = "← 点左侧案卷查看。"
 autowrap_mode = 3
+
+[node name="Phone" parent="." instance=ExtResource("2_phone")]

@@ -6,8 +6,15 @@ extends Control
 const POLICE := "res://scenes/police.tscn"
 const Content = preload("res://game/content.gd")
 
+# 查到某案卷 → 莫忘弹一条提醒引导回去问老头(确定性双向提示)
+const FILE_HINTS := {
+	"wife": "ask_wife_death",
+	"medical": "ask_no_accident",
+}
+
 @onready var display: Label = $DisplayBg/Display
 @onready var back_btn: Button = $BackBtn
+@onready var phone: CanvasLayer = $Phone
 
 func _ready() -> void:
 	back_btn.pressed.connect(_back)
@@ -26,6 +33,11 @@ func _show(file_id: String) -> void:
 	var k := str(f.get("grants_key", ""))
 	if k != "":
 		Game.state.add_key(k)   # 发线索钥匙，跨场景保留
+	# 双向提示：查到关键案卷 → 莫忘弹提醒引导回去问老头(去重，只一次)
+	if FILE_HINTS.has(file_id):
+		var hid: String = FILE_HINTS[file_id]
+		if Content.MOWANG_HINTS.has(hid) and Game.state.fire_hint(hid, str(Content.MOWANG_HINTS[hid])):
+			phone.notify_hint()
 
 func _back() -> void:
 	Sfx.play_door()
