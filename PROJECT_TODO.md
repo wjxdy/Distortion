@@ -5,7 +5,9 @@
 - [ ] 主世界街道 F5 微调：背景=**动态落雨城市**(`world_rain_city.tres`,12帧)在 `ParallaxBackground/RainLayer`(横向 motion_scale=0.3 视差)，前景=主街 `world_street_road.png`。待用户实机看：① 视差漂移手感(0.3 太快/太慢可在 RainLayer 改)；② 雨夜明暗/雨量；③ 背景透出与缩放(可拖 FarCity 调"多远")；④ 墙带/门位/Player 起点。满意后无需再动。(`world_far_city.png` 已弃用。)
 - [ ] F5 调开场 2D 假 HD-2D 氛围：辉光阈值(Compatibility 下可能需调 `glow_hdr_threshold`)、暗角强度、雨/尘密度；不满意可关某节点。
 - [ ] 用 Godot 实机跑通新版完整流程（需后端在跑）：序幕 4 幕 -> 手机来电 -> 审讯气泡对话 -> 查档案 -> 追问蓝裙子/林秀兰 -> 真相裂痕 -> 结尾。重点看：气泡/尖尖位置、打字机手感、Ken Burns、真相 fx_crack 演出、回看记录。
-- [ ] 确认最终模型/云产品路线：继续用 Kimi/OpenAI 兼容接口，还是改回腾讯云大模型 + SCF。
+- [ ] 确认最终模型/云产品路线：继续用 Kimi/OpenAI 兼容接口（现默认 moonshot-v1-32k），还是改回腾讯云大模型 + SCF。
+- [ ] Moonshot 过载恢复后实测 moonshot-v1-32k 真实速度（应回到 ~1s）；当前诊断时其服务端整体过载，看不到正常速度。
+- [ ] 体验优化（可选）：客户端在等模型时显示"思考中/打字"指示，避免过载时玩家干等（保底沉默约 12s 才出「……」）。保底沉默触发次数/超时/重试在 `llm.js` 顶部常量可调。
 - [ ] 音乐（BGM）：用户后期实现，`opening.gd`/`interrogation.gd` 已留挂载点注释。
 
 ## 进行中
