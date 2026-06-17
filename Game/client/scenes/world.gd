@@ -4,6 +4,7 @@
 extends Control
 
 const POLICE := "res://scenes/police.tscn"
+const COMMUNITY := "res://scenes/community.tscn"
 const LEVEL_WIDTH := 2560.0
 
 @onready var player: CharacterBody2D = $Player
@@ -49,7 +50,7 @@ func _update_prompt() -> void:
 		prompt.text = "↑ 进入  警察局"
 		prompt.visible = true
 	elif _near(community_door):
-		prompt.text = "↑ 进入  小区（暂未开放）"
+		prompt.text = "↑ 进入  小区"
 		prompt.visible = true
 	else:
 		prompt.visible = false
@@ -61,8 +62,7 @@ func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
 	if event.is_action_pressed("move_up") and _near(community_door) and not _near(police_door):
-		Sfx.play_click()
-		_show_toast("小区暂未开放，先去警察局。")
+		_enter_door(COMMUNITY)
 
 func _enter_door(scene_path: String) -> void:
 	player.enter_door()
