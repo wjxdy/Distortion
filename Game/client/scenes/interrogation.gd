@@ -199,13 +199,9 @@ func _handle_hint(data) -> void:
 		phone.notify_hint()         # 响声 + 红点 + 右上角小字(详情在手机莫忘 app)
 
 func _check_truths() -> void:
+	# 静默记录真相(供后续结局判定)。去掉了刺耳的"邦"音 + 裂痕特效 + 横幅，引导改由莫忘提醒承担。
 	for id in Triggers.evaluate(state, last_user_msg):
 		state.reveal(id)
-		var frag := Triggers.fragment_of(id)
-		_log("[color=#ffd166]💥 " + frag + "[/color]")
-		_set_emotion("sad")   # 真相浮现 = 妻子之死，他陷入悲伤
-		_play_crack()
-		_banner("💥 " + frag, Color(1, 0.82, 0.4), 4.0)
 	if state.revealed.size() >= Content.TRUTHS.size():
 		finished = true
 		_banner(Content.ENDING, Color(0.78, 0.57, 0.92), 6.0)
