@@ -1,7 +1,11 @@
 # 项目待办
 
 ## 下一步
-- [ ] 剧情去邪教版【客户端部分】落地（后端人设已改完，见 PROGRESS 2026-06-17）：① 莫忘日志「滑坡」终端 UI（线索 8，文案见桌面文档第五节）；② 审讯对峙脚本/出示证据点（合照、诊断书、日志转折点）；③ 三分支结局 UI（A 告诉真相 / B 顺着他变成下一个莫忘 / C 沉默 + 统一收尾字幕）。
+- [ ] 剧情去邪教版【客户端】落地，分步推进（步骤A已完成）：
+  - [x] **步骤A**：`game/content.gd` 重写成去邪教版数据（两层真相 fact/complicity + 5 终端线索 + 统一结尾 + 去旧设定），TDD 23/23。
+  - [ ] **步骤2 终端室实战化**（`terminal.tscn/.gd` 现为占位）：把 content.gd 的 archive/medical/neighbor/photo/molog 挂成终端界面；重点做**莫忘日志「滑坡」UI**（线索8，文案见桌面文档第五节，content.gd 已存 molog 文案）；解锁 molog 钥匙=第二层真相入口。终端线索可按顺序门控(neighbor/photo→molog)。
+  - [ ] **步骤3 审讯室接剧本节点**：线索1「我没有家人」开场、线索7「记记日常」回避追问、最终对峙；把"结束/结局"从现在的 `revealed>=TRUTHS.size()` 解耦到对峙后的结局流程。
+  - [ ] **步骤4 三分支结局 UI**：A 告诉真相 / B 顺着他(对话框渐变成莫忘样式) / C 沉默 + 统一收尾字幕(content.gd ENDING 已就位)。
 - [ ] 主世界街道 F5 微调：背景=**动态落雨城市**(`world_rain_city.tres`,12帧)在 `ParallaxBackground/RainLayer`(横向 motion_scale=0.3 视差)，前景=主街 `world_street_road.png`。待用户实机看：① 视差漂移手感(0.3 太快/太慢可在 RainLayer 改)；② 雨夜明暗/雨量；③ 背景透出与缩放(可拖 FarCity 调"多远")；④ 墙带/门位/Player 起点。满意后无需再动。(`world_far_city.png` 已弃用。)
 - [ ] F5 调开场 2D 假 HD-2D 氛围：辉光阈值(Compatibility 下可能需调 `glow_hdr_threshold`)、暗角强度、雨/尘密度；不满意可关某节点。
 - [ ] 用 Godot 实机跑通新版完整流程（需后端在跑）：序幕 4 幕 -> 手机来电 -> 审讯气泡对话 -> 查档案 -> 追问蓝裙子/林秀兰 -> 真相裂痕 -> 结尾。重点看：气泡/尖尖位置、打字机手感、Ken Burns、真相 fx_crack 演出、回看记录。

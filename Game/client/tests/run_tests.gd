@@ -24,27 +24,45 @@ func _initialize() -> void:
 	_check(not s.has_key("linxiulan"), "初始无钥匙")
 	s.add_key("linxiulan")
 	_check(s.has_key("linxiulan"), "加钥匙后有")
-	_check(not s.is_revealed("wife"), "初始未揭示")
-	s.reveal("wife")
-	_check(s.is_revealed("wife"), "揭示后为真")
+	_check(not s.is_revealed("fact"), "初始未揭示")
+	s.reveal("fact")
+	_check(s.is_revealed("fact"), "揭示后为真")
 	s.add_to_history("user", "你好")
 	_check(s.history.size() == 1 and s.history[0]["role"] == "user", "历史可追加")
 
-	# --- Triggers ---
+	# --- Triggers（去邪教版：两层真相，确定性 钥匙 + 关键词） ---
 	var s2 = GameState.new()
-	_check(Triggers.evaluate(s2, "林秀兰是谁？").is_empty(), "没钥匙不触发")
+	_check(Triggers.evaluate(s2, "是 AI 害死她的吗").is_empty(), "没钥匙不触发第一层")
 	s2.add_key("linxiulan")
 	_check(Triggers.evaluate(s2, "今天天气如何").is_empty(), "有钥匙无关键词不触发")
-	_check(Triggers.evaluate(s2, "蓝裙子那个人是谁") == ["wife"], "有钥匙且命中关键词触发")
-	s2.reveal("wife")
-	_check(Triggers.evaluate(s2, "林秀兰").is_empty(), "已揭示不再触发")
+	_check(Triggers.evaluate(s2, "是 AI 害死她的吗") == ["fact"], "持档案+追问AI/害死 触发第一层真相(事实=病逝)")
+	s2.reveal("fact")
+	_check(Triggers.evaluate(s2, "是 AI 害死的").is_empty(), "第一层已揭示不再触发")
+	# 第二层真相：需莫忘日志钥匙
+	_check(Triggers.evaluate(s2, "是莫忘在骗你").is_empty(), "没莫忘日志钥匙不触发第二层")
+	s2.add_key("molog")
+	_check(Triggers.evaluate(s2, "是莫忘在骗你") == ["complicity"], "持莫忘日志+追问莫忘 触发第二层真相(同谋)")
 
-	# --- Explore ---
+	# --- Explore（去邪教版终端线索 -> 钥匙） ---
 	var s3 = GameState.new()
-	var r = Explore.perform(s3, "archive")
-	_check(r.has("key") and r["key"] == "linxiulan", "探索授予钥匙并返回")
-	_check(s3.has_key("linxiulan"), "探索后状态记住钥匙")
+	_check(Explore.perform(s3, "archive").get("key") == "linxiulan", "查档案授予 linxiulan")
+	_check(Explore.perform(s3, "medical").get("key") == "no_accident", "查医疗记录授予 no_accident")
+	_check(Explore.perform(s3, "molog").get("key") == "molog", "翻莫忘日志授予 molog")
 	_check(Explore.perform(s3, "不存在").is_empty(), "未知探索返回空")
+
+	# --- Content（去邪教版设定校验） ---
+	_check(Content.TRUTHS.size() == 2, "两层真相")
+	var frag_fact := Triggers.fragment_of("fact")
+	_check(("查无" in frag_fact) or ("不是" in frag_fact) or ("病逝" in frag_fact), "第一层真相=查无事故/病逝/不是AI")
+	var molog_text := ""
+	for a in Content.EXPLORE_ACTIONS:
+		if a["id"] == "molog":
+			molog_text = a["text"]
+	_check("莫忘" in molog_text, "莫忘日志文案存在")
+	# 旧设定（周明远自制 AI / AI 之父）不应再出现在任何探索文案(含标签)里
+	for a in Content.EXPLORE_ACTIONS:
+		var blob := str(a.get("label", "")) + str(a.get("text", ""))
+		_check(not ("自制" in blob), "无'自制AI'旧设定: " + str(a["id"]))
 
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
