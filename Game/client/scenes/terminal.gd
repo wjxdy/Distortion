@@ -10,6 +10,7 @@ const Content = preload("res://game/content.gd")
 const FILE_HINTS := {
 	"wife": "ask_wife_death",
 	"medical": "ask_no_accident",
+	"address": "got_address",
 }
 
 @onready var display: Label = $DisplayBg/Display

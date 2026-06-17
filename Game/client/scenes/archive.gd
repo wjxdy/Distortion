@@ -2,6 +2,7 @@
 extends Control
 
 const POLICE := "res://scenes/police.tscn"
+const Content = preload("res://game/content.gd")
 
 @onready var player: CharacterBody2D = $Player
 @onready var prompt: Label = $Prompt
@@ -56,3 +57,6 @@ func _take_key() -> void:
 	key_obj.visible = false
 	info.text = "你取走了周明远家的钥匙（搜查授权已批）。现在可以去他家了。"
 	info.visible = true
+	# 莫忘提醒：钥匙到手 → 可以去小区
+	if Game.state.fire_hint("got_key", str(Content.MOWANG_HINTS["got_key"])):
+		phone.notify_hint()
