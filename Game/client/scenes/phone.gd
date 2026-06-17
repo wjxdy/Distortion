@@ -14,6 +14,7 @@ signal closed
 @onready var phone_dot: ColorRect = $PhoneBtn/Dot
 @onready var screen: Control = $Screen
 @onready var task_btn: Button = $Screen/Body/AppList/TaskBtn
+@onready var task_dot: ColorRect = $Screen/Body/AppList/TaskBtn/Dot
 @onready var mowang_btn: Button = $Screen/Body/AppList/MowangBtn
 @onready var mowang_dot: ColorRect = $Screen/Body/AppList/MowangBtn/Dot
 @onready var close_btn: Button = $Screen/Body/AppList/CloseBtn
@@ -27,11 +28,13 @@ func _ready() -> void:
 	mowang_btn.pressed.connect(_show_mowang)
 	refresh_badge()
 
-# 外部(场景)在触发新提醒后调用，刷新红点。
+# 外部(场景)在触发新提醒后调用，刷新红点。📱 红点 = 任务或莫忘任一未读。
 func refresh_badge() -> void:
-	var unread: bool = Game.state.mowang_unread
-	phone_dot.visible = unread
-	mowang_dot.visible = unread
+	var task_un: bool = Game.state.task_unread
+	var mw_un: bool = Game.state.mowang_unread
+	phone_dot.visible = task_un or mw_un
+	task_dot.visible = task_un
+	mowang_dot.visible = mw_un
 
 func open() -> void:
 	Sfx.play_click()
@@ -46,6 +49,8 @@ func close() -> void:
 
 func _show_task() -> void:
 	display.text = Content.BOSS_TASK
+	Game.state.read_task()   # 看过任务 → 红点清
+	refresh_badge()
 
 func _show_mowang() -> void:
 	# 莫忘 app：展示已触发的提醒；看过即转已读、红点清。

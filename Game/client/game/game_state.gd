@@ -10,6 +10,9 @@ var hints_fired := {}    # {hint_id: true} 已触发过的提醒，用于去重
 var mowang_log: Array = []  # 已触发的提醒文案，按顺序（莫忘 app 里展示）
 var mowang_unread := false  # 有新提醒未读 → 手机/莫忘 app 亮红点
 
+# 上司任务：开局即有一条未读（手机/任务 app 亮红点，引导玩家先看任务）
+var task_unread := true
+
 func add_key(k: String) -> void:
 	keys[k] = true
 
@@ -37,6 +40,10 @@ func fire_hint(id: String, text: String) -> bool:
 # 玩家看过莫忘 app → 转已读（红点清）。
 func read_mowang() -> void:
 	mowang_unread = false
+
+# 玩家看过任务 → 转已读（红点清）。
+func read_task() -> void:
+	task_unread = false
 
 # 拿到某线索钥匙 = 侦探已查到对应事实。喂给模型当上下文，让周明远能对"你已查到的东西"做反应。
 const PROGRESS_FACTS := {

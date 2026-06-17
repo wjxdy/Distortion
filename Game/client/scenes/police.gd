@@ -47,7 +47,7 @@ func _input(event: InputEvent) -> void:
 	if not event.is_action_pressed("move_up"):
 		return
 	if _at(exit_area):
-		Sfx.play_click()
+		Sfx.play_door()
 		get_tree().change_scene_to_file(STREET)      # 出门回街道，直接切
 	elif _at(interrogation_area):
 		_enter_door(INTERROGATION)
@@ -56,6 +56,6 @@ func _input(event: InputEvent) -> void:
 
 func _enter_door(scene_path: String) -> void:
 	player.enter_door()
-	Sfx.play_click()
+	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout
 	get_tree().change_scene_to_file(scene_path)

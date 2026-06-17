@@ -73,7 +73,7 @@ func _finish_typing() -> void:
 	create_tween().tween_property(hint, "modulate:a", 0.3, 0.4)
 
 func _go_world() -> void:
-	Sfx.play_click()
+	Sfx.play_door()
 	get_tree().change_scene_to_file(WORLD)
 
 func _input(event: InputEvent) -> void:

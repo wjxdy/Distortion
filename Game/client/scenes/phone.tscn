@@ -68,6 +68,18 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "📋 任务"
 
+[node name="Dot" type="ColorRect" parent="Screen/Body/AppList/TaskBtn"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -22.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 22.0
+color = Color(0.9, 0.2, 0.2, 1)
+
 [node name="MowangBtn" type="Button" parent="Screen/Body/AppList"]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2

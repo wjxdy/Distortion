@@ -24,6 +24,9 @@ func _ready() -> void:
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	_update_prompt()
+	# 开局有未读任务 → 响一声通知音，提示玩家点手机看任务
+	if Game.state.task_unread:
+		Sfx.play_notify()
 
 func _process(_delta: float) -> void:
 	# 相机跟随玩家(水平)，夹在关卡两端不露边
@@ -63,7 +66,7 @@ func _input(event: InputEvent) -> void:
 
 func _enter_door(scene_path: String) -> void:
 	player.enter_door()
-	Sfx.play_click()
+	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout
 	get_tree().change_scene_to_file(scene_path)
 

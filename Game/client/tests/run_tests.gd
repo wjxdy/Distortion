@@ -106,5 +106,13 @@ func _initialize() -> void:
 		_check(("林秀兰" in summ) or ("自然" in summ), "摘要含林秀兰死因")
 		_check(("查无" in summ) or ("事故" in summ), "摘要含医疗事故查无")
 
+	# --- 开局任务红点（上司任务默认未读，看过转已读） ---
+	var s6 = GameState.new()
+	_check(s6.has_method("read_task"), "GameState 有 read_task")
+	if s6.has_method("read_task"):
+		_check(s6.task_unread, "开局上司任务默认未读(亮红点)")
+		s6.read_task()
+		_check(not s6.task_unread, "看过任务后转已读")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

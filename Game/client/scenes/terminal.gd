@@ -28,7 +28,7 @@ func _show(file_id: String) -> void:
 		Game.state.add_key(k)   # 发线索钥匙，跨场景保留
 
 func _back() -> void:
-	Sfx.play_click()
+	Sfx.play_door()
 	get_tree().change_scene_to_file(POLICE)
 
 func _input(event: InputEvent) -> void:

@@ -129,8 +129,10 @@ func _typewriter(label: Label, full: String) -> void:
 	var dur: float = clampf(full.length() * 0.04, 0.4, 2.6)
 	if type_tween and type_tween.is_valid():
 		type_tween.kill()
+	Sfx.start_typing()   # 老头打字时循环播打字机音效
 	type_tween = create_tween()
 	type_tween.tween_property(label, "visible_ratio", 1.0, dur)
+	type_tween.tween_callback(Sfx.stop_typing)   # 打完即停
 
 # ---------- 对话流程 ----------
 
@@ -194,6 +196,7 @@ func _handle_hint(data) -> void:
 		return
 	var text := str(Content.MOWANG_HINTS[id])
 	if state.fire_hint(id, text):   # 只有首次触发才提示
+		Sfx.play_notify()           # 手机弹消息音效
 		phone.refresh_badge()
 		_banner("💬 莫忘：" + text, Color(0.55, 0.85, 1), 4.5)
 
@@ -273,7 +276,7 @@ func _play_crack() -> void:
 	tw.tween_callback(func() -> void: crack.visible = false)
 
 func _back() -> void:
-	Sfx.play_click()
+	Sfx.play_door()
 	get_tree().change_scene_to_file(POLICE)
 
 func _input(event: InputEvent) -> void:
