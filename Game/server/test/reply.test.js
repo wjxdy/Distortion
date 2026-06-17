@@ -55,6 +55,12 @@ test("中文方括号【hint:ID】也能剥掉", () => {
   assert.equal(r.hint, "investigate_death");
 });
 
+test("中段插入的情绪标签也剥掉(终局把否认+卸防挤一条时)", () => {
+  const r = parseReply("[angry]你们懂什么！\n\n[calm]好吧，我承认。");
+  assert.equal(r.reply, "你们懂什么！\n\n好吧，我承认。");
+  assert.equal(r.emotion, "angry");
+});
+
 test("解析结局标签 [[end:reveal]]，剥离并返回 end", () => {
   const r = parseReply("[sad]她就那么走了。[[end:reveal]]");
   assert.equal(r.reply, "她就那么走了。");
