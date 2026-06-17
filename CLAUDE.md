@@ -30,9 +30,12 @@
 - 美术风格：**8 比特复古像素**；字体：Zpix（`fonts/zpix.ttf`，全局默认）。
 - 尚无美术的场景/物件，先用**纯色 `ColorRect` 方块 + 文字标签**占位（同样作为 `.tscn` 节点），后期用户再替换为真图。
 
-## 验证
+## 实现与验证（用 godot-mcp）
 
-- 改完用无头加载校验场景无报错：
-  `Godot --headless --path . res://scenes/<场景>.tscn --quit-after 6`
-- 客户端确定性逻辑测试：`Godot --headless --path . -s res://tests/run_tests.gd`
-- 涉及真实 UI 交互/手感的改动，最终由用户在编辑器 F5 实机确认。
+- **实现/调试 Godot 功能时，优先用 `godot-mcp`**（已配为用户级 MCP）：运行项目、捕获运行时报错/调试输出、读取场景树与项目结构、必要时创建场景/加节点。
+- **改完要用 godot-mcp 自验**改动能否跑通、有没有报错，而不是只把验证甩给用户 F5。
+- **兜底**：若本会话 godot-mcp 未加载或未连上（MCP 工具仅在会话启动时加载；无头/后台运行可能没有），退回命令行无头校验，并明确告知用户用的是兜底方式：
+  - 加载场景无报错：`Godot --headless --path . res://scenes/<场景>.tscn --quit-after 6`
+  - 确定性逻辑测试：`Godot --headless --path . -s res://tests/run_tests.gd`
+- 用 godot-mcp 建/改 `.tscn` 后，提醒用户在编辑器 **Reload Saved Scene** 才能看到。
+- 涉及真实 UI 交互/手感的改动，最终仍由用户在编辑器 F5 实机确认。

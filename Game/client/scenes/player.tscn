@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/player.gd" id="1_player"]
+[ext_resource type="SpriteFrames" path="res://art/detective_frames.tres" id="2_frames"]
+
+[sub_resource type="RectangleShape2D" id="RectFeet"]
+size = Vector2(54, 18)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_player")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Col" type="CollisionShape2D" parent="."]
+position = Vector2(0, 56)
+shape = SubResource("RectFeet")

@@ -1,68 +1,61 @@
-# 警局内部 · 横版走廊（复用街道同款移动：←→ 走，门口/出口按 ↑）
-# 三个交互点：最左=返回街道；审讯室门=进老人对话；终端室门=进终端室(占位)。
-# 美术全用纯色方块占位，后期替换。
+# 警局内部 · 走廊。移动/动画由 Player.tscn(player.gd) 负责；本脚本只管门口提示与切场景。
+# 三个交互点(按 x 区间)：最左=返回街道；审讯室门=进老人对话；终端室门=进终端室(占位)。
 extends Control
 
 const STREET := "res://scenes/world.tscn"
 const INTERROGATION := "res://scenes/interrogation.tscn"
 const TERMINAL := "res://scenes/terminal.tscn"
 
-const SPEED := 340.0
-const MIN_X := 90.0
-const MAX_X := 1190.0
-
-# 交互触发区：玩家中心 x 落在区间 [x, y] 内按 ↑ 触发
-const EXIT_ZONE := Vector2(70.0, 200.0)            # 返回街道
-const INTERROGATION_DOOR := Vector2(260.0, 460.0)  # 审讯室门
-const TERMINAL_DOOR := Vector2(800.0, 1000.0)      # 终端室门
-
-@onready var player: ColorRect = $Player
+@onready var player: CharacterBody2D = $Player
 @onready var prompt: Label = $Prompt
+@onready var exit_area: Area2D = $ExitArea
+@onready var interrogation_area: Area2D = $InterrogationArea
+@onready var terminal_area: Area2D = $TerminalArea
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）
 	prompt.visible = false
 	_update_prompt()
 
-func _process(delta: float) -> void:
-	var dir := Input.get_axis("ui_left", "ui_right")
-	if dir != 0.0:
-		var c := _player_center() + dir * SPEED * delta
-		c = clampf(c, MIN_X, MAX_X)
-		player.position.x = c - player.size.x * 0.5
+func _process(_delta: float) -> void:
+	if player.locked:
+		return
 	_update_prompt()
 
-func _player_center() -> float:
-	return player.position.x + player.size.x * 0.5
-
-func _in(zone: Vector2) -> bool:
-	var c := _player_center()
-	return c >= zone.x and c <= zone.y
+func _at(area: Area2D) -> bool:
+	# 只有人物的碰撞体(Player/Col)真正叠到触发区才算
+	return area.overlaps_body(player)
 
 func _update_prompt() -> void:
-	if _in(EXIT_ZONE):
+	if _at(exit_area):
 		prompt.text = "↑ 返回  街道"
 		prompt.visible = true
-	elif _in(INTERROGATION_DOOR):
+	elif _at(interrogation_area):
 		prompt.text = "↑ 进入  审讯室"
 		prompt.visible = true
-	elif _in(TERMINAL_DOOR):
+	elif _at(terminal_area):
 		prompt.text = "↑ 进入  终端室"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
-		prompt.position = Vector2(_player_center() - prompt.size.x * 0.5, player.position.y - 56.0)
+		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 130.0)
 
 func _input(event: InputEvent) -> void:
-	if not event.is_action_pressed("ui_up"):
+	if player.locked:
 		return
-	if _in(EXIT_ZONE):
+	if not event.is_action_pressed("move_up"):
+		return
+	if _at(exit_area):
 		Sfx.play_click()
-		get_tree().change_scene_to_file(STREET)
-	elif _in(INTERROGATION_DOOR):
-		Sfx.play_click()
-		get_tree().change_scene_to_file(INTERROGATION)
-	elif _in(TERMINAL_DOOR):
-		Sfx.play_click()
-		get_tree().change_scene_to_file(TERMINAL)
+		get_tree().change_scene_to_file(STREET)      # 出门回街道，直接切
+	elif _at(interrogation_area):
+		_enter_door(INTERROGATION)
+	elif _at(terminal_area):
+		_enter_door(TERMINAL)
+
+func _enter_door(scene_path: String) -> void:
+	player.enter_door()
+	Sfx.play_click()
+	await get_tree().create_timer(0.45).timeout
+	get_tree().change_scene_to_file(scene_path)
