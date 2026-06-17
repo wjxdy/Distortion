@@ -185,18 +185,34 @@ func _on_reply(result: int, code: int, _headers: PackedStringArray, body: Packed
 	_log("[color=#e8e1c8]周明远：[/color]" + reply)
 	state.add_to_history("assistant", reply)
 	_check_truths()
-	_handle_hint(data)
+	_handle_hint(data)          # 优先：模型吐的标签
+	_hint_fallback(reply)       # 兜底：模型沉默/漏吐时，按对话内容+进度确定性补发
 
-# 莫忘提醒：模型在 hint 字段给出节点ID → 去重(整局只一次)后弹提示条 + 手机红点。
-func _handle_hint(data) -> void:
-	if typeof(data) != TYPE_DICTIONARY or not data.has("hint"):
-		return
-	var id := str(data["hint"])
+# 统一发提醒：去重(整局只一次)后弹右上角小字 + 手机响声红点。
+func _fire_hint(id: String) -> void:
 	if id == "" or not Content.MOWANG_HINTS.has(id):
 		return
-	var text := str(Content.MOWANG_HINTS[id])
-	if state.fire_hint(id, text):   # 只有首次触发才提示
-		phone.notify_hint()         # 响声 + 红点 + 右上角小字(详情在手机莫忘 app)
+	if state.fire_hint(id, str(Content.MOWANG_HINTS[id])):
+		phone.notify_hint()
+
+# 模型在 hint 字段给出节点ID 时触发。
+func _handle_hint(data) -> void:
+	if typeof(data) == TYPE_DICTIONARY and data.has("hint"):
+		_fire_hint(str(data["hint"]))
+
+# 兜底：模型没吐标签(过载/漏吐/被去重)时，按老头这轮回复 + 玩家问话 + 调查进度确定性补发。
+# fire_hint 自带去重，所以和模型不会重复触发。
+func _hint_fallback(reply: String) -> void:
+	var blames_ai: bool = ("AI" in reply) or ("Ａｉ" in reply) or ("误诊" in reply)
+	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("no_accident")
+	if blames_ai:
+		if has_evidence:
+			_fire_hint("visit_community")     # 查过死因还咬定 → 去小区
+		else:
+			_fire_hint("investigate_death")   # 还没查 → 去终端查死因
+	var m := last_user_msg
+	if ("莫忘" in m) or ("手机" in m) or ("app" in m) or ("APP" in m) or ("为什么用" in m) or ("天天" in m):
+		_fire_hint("protecting_app")
 
 func _check_truths() -> void:
 	# 静默记录真相(供后续结局判定)。去掉了刺耳的"邦"音 + 裂痕特效 + 横幅，引导改由莫忘提醒承担。
