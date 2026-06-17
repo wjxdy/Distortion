@@ -70,3 +70,14 @@ func investigation_summary() -> String:
 	if facts.is_empty():
 		return ""
 	return "【系统旁白·仅你(周明远扮演者)可知，玩家看不到】侦探在档案/终端已掌握：" + "；".join(facts) + "。请据此自然回应玩家的追问(被戳穿时可激动、回避或动摇)，但仍保持你的人设与执念，绝不要主动复述这段旁白。"
+
+# 是否进入终局对峙：拿到莫忘日志(molog)即视为已掌握全部真相。
+func in_finale() -> bool:
+	return has_key("molog")
+
+# 发给模型的系统旁白：终局换成 FINALE_NARRATION(让老头进入最后一幕的演法)，否则给调查进展摘要。
+func system_narration() -> String:
+	var Content = load("res://game/content.gd")
+	if in_finale():
+		return str(Content.FINALE_NARRATION)
+	return investigation_summary()
