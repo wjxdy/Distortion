@@ -5,12 +5,14 @@ extends Control
 const STREET := "res://scenes/world.tscn"
 const INTERROGATION := "res://scenes/interrogation.tscn"
 const TERMINAL := "res://scenes/terminal.tscn"
+const ARCHIVE := "res://scenes/archive.tscn"
 
 @onready var player: CharacterBody2D = $Player
 @onready var prompt: Label = $Prompt
 @onready var exit_area: Area2D = $ExitArea
 @onready var interrogation_area: Area2D = $InterrogationArea
 @onready var terminal_area: Area2D = $TerminalArea
+@onready var archive_area: Area2D = $ArchiveArea
 @onready var phone: CanvasLayer = $Phone   # 走廊也能点开手机
 
 func _ready() -> void:
@@ -40,6 +42,9 @@ func _update_prompt() -> void:
 	elif _at(terminal_area):
 		prompt.text = "↑ 进入  终端室"
 		prompt.visible = true
+	elif _at(archive_area):
+		prompt.text = "↑ 进入  档案室"
+		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
@@ -57,6 +62,8 @@ func _input(event: InputEvent) -> void:
 		_enter_door(INTERROGATION)
 	elif _at(terminal_area):
 		_enter_door(TERMINAL)
+	elif _at(archive_area):
+		_enter_door(ARCHIVE)
 
 func _enter_door(scene_path: String) -> void:
 	player.enter_door()

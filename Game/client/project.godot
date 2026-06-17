@@ -18,6 +18,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 
 Sfx="*res://autoload/sfx.gd"
 Game="*res://game/game_global.gd"
+Inv="*res://scenes/inventory.tscn"
 
 [display]
 

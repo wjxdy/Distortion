@@ -9,7 +9,8 @@
   - [x] **小区支线 + 第二层真相·莫忘日志滑坡**：建 community/elevator/home_corridor/oldman_home 4 场景(色块);老人手机里莫忘日志逐条滑坡→发 molog;world 解锁小区门。引导链 ask_why_ai→visit_community→(房间)→molog→confront_molog。
   - [ ] **审讯室接剧本对峙节点 + 实机串一遍**:线索1「我没有家人」开场、线索7「记记日常」回避、线索9 最终对峙;把"结束"从 revealed>=TRUTHS 解耦到对峙后。实机验证小区全链路 + 莫忘 hint 模型触发(ask_why_ai/visit_community)是否到位。
   - [ ] **三分支结局 UI**:A真相/B顺着他(对话框渐变莫忘)/C沉默 + 统一字幕。
-  - [ ] 小区场景美术替换(现全色块占位) + 房间证物/邻居可再丰富。
+  - [x] 道具栏(autoload Inv 全局 HUD) + 警局档案室拿钥匙 + 老人家门需钥匙 + 老人手机进道具栏。
+  - [ ] 小区/档案室场景美术替换(现全色块占位) + 房间证物/邻居可再丰富。
   - [ ] **步骤3 审讯室接剧本节点**：线索1「我没有家人」开场、线索7「记记日常」回避追问、最终对峙；把"结束/结局"从现在的 `revealed>=TRUTHS.size()` 解耦到对峙后的结局流程。
   - [ ] **步骤4 三分支结局 UI**：A 告诉真相 / B 顺着他(对话框渐变成莫忘样式) / C 沉默 + 统一收尾字幕(content.gd ENDING 已就位)。
 - [ ] 主世界街道 F5 微调：背景=**动态落雨城市**(`world_rain_city.tres`,12帧)在 `ParallaxBackground/RainLayer`(横向 motion_scale=0.3 视差)，前景=主街 `world_street_road.png`。待用户实机看：① 视差漂移手感(0.3 太快/太慢可在 RainLayer 改)；② 雨夜明暗/雨量；③ 背景透出与缩放(可拖 FarCity 调"多远")；④ 墙带/门位/Player 起点。满意后无需再动。(`world_far_city.png` 已弃用。)

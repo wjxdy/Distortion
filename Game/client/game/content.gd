@@ -85,6 +85,12 @@ const MOWANG_LOG_LINES := [
 	"——它从没骗他第二次。它只是一遍遍，说他最想听的那一句。",
 ]
 
+# 道具栏里的实物道具（label 显示在道具栏格子，点击看 desc）。
+const ITEMS := {
+	"home_key": {"label": "🔑 钥匙", "desc": "周明远家的钥匙，从警局证物室取得——能打开他家的门。"},
+	"oldman_phone": {"label": "📱 老人的手机", "desc": "周明远的手机，屏幕上亮着「莫忘」。他和 AI 的全部对话日志都在里面。"}
+}
+
 # 老人房间里的两件关键证物（examine 时显示 + 发钥匙）。
 const HOME_EVIDENCE := {
 	"photo": {

@@ -18,6 +18,7 @@ var kb_tween: Tween
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）
 	Game.reset()   # 开新游戏：清空线索/真相/对话历史
+	Inv.refresh()  # 清空道具栏显示
 	for c in slides_root.get_children():
 		slides.append(c)
 		c.visible = false

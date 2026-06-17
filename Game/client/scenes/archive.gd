@@ -1,17 +1,20 @@
-# 老人楼·楼道长廊（色块占位，横版可走）。一排门牌号，702 = 周明远家。
+# 警局档案室 / 证物室（色块占位，可走）。这里取走周明远家的钥匙(搜查授权)→ 进道具栏。
 extends Control
 
-const ELEVATOR := "res://scenes/elevator.tscn"
-const HOME := "res://scenes/oldman_home.tscn"
+const POLICE := "res://scenes/police.tscn"
 
 @onready var player: CharacterBody2D = $Player
 @onready var prompt: Label = $Prompt
+@onready var info: Label = $Info
+@onready var key_obj: ColorRect = $KeyObj
+@onready var key_area: Area2D = $KeyArea
 @onready var exit_area: Area2D = $ExitArea
-@onready var home_door: Area2D = $HomeDoor
 @onready var phone: CanvasLayer = $Phone
 
 func _ready() -> void:
 	prompt.visible = false
+	info.visible = false
+	key_obj.visible = not Game.state.has_item("home_key")   # 已取过就不再显示
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 
@@ -24,11 +27,11 @@ func _at(area: Area2D) -> bool:
 	return area.overlaps_body(player)
 
 func _update_prompt() -> void:
-	if _at(home_door):
-		prompt.text = "↑ 进入  702 · 周明远家" if Game.state.has_item("home_key") else "702 · 门锁着（需要钥匙）"
+	if _at(key_area) and not Game.state.has_item("home_key"):
+		prompt.text = "↑ 取走  钥匙"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 返回  电梯"
+		prompt.text = "↑ 返回  走廊"
 		prompt.visible = true
 	else:
 		prompt.visible = false
@@ -40,13 +43,16 @@ func _input(event: InputEvent) -> void:
 		return
 	if not event.is_action_pressed("move_up"):
 		return
-	if _at(home_door):
-		if Game.state.has_item("home_key"):
-			Sfx.play_door()
-			get_tree().change_scene_to_file(HOME)
-		else:
-			Sfx.play_click()
-			prompt.text = "门锁着——去警局档案室拿钥匙"
+	if _at(key_area) and not Game.state.has_item("home_key"):
+		_take_key()
 	elif _at(exit_area):
 		Sfx.play_door()
-		get_tree().change_scene_to_file(ELEVATOR)
+		get_tree().change_scene_to_file(POLICE)
+
+func _take_key() -> void:
+	Sfx.play_click()
+	Game.state.add_item("home_key")
+	Inv.refresh()
+	key_obj.visible = false
+	info.text = "你取走了周明远家的钥匙（搜查授权已批）。现在可以去他家了。"
+	info.visible = true

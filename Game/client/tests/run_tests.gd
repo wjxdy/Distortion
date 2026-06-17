@@ -114,5 +114,14 @@ func _initialize() -> void:
 		s6.read_task()
 		_check(not s6.task_unread, "看过任务后转已读")
 
+	# --- 道具栏（钥匙等实物，门禁判定用） ---
+	var s7 = GameState.new()
+	_check(s7.has_method("add_item"), "GameState 有 add_item")
+	if s7.has_method("add_item"):
+		_check(not s7.has_item("home_key"), "初始无钥匙道具")
+		s7.add_item("home_key")
+		_check(s7.has_item("home_key"), "拿到钥匙后 has_item 为真")
+	_check(Content.ITEMS.has("home_key"), "道具表含 home_key")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

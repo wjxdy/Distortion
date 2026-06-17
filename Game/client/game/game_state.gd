@@ -13,6 +13,15 @@ var mowang_unread := false  # 有新提醒未读 → 手机/莫忘 app 亮红点
 # 上司任务：开局即有一条未读（手机/任务 app 亮红点，引导玩家先看任务）
 var task_unread := true
 
+# 道具栏：拿到的实物道具（钥匙、老人的手机…），跨场景保留，门禁判定 + 道具栏展示用
+var items := {}    # {item_id: true}
+
+func add_item(id: String) -> void:
+	items[id] = true
+
+func has_item(id: String) -> bool:
+	return items.has(id)
+
 func add_key(k: String) -> void:
 	keys[k] = true
 

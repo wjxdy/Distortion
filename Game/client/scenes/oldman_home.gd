@@ -78,6 +78,8 @@ func _examine(id: String) -> void:
 func _open_log() -> void:
 	Sfx.play_click()
 	Game.state.add_key("phone")
+	Game.state.add_item("oldman_phone")   # 老人手机进道具栏(可在道具界面回看)
+	Inv.refresh()
 	log_idx = 0
 	log_label.text = str(Content.MOWANG_LOG_LINES[0])
 	next_btn.text = "下一条 ▼"

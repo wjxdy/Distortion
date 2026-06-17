@@ -70,6 +70,13 @@ position = Vector2(1035, 640)
 position = Vector2(8, -198)
 shape = SubResource("DoorZone")
 
+[node name="ArchiveArea" type="Area2D" parent="." unique_id=311010]
+position = Vector2(700, 640)
+
+[node name="Col" type="CollisionShape2D" parent="ArchiveArea" unique_id=311011]
+position = Vector2(0, -198)
+shape = SubResource("DoorZone")
+
 [node name="ExitDoorLabel" type="Label" parent="." unique_id=311001]
 offset_left = 50.0
 offset_top = 188.0
@@ -104,6 +111,18 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 22
 text = "终端室"
+horizontal_alignment = 1
+
+[node name="ArchiveDoorLabel" type="Label" parent="." unique_id=311012]
+offset_left = 600.0
+offset_top = 188.0
+offset_right = 800.0
+offset_bottom = 222.0
+theme_override_colors/font_color = Color(0.9, 0.85, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "档案室"
 horizontal_alignment = 1
 
 [node name="Player" parent="." unique_id=414641871 instance=ExtResource("2_player")]
