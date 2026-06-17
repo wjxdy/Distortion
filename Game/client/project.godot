@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 [autoload]
 
 Sfx="*res://autoload/sfx.gd"
+Game="*res://game/game_global.gd"
 
 [display]
 

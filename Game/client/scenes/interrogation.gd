@@ -47,7 +47,7 @@ var finished := false
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）：例如 Sfx.play_bgm("res://audio/interrogation_theme.ogg")
-	state = GameState.new()
+	state = Game.state   # 用全局状态：手机/终端拿的线索跨场景保留
 
 	# 情绪精灵图切片：emo_frames[row][col]
 	var sheet := load(EMO_SHEET)

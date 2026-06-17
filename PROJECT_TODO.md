@@ -3,7 +3,8 @@
 ## 下一步
 - [ ] 剧情去邪教版【客户端】落地，分步推进（步骤A已完成）：
   - [x] **步骤A**：`game/content.gd` 重写成去邪教版数据（两层真相 fact/complicity + 5 终端线索 + 统一结尾 + 去旧设定），TDD 23/23。
-  - [ ] **步骤2 终端室实战化**（`terminal.tscn/.gd` 现为占位）：把 content.gd 的 archive/medical/neighbor/photo/molog 挂成终端界面；重点做**莫忘日志「滑坡」UI**（线索8，文案见桌面文档第五节，content.gd 已存 molog 文案）；解锁 molog 钥匙=第二层真相入口。终端线索可按顺序门控(neighbor/photo→molog)。
+  - [x] **手机中枢第一刀**：删旧"手机来电"开场→进世界点手机看上司任务；加全局状态 autoload `Game`(线索跨场景保留)；手机 UI 色块占位(任务/档案/关闭/显示区)全 .tscn 可拖。
+  - [ ] **手机中枢第二刀（接档案/线索进手机）**：把 content.gd 的 archive/medical/neighbor/photo 做成手机 app 内容(点档案→显示+授予钥匙 via Game)；**重点莫忘日志「滑坡」UI**(线索8,文案见桌面文档第五节/content.gd molog,第二层真相入口);线索可按顺序门控。做完后**退役终端室场景**(`terminal` 不再用,警局走廊终端室门改掉或留空)，并去掉审讯室里重复的"查档案"按钮。全部色块占位+.tscn 节点。
   - [ ] **步骤3 审讯室接剧本节点**：线索1「我没有家人」开场、线索7「记记日常」回避追问、最终对峙；把"结束/结局"从现在的 `revealed>=TRUTHS.size()` 解耦到对峙后的结局流程。
   - [ ] **步骤4 三分支结局 UI**：A 告诉真相 / B 顺着他(对话框渐变成莫忘样式) / C 沉默 + 统一收尾字幕(content.gd ENDING 已就位)。
 - [ ] 主世界街道 F5 微调：背景=**动态落雨城市**(`world_rain_city.tres`,12帧)在 `ParallaxBackground/RainLayer`(横向 motion_scale=0.3 视差)，前景=主街 `world_street_road.png`。待用户实机看：① 视差漂移手感(0.3 太快/太慢可在 RainLayer 改)；② 雨夜明暗/雨量；③ 背景透出与缩放(可拖 FarCity 调"多远")；④ 墙带/门位/Player 起点。满意后无需再动。(`world_far_city.png` 已弃用。)

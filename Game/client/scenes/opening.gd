@@ -13,17 +13,14 @@ var type_tween: Tween
 var kb_tween: Tween
 
 @onready var slides_root: Control = $Slides
-@onready var phone_shade: ColorRect = $PhoneShade
 @onready var hint: Label = $Hint
-@onready var phone: CenterContainer = $Phone
-@onready var go_btn: Button = $Phone/Frame/Screen/VBox/GoBtn
 
 func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）
+	Game.reset()   # 开新游戏：清空线索/真相/对话历史
 	for c in slides_root.get_children():
 		slides.append(c)
 		c.visible = false
-	go_btn.pressed.connect(_go_world)
 	_advance()
 
 func _advance() -> void:
@@ -34,7 +31,7 @@ func _advance() -> void:
 		return
 	idx += 1
 	if idx >= slides.size():
-		_show_phone()
+		_go_world()   # 序幕放完 → 直接进主世界（手机改到 world 里点）
 		return
 	_show_slide(idx)
 
@@ -74,15 +71,6 @@ func _finish_typing() -> void:
 		(slides[idx].get_node("Text") as Label).visible_ratio = 1.0
 	typing = false
 	create_tween().tween_property(hint, "modulate:a", 0.3, 0.4)
-
-func _show_phone() -> void:
-	phase = "phone"
-	if kb_tween and kb_tween.is_valid():
-		kb_tween.kill()
-	hint.hide()
-	# 保留最后一张作底，压暗 + 弹手机
-	phone_shade.visible = true
-	phone.visible = true
 
 func _go_world() -> void:
 	Sfx.play_click()

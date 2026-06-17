@@ -64,5 +64,17 @@ func _initialize() -> void:
 		var blob := str(a.get("label", "")) + str(a.get("text", ""))
 		_check(not ("自制" in blob), "无'自制AI'旧设定: " + str(a["id"]))
 
+	# --- 全局状态单例（跨场景保留线索：手机在 world 拿的钥匙，审讯室要还在） ---
+	var GG = load("res://game/game_global.gd")
+	_check(GG != null, "game_global.gd 存在(全局状态单例)")
+	if GG:
+		var g = GG.new()
+		g.reset()
+		g.state.add_key("linxiulan")
+		_check(g.state.has_key("linxiulan"), "全局状态持有钥匙")
+		g.reset()
+		_check(not g.state.has_key("linxiulan"), "reset 后清空(新游戏)")
+		g.free()
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
