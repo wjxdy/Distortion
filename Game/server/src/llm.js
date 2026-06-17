@@ -34,9 +34,10 @@ const EMOTIONS = new Set(["calm", "angry", "sinister", "sad"]);
 export function parseReply(content) {
   let text = String(content).trim();
 
-  // 提取并剥离隐藏提醒标签 [[hint:ID]]（ID 为字母/数字/下划线）
+  // 提取并剥离隐藏提醒标签 hint:ID（ID 为字母/数字/下划线）。
+  // 模型常把双括号写成单括号、或用中文【】——都要剥掉，绝不能漏进玩家看到的台词。
   let hint = "";
-  const hm = text.match(/\[\[\s*hint\s*:\s*([A-Za-z0-9_]+)\s*\]\]/i);
+  const hm = text.match(/[\[【]{1,2}\s*hint\s*:\s*([A-Za-z0-9_]+)\s*[\]】]{1,2}/i);
   if (hm) {
     hint = hm[1];
     text = (text.slice(0, hm.index) + text.slice(hm.index + hm[0].length)).trim();

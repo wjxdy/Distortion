@@ -42,3 +42,15 @@ test("提醒标签前后空白都清掉，不残留在回复里", () => {
   assert.equal(r.reply, "我就……记记日常。");
   assert.equal(r.hint, "protecting_app");
 });
+
+test("模型只写单括号 [hint:ID] 也要剥掉，绝不漏进台词", () => {
+  const r = parseReply("我记得用手机里的莫忘记事的。[hint:protecting_app]");
+  assert.equal(r.reply, "我记得用手机里的莫忘记事的。");
+  assert.equal(r.hint, "protecting_app");
+});
+
+test("中文方括号【hint:ID】也能剥掉", () => {
+  const r = parseReply("是 AI 害死她的！【hint:investigate_death】");
+  assert.equal(r.reply, "是 AI 害死她的！");
+  assert.equal(r.hint, "investigate_death");
+});
