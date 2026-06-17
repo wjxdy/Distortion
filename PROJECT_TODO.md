@@ -9,6 +9,7 @@
 - [ ] 音乐（BGM）：用户后期实现，`opening.gd`/`interrogation.gd` 已留挂载点注释。
 
 ## 进行中
+- [ ] 警局走廊 F5 微调：真背景 `bg_police_corridor.png` 已接入 + 可走 floor 带(墙 Top550/Bottom775)。待用户看：floor 带纵向高度够不够(不够就把 Walls/Top 往上拖)、三门区(ExitArea/InterrogationArea/TerminalArea)是否对准图里对应门、Player 起点。门映射:左门=街道/带窗厚门=审讯室/右侧机房开门=终端室,要换映射改 police.gd 提示文案或拖区。
 - [ ] MVP 核心审讯闭环打磨。
 - [ ] 实机验证 AI 自驱表情：开后端发消息，确认模型句首 `[情绪]` 标签被正确解析、立绘随之切换（离线只验证了 parseReply 单测 + 客户端 _set_emotion 截图）。验收通过后删 `interrogation.gd` 临时 F1-F4 调试键。
 
