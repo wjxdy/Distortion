@@ -50,7 +50,7 @@ func _update_prompt() -> void:
 		prompt.text = "↑ 进入  警察局"
 		prompt.visible = true
 	elif _near(community_door):
-		prompt.text = "↑ 进入  小区"
+		prompt.text = "↑ 进入  小区" if Game.state.has_key("home_address") else "小区（先去终端查他的住址）"
 		prompt.visible = true
 	else:
 		prompt.visible = false
@@ -62,7 +62,11 @@ func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
 	if event.is_action_pressed("move_up") and _near(community_door) and not _near(police_door):
-		_enter_door(COMMUNITY)
+		if Game.state.has_key("home_address"):
+			_enter_door(COMMUNITY)
+		else:
+			Sfx.play_click()
+			_show_toast("还不知道他住哪——先去警局终端查他的户籍。")
 
 func _enter_door(scene_path: String) -> void:
 	player.enter_door()

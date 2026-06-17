@@ -69,6 +69,27 @@ offset_right = 1280.0
 offset_bottom = 720.0
 color = Color(0.1, 0.1, 0.13, 1)
 
+[node name="StreetSign" type="ColorRect" parent="."]
+offset_left = 14.0
+offset_top = 300.0
+offset_right = 150.0
+offset_bottom = 430.0
+color = Color(0.18, 0.2, 0.26, 1)
+
+[node name="SignLabel" type="Label" parent="StreetSign"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "←
+街道
+
+走到这
+↑ 返回"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Npc1" type="ColorRect" parent="."]
 offset_left = 250.0
 offset_top = 470.0

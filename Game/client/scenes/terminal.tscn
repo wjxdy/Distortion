@@ -52,6 +52,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "📁 周明远 资料"
 
+[node name="AddressBtn" type="Button" parent="FileList"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "📁 户籍 / 住址"
+
 [node name="WifeBtn" type="Button" parent="FileList"]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2

@@ -112,6 +112,11 @@ const TERMINAL_FILES := {
 		"grants_key": "",
 		"text": "周明远，退休工人，无前科。近一年多次报警投诉医院 AI「谋杀」，均查无实据。社区备注：疑似阿尔茨海默，独居，无子女在侧。"
 	},
+	"address": {
+		"label": "周明远 户籍 / 住址",
+		"grants_key": "home_address",
+		"text": "户籍登记：周明远，独居。现住址——晚晴小区 2 号楼 702 室。（知道他家在哪了。）"
+	},
 	"wife": {
 		"label": "林秀兰 死亡记录",
 		"grants_key": "linxiulan",

@@ -21,6 +21,7 @@ func _ready() -> void:
 	# 各案卷按钮 -> 对应 TERMINAL_FILES 条目
 	($FileList/CaseBtn as Button).pressed.connect(_show.bind("case"))
 	($FileList/ZhouBtn as Button).pressed.connect(_show.bind("zhou"))
+	($FileList/AddressBtn as Button).pressed.connect(_show.bind("address"))
 	($FileList/WifeBtn as Button).pressed.connect(_show.bind("wife"))
 	($FileList/MedicalBtn as Button).pressed.connect(_show.bind("medical"))
 
