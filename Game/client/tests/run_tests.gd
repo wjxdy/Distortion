@@ -64,6 +64,13 @@ func _initialize() -> void:
 		var blob := str(a.get("label", "")) + str(a.get("text", ""))
 		_check(not ("自制" in blob), "无'自制AI'旧设定: " + str(a["id"]))
 
+	# --- 终端案卷（警局电脑终端查询项） ---
+	_check(Content.TERMINAL_FILES.has("wife") and Content.TERMINAL_FILES["wife"]["grants_key"] == "linxiulan", "终端·林秀兰记录授予 linxiulan")
+	_check(Content.TERMINAL_FILES.has("medical") and Content.TERMINAL_FILES["medical"]["grants_key"] == "no_accident", "终端·医疗事故授予 no_accident")
+	_check(("自然死亡" in Content.TERMINAL_FILES["wife"]["text"]), "终端·林秀兰记录=自然死亡")
+	for fid in Content.TERMINAL_FILES:
+		_check(Content.TERMINAL_FILES[fid]["text"] != "", "终端案卷有内容: " + str(fid))
+
 	# --- 全局状态单例（跨场景保留线索：手机在 world 拿的钥匙，审讯室要还在） ---
 	var GG = load("res://game/game_global.gd")
 	_check(GG != null, "game_global.gd 存在(全局状态单例)")
