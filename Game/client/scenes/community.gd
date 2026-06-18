@@ -12,6 +12,15 @@ const ELEVATOR := "res://scenes/elevator.tscn"
 @onready var npc_area: Area2D = $NpcArea
 @onready var building_door: Area2D = $OldBuildingDoor
 @onready var phone: CanvasLayer = $Phone
+@onready var npc1: Sprite2D = $Npc1
+@onready var npc2: Sprite2D = $Npc2
+
+const CELL_W: int = 234
+const CELL_H: int = 384
+const IDLE_FRAMES: int = 5
+var npc_frame: int = 0
+var npc_timer: float = 0.0
+var npc2_offset: int = 2   # NPC2 相位偏移，避免同步
 
 func _ready() -> void:
 	Music.play_world_with_rain()
@@ -21,10 +30,19 @@ func _ready() -> void:
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从街道/电梯回来时，落到对应入口锚点
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_animate_npcs(delta)
 	if player.locked:
 		return
 	_update_prompt()
+
+func _animate_npcs(delta: float) -> void:
+	npc_timer += delta
+	if npc_timer >= 1.0:   # 1 秒 1 帧，缓慢呼吸
+		npc_timer = 0.0
+		npc_frame = (npc_frame + 1) % IDLE_FRAMES
+		npc1.region_rect = Rect2(npc_frame * CELL_W, 0, CELL_W, CELL_H)
+		npc2.region_rect = Rect2(((npc_frame + npc2_offset) % IDLE_FRAMES) * CELL_W, 0, CELL_W, CELL_H)
 
 func _at(area: Area2D) -> bool:
 	return area.overlaps_body(player)

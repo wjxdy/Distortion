@@ -1,71 +1,188 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://vwxh4uco7o7x"]
 
-[ext_resource type="Script" path="res://scenes/elevator.gd" id="1_elev"]
+[ext_resource type="Script" uid="uid://bkag80rylp7e5" path="res://scenes/elevator.gd" id="1_elev"]
+[ext_resource type="Texture2D" uid="uid://c017ns48j0pea" path="res://art/elevator.png" id="2_elev_bg"]
+[ext_resource type="Texture2D" uid="uid://dchqif0xk5gpn" path="res://art/按键.png" id="3_btn_key"]
 
-[node name="Elevator" type="Control"]
+[sub_resource type="StyleBoxEmpty" id="EmptyStyle"]
+
+[node name="Elevator" type="Control" unique_id=334438095]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_elev")
 
-[node name="Bg" type="ColorRect" parent="."]
-offset_right = 1280.0
-offset_bottom = 720.0
-color = Color(0.08, 0.09, 0.1, 1)
+[node name="Bg" type="TextureRect" parent="." unique_id=632596738]
+layout_mode = 0
+offset_left = 2.0
+offset_right = 1287.0
+offset_bottom = 715.0
+texture = ExtResource("2_elev_bg")
+expand_mode = 2
 
-[node name="Title" type="Label" parent="."]
+[node name="Panel" type="ColorRect" parent="." unique_id=1282592313]
+layout_mode = 0
+offset_left = 920.0
+offset_top = 80.0
+offset_right = 1210.0
+offset_bottom = 640.0
+color = Color(0.04, 0.04, 0.06, 0.85)
+
+[node name="FloorDisplay" type="Label" parent="." unique_id=1360217931]
+layout_mode = 0
+offset_left = 920.0
+offset_top = 100.0
+offset_right = 1210.0
+offset_bottom = 150.0
+theme_override_colors/font_color = Color(1, 0.7, 0.3, 1)
+theme_override_font_sizes/font_size = 36
+text = "7"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="." unique_id=1290928]
+layout_mode = 0
 offset_left = 40.0
 offset_top = 30.0
-offset_right = 700.0
+offset_right = 400.0
 offset_bottom = 72.0
-theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.85, 0.88, 0.95, 1)
+theme_override_font_sizes/font_size = 26
 text = "▍电梯 · 选择楼层"
 
-[node name="BackBtn" type="Button" parent="."]
-offset_left = 1060.0
-offset_top = 30.0
-offset_right = 1244.0
-offset_bottom = 72.0
+[node name="BackBtn" type="Button" parent="." unique_id=285347998]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 640.0
+offset_right = 200.0
+offset_bottom = 690.0
 theme_override_font_sizes/font_size = 20
-text = "← 返回楼下"
+text = "← 出电梯"
 
-[node name="Floors" type="VBoxContainer" parent="."]
-offset_left = 540.0
-offset_top = 150.0
-offset_right = 740.0
-offset_bottom = 560.0
-theme_override_constants/separation = 18
+[node name="Floors" type="VBoxContainer" parent="." unique_id=1769896226]
+layout_mode = 0
+offset_left = 935.0
+offset_top = 180.0
+offset_right = 1195.0
+offset_bottom = 610.0
+theme_override_constants/separation = 12
 
-[node name="F9" type="Button" parent="Floors"]
-custom_minimum_size = Vector2(0, 70)
+[node name="F9" type="Button" parent="Floors" unique_id=772951457]
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+focus_mode = 0
+theme_override_styles/normal = SubResource("EmptyStyle")
+theme_override_styles/pressed = SubResource("EmptyStyle")
+theme_override_styles/hover = SubResource("EmptyStyle")
+flat = true
+
+[node name="KeyLabel" type="Label" parent="Floors/F9" unique_id=100000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.96, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "9 层"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="F7" type="Button" parent="Floors"]
-custom_minimum_size = Vector2(0, 70)
+[node name="F7" type="Button" parent="Floors" unique_id=4680123]
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "7 层"
+focus_mode = 0
+theme_override_styles/normal = SubResource("EmptyStyle")
+theme_override_styles/pressed = SubResource("EmptyStyle")
+theme_override_styles/hover = SubResource("EmptyStyle")
+flat = true
 
-[node name="F5" type="Button" parent="Floors"]
-custom_minimum_size = Vector2(0, 70)
+[node name="KeyLabel" type="Label" parent="Floors/F7" unique_id=100000013]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "7 层 · ▲ 老人的家"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="F5" type="Button" parent="Floors" unique_id=2038572551]
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+focus_mode = 0
+theme_override_styles/normal = SubResource("EmptyStyle")
+theme_override_styles/pressed = SubResource("EmptyStyle")
+theme_override_styles/hover = SubResource("EmptyStyle")
+flat = true
+
+[node name="KeyLabel" type="Label" parent="Floors/F5" unique_id=100000023]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.96, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "5 层"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="F3" type="Button" parent="Floors"]
-custom_minimum_size = Vector2(0, 70)
+[node name="F3" type="Button" parent="Floors" unique_id=2103876858]
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "3 层"
+focus_mode = 0
+theme_override_styles/normal = SubResource("EmptyStyle")
+theme_override_styles/pressed = SubResource("EmptyStyle")
+theme_override_styles/hover = SubResource("EmptyStyle")
+flat = true
 
-[node name="Info" type="Label" parent="."]
-offset_left = 440.0
-offset_top = 590.0
-offset_right = 840.0
-offset_bottom = 628.0
+[node name="KeyLabel" type="Label" parent="Floors/F3" unique_id=100000033]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.96, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = "3 层"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PressedOverlay" type="TextureRect" parent="." unique_id=-795038895]
+visible = false
+self_modulate = Color(1, 0.72, 0.25, 0)
+layout_mode = 0
+offset_left = 540.0
+offset_top = 230.0
+offset_right = 740.0
+offset_bottom = 430.0
+texture = ExtResource("3_btn_key")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="Label" parent="." unique_id=2006587173]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 640.0
+offset_right = 820.0
+offset_bottom = 690.0
 theme_override_colors/font_color = Color(1, 0.82, 0.5, 1)
 theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1

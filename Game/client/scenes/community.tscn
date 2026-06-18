@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://dd44mu722nl0n" path="res://scenes/community.gd" id="1_comm"]
 [ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="3_phone"]
+[ext_resource type="Texture2D" uid="uid://qgc4twc5rlmv" path="res://art/‌community.png" id="4_community_bg"]
+[ext_resource type="Texture2D" uid="uid://bhej6878ppwam" path="res://art/npc/combined_5x3_1170x1152_T0B0L0R0.png" id="5_npc1"]
+[ext_resource type="Texture2D" uid="uid://oemod6d6bsen" path="res://art/npc/combined_5x3_1170x1152_T0B0L0R0 (1).png" id="6_npc2"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
 size = Vector2(1300, 120)
@@ -22,11 +25,14 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_comm")
 
-[node name="Bg" type="ColorRect" parent="." unique_id=1300378209]
+[node name="Bg" type="TextureRect" parent="." unique_id=1300378209]
 layout_mode = 0
-offset_right = 1280.0
-offset_bottom = 720.0
-color = Color(0.07, 0.08, 0.12, 1)
+offset_left = 4.0
+offset_top = -12.0
+offset_right = 1283.0
+offset_bottom = 711.0
+texture = ExtResource("4_community_bg")
+expand_mode = 2
 
 [node name="Building1" type="ColorRect" parent="." unique_id=1263901285]
 layout_mode = 0
@@ -34,7 +40,7 @@ offset_left = 180.0
 offset_top = 110.0
 offset_right = 460.0
 offset_bottom = 560.0
-color = Color(0.13, 0.14, 0.2, 1)
+color = Color(0.13, 0.14, 0.2, 0)
 
 [node name="B1Label" type="Label" parent="Building1" unique_id=1531837297]
 layout_mode = 0
@@ -51,7 +57,7 @@ offset_left = 760.0
 offset_top = 110.0
 offset_right = 1060.0
 offset_bottom = 560.0
-color = Color(0.16, 0.15, 0.19, 1)
+color = Color(0.16, 0.15, 0.19, 0)
 
 [node name="B2Label" type="Label" parent="Building2" unique_id=652982888]
 layout_mode = 0
@@ -69,7 +75,7 @@ offset_left = 110.0
 offset_top = 300.0
 offset_right = 200.0
 offset_bottom = 450.0
-color = Color(0.05, 0.05, 0.07, 1)
+color = Color(0.05, 0.05, 0.07, 0)
 
 [node name="Floor" type="ColorRect" parent="." unique_id=172165125]
 layout_mode = 0
@@ -77,7 +83,7 @@ offset_left = -9.0
 offset_top = 541.0
 offset_right = 1266.0
 offset_bottom = 721.0
-color = Color(0.1, 0.1, 0.13, 1)
+color = Color(0.1, 0.1, 0.13, 0)
 
 [node name="StreetSign" type="ColorRect" parent="." unique_id=653465616]
 layout_mode = 0
@@ -85,7 +91,7 @@ offset_left = 14.0
 offset_top = 300.0
 offset_right = 150.0
 offset_bottom = 430.0
-color = Color(0.18, 0.2, 0.26, 1)
+color = Color(0.18, 0.2, 0.26, 0)
 
 [node name="SignLabel" type="Label" parent="StreetSign" unique_id=258158224]
 layout_mode = 0
@@ -101,21 +107,19 @@ text = "←
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Npc1" type="ColorRect" parent="." unique_id=551695129]
-layout_mode = 0
-offset_left = 250.0
-offset_top = 470.0
-offset_right = 300.0
-offset_bottom = 560.0
-color = Color(0.35, 0.4, 0.5, 1)
+[node name="Npc1" type="Sprite2D" parent="." unique_id=551695129]
+position = Vector2(248, 482)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("5_npc1")
+region_enabled = true
+region_rect = Rect2(0, 0, 234, 384)
 
-[node name="Npc2" type="ColorRect" parent="." unique_id=975427008]
-layout_mode = 0
-offset_left = 340.0
-offset_top = 470.0
-offset_right = 390.0
-offset_bottom = 560.0
-color = Color(0.4, 0.36, 0.45, 1)
+[node name="Npc2" type="Sprite2D" parent="." unique_id=975427008]
+position = Vector2(360, 480)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("6_npc2")
+region_enabled = true
+region_rect = Rect2(0, 0, 234, 384)
 
 [node name="NpcText" type="Label" parent="." unique_id=1898626679]
 visible = false
