@@ -130,6 +130,17 @@ vertical_alignment = 1
 
 [node name="Phone" parent="." unique_id=78586422 instance=ExtResource("5_phone")]
 
+[node name="IntroFadeLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="IntroFade" type="ColorRect" parent="IntroFadeLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
 [node name="Spawns" type="Node2D" parent="." unique_id=1012107982]
 
 [node name="start" type="Marker2D" parent="Spawns" unique_id=1851279430]

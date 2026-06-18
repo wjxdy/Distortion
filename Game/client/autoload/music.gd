@@ -2,13 +2,16 @@
 extends Node
 
 const MAIN_WORLD := "res://audio/bgm/main_world.ogg"
+const OPENING_SLIDES := "res://audio/bgm/opening_slides.mp3"
 const RAIN_WORLD := "res://audio/ambience/rain_world.ogg"
+const POLICE_STATION := "res://audio/ambience/police_station_ambience.mp3"
 const MUSIC_BUS := "Music"   # BGM+雨声走这条独立总线，设置里开关=静音它(不影响音效)
 
 @export var default_volume_db := -13.0
 @export var fade_seconds := 0.8
 @export var rain_volume_db := -13.0
 @export var rain_fade_seconds := 2.0
+@export var police_ambience_volume_db := -15.0
 
 var current_path := ""
 var _player: AudioStreamPlayer
@@ -18,6 +21,7 @@ var _rain_tween: Tween
 
 func _ready() -> void:
 	_setup_bus()
+	set_enabled(true)
 	_ensure_player()
 
 # 运行时建一条 "Music" 音频总线(发送到 Master)，BGM/雨声 player 都走它。
@@ -39,6 +43,10 @@ func is_enabled() -> bool:
 	var idx := AudioServer.get_bus_index(MUSIC_BUS)
 	return idx == -1 or not AudioServer.is_bus_mute(idx)
 
+func play_opening() -> void:
+	stop_rain()
+	fade_to(OPENING_SLIDES, default_volume_db, 1.4)
+
 func play_world() -> void:
 	fade_to(MAIN_WORLD)
 
@@ -46,7 +54,11 @@ func play_world_with_rain() -> void:
 	play_world()
 	start_rain()
 
-func fade_to(path: String, target_volume_db := default_volume_db) -> void:
+func play_police_ambience() -> void:
+	stop_rain(0.6)
+	fade_to(POLICE_STATION, police_ambience_volume_db, 1.2)
+
+func fade_to(path: String, target_volume_db := default_volume_db, duration := fade_seconds) -> void:
 	_ensure_player()
 	if current_path == path and _player.playing:
 		return
@@ -58,26 +70,28 @@ func fade_to(path: String, target_volume_db := default_volume_db) -> void:
 		_fade_tween.kill()
 	if _player.playing:
 		_fade_tween = create_tween()
-		_fade_tween.tween_property(_player, "volume_db", -80.0, fade_seconds * 0.5)
+		_fade_tween.tween_property(_player, "volume_db", -80.0, duration * 0.5)
 		_fade_tween.tween_callback(func() -> void: _start_stream(path, stream, target_volume_db))
-		_fade_tween.tween_property(_player, "volume_db", target_volume_db, fade_seconds * 0.5)
+		_fade_tween.tween_property(_player, "volume_db", target_volume_db, duration * 0.5)
 	else:
-		_start_stream(path, stream, target_volume_db)
+		_start_stream(path, stream, -80.0)
+		_fade_tween = create_tween()
+		_fade_tween.tween_property(_player, "volume_db", target_volume_db, duration)
 
-func stop() -> void:
+func stop(duration := fade_seconds) -> void:
 	_ensure_player()
 	if _fade_tween and _fade_tween.is_valid():
 		_fade_tween.kill()
 	if not _player.playing:
 		return
 	_fade_tween = create_tween()
-	_fade_tween.tween_property(_player, "volume_db", -80.0, fade_seconds)
+	_fade_tween.tween_property(_player, "volume_db", -80.0, duration)
 	_fade_tween.tween_callback(func() -> void:
 		_player.stop()
 		current_path = ""
 	)
 
-func start_rain(target_volume_db := rain_volume_db) -> void:
+func start_rain(target_volume_db := rain_volume_db, duration := rain_fade_seconds) -> void:
 	_ensure_rain_player()
 	if _rain_tween and _rain_tween.is_valid():
 		_rain_tween.kill()
@@ -93,16 +107,16 @@ func start_rain(target_volume_db := rain_volume_db) -> void:
 		_rain_player.volume_db = -80.0
 		_rain_player.play()
 	_rain_tween = create_tween()
-	_rain_tween.tween_property(_rain_player, "volume_db", target_volume_db, rain_fade_seconds)
+	_rain_tween.tween_property(_rain_player, "volume_db", target_volume_db, duration)
 
-func stop_rain() -> void:
+func stop_rain(duration := rain_fade_seconds * 0.5) -> void:
 	_ensure_rain_player()
 	if _rain_tween and _rain_tween.is_valid():
 		_rain_tween.kill()
 	if not _rain_player.playing:
 		return
 	_rain_tween = create_tween()
-	_rain_tween.tween_property(_rain_player, "volume_db", -80.0, rain_fade_seconds * 0.5)
+	_rain_tween.tween_property(_rain_player, "volume_db", -80.0, duration)
 	_rain_tween.tween_callback(_rain_player.stop)
 
 func _ensure_player() -> void:
@@ -123,6 +137,8 @@ func _ensure_rain_player() -> void:
 
 func _start_stream(path: String, stream: AudioStream, target_volume_db: float) -> void:
 	if stream is AudioStreamOggVorbis:
+		stream.loop = true
+	elif stream is AudioStreamMP3:
 		stream.loop = true
 	current_path = path
 	_player.stream = stream

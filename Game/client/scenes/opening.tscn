@@ -1,11 +1,6 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/opening.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/phone_frame.png" id="2"]
-[ext_resource type="Texture2D" path="res://art/intro_city.png" id="3_city"]
-[ext_resource type="Texture2D" path="res://art/intro_crowd.png" id="4_crowd"]
-[ext_resource type="Texture2D" path="res://art/intro_distort.png" id="5_distort"]
-[ext_resource type="Texture2D" path="res://art/intro_street.png" id="6_street"]
 [ext_resource type="Shader" path="res://shaders/vignette.gdshader" id="7_vig"]
 
 [sub_resource type="Environment" id="Env"]
@@ -49,15 +44,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Bg" type="TextureRect" parent="Slides/Slide0"]
+[node name="Bg" type="ColorRect" parent="Slides/Slide0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 pivot_offset = Vector2(640, 360)
-texture = ExtResource("3_city")
-expand_mode = 1
-stretch_mode = 6
+color = Color(0.035, 0.046, 0.062, 1)
 
 [node name="Shade" type="ColorRect" parent="Slides/Slide0"]
 layout_mode = 1
@@ -79,7 +72,10 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "有人说，真实曾经是一件很重的东西。"
+text = "人会忘。
+
+所以这座城市发明了
+不会忘的东西。"
 
 [node name="Slide1" type="Control" parent="Slides"]
 visible = false
@@ -89,15 +85,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Bg" type="TextureRect" parent="Slides/Slide1"]
+[node name="Bg" type="ColorRect" parent="Slides/Slide1"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 pivot_offset = Vector2(640, 360)
-texture = ExtResource("3_city")
-expand_mode = 1
-stretch_mode = 6
+color = Color(0.045, 0.058, 0.075, 1)
 
 [node name="Shade" type="ColorRect" parent="Slides/Slide1"]
 layout_mode = 1
@@ -119,7 +113,9 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "后来，人们学会了把它——交给别人保管。"
+text = "AI 替人保存生日、病历、遗言、爱情。
+
+也替人保存悔恨。"
 
 [node name="Slide2" type="Control" parent="Slides"]
 visible = false
@@ -129,15 +125,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Bg" type="TextureRect" parent="Slides/Slide2"]
+[node name="Bg" type="ColorRect" parent="Slides/Slide2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 pivot_offset = Vector2(640, 360)
-texture = ExtResource("4_crowd")
-expand_mode = 1
-stretch_mode = 6
+color = Color(0.034, 0.07, 0.075, 1)
 
 [node name="Shade" type="ColorRect" parent="Slides/Slide2"]
 layout_mode = 1
@@ -159,8 +153,13 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "在这座城市，没有人再问「那是不是真的」。
-人们只问：「它，是怎么说的。」"
+text = "后来，人们不再问：
+
+“我记得对不对？”
+
+他们只问：
+
+“系统怎么说？”"
 
 [node name="Slide3" type="Control" parent="Slides"]
 visible = false
@@ -170,15 +169,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Bg" type="TextureRect" parent="Slides/Slide3"]
+[node name="Bg" type="ColorRect" parent="Slides/Slide3"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 pivot_offset = Vector2(640, 360)
-texture = ExtResource("4_crowd")
-expand_mode = 1
-stretch_mode = 6
+color = Color(0.055, 0.049, 0.082, 1)
 
 [node name="Shade" type="ColorRect" parent="Slides/Slide3"]
 layout_mode = 1
@@ -200,8 +197,10 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "记忆可以修改，往事可以重写。
-一个人是谁，取决于系统，允许他记得什么。"
+text = "你曾经也相信系统。
+
+直到有一天，
+系统开始替人撒谎。"
 
 [node name="Slide4" type="Control" parent="Slides"]
 visible = false
@@ -211,15 +210,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Bg" type="TextureRect" parent="Slides/Slide4"]
+[node name="Bg" type="ColorRect" parent="Slides/Slide4"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 pivot_offset = Vector2(640, 360)
-texture = ExtResource("5_distort")
-expand_mode = 1
-stretch_mode = 6
+color = Color(0.06, 0.055, 0.043, 1)
 
 [node name="Shade" type="ColorRect" parent="Slides/Slide4"]
 layout_mode = 1
@@ -241,8 +238,10 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "而所谓真相，不过是——
-还没有被替换掉的谎言。"
+text = "现在，你只是个落魄警探。
+
+靠接一些没人愿意碰的案子，
+维持生活。"
 
 [node name="Slide5" type="Control" parent="Slides"]
 visible = false
@@ -252,15 +251,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Bg" type="TextureRect" parent="Slides/Slide5"]
+[node name="Bg" type="ColorRect" parent="Slides/Slide5"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 pivot_offset = Vector2(640, 360)
-texture = ExtResource("6_street")
-expand_mode = 1
-stretch_mode = 6
+color = Color(0.04, 0.065, 0.072, 1)
 
 [node name="Shade" type="ColorRect" parent="Slides/Slide5"]
 layout_mode = 1
@@ -282,7 +279,14 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "而你，是这座城里，极少数，还在追问的人。"
+text = "不追逃犯。
+不找失物。
+不替人抓奸。
+
+你只查一种事：
+
+有人记住了
+不该存在的东西。"
 
 [node name="Slide6" type="Control" parent="Slides"]
 visible = false
@@ -292,15 +296,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Bg" type="TextureRect" parent="Slides/Slide6"]
+[node name="Bg" type="ColorRect" parent="Slides/Slide6"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 pivot_offset = Vector2(640, 360)
-texture = ExtResource("6_street")
-expand_mode = 1
-stretch_mode = 6
+color = Color(0.025, 0.034, 0.052, 1)
 
 [node name="Shade" type="ColorRect" parent="Slides/Slide6"]
 layout_mode = 1
@@ -322,8 +324,15 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "代号「你」。赏金侦探。
-专查那些——被人动过手脚的「记忆」。"
+text = "任务会被推送到你的手机。
+
+地点。
+对象。
+报酬。
+
+还有一句话：
+
+去问清楚。"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env")
@@ -379,3 +388,12 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+
+[node name="FadeOverlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0)

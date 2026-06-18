@@ -12,6 +12,7 @@ var state: GameState
 # 目标场景 _ready 调 place_player 把玩家摆到对应 Marker2D 后清空。
 # 为空（如开局从序幕进街道）则保持目标 .tscn 里的默认出生点。
 var spawn_point: String = ""
+var world_intro_from_opening := false
 
 func _ready() -> void:
 	reset()
@@ -19,6 +20,7 @@ func _ready() -> void:
 # 开新游戏时调用（开场 opening 会调）：清空钥匙/真相/历史。
 func reset() -> void:
 	state = GameState.new()
+	world_intro_from_opening = false
 
 # 目标场景在 _ready 里调：按 spawn_point 找 Spawns/<名字> 的 Marker2D（可在编辑器拖），
 # 把玩家移过去。没指定来源（如开局从序幕进街道）则回退到 Spawns/start 锚点。

@@ -14,27 +14,41 @@ const LEVEL_WIDTH := 2560.0
 @onready var prompt: Label = $Prompt
 @onready var toast: Label = $UI/Toast
 @onready var phone: CanvasLayer = $Phone   # 可复用手机 UI 实例(phone.tscn)
+@onready var intro_fade: ColorRect = $IntroFadeLayer/IntroFade
 
 var toast_tween: Tween
+var intro_running := false
 
 func _ready() -> void:
-	Music.play_world_with_rain()
+	var intro_from_opening := Game.world_intro_from_opening
+	Game.world_intro_from_opening = false
 	toast.modulate.a = 0.0
 	prompt.visible = false
+	intro_fade.visible = intro_from_opening
+	intro_fade.color.a = 1.0 if intro_from_opening else 0.0
+	Inv.visible = not intro_from_opening
+	if intro_from_opening:
+		intro_running = true
+		player.locked = true
+		Music.stop_rain(0.1)
+		Music.fade_to(Music.MAIN_WORLD, Music.default_volume_db, 2.0)
+		_run_opening_arrival()
+	else:
+		Music.play_world_with_rain()
 	# 看手机时锁住走动（手机自身管显隐/填字，这里只联动锁人）
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从别的场景回来时，落到对应入口锚点
 	_update_prompt()
-	# 开局有未读任务 → 响一声通知音，提示玩家点手机看任务
-	if Game.state.task_unread:
-		Sfx.play_notify()
+	# 开局有未读任务 → 只弹文字提示；不播通知音，避免打断开场入场。
+	if Game.state.task_unread and not intro_from_opening:
+		_show_toast("【周队】新任务已送达")
 
 func _process(_delta: float) -> void:
 	# 相机跟随玩家(水平)，夹在关卡两端不露边
 	camera.position.x = clampf(player.position.x, 640.0, LEVEL_WIDTH - 640.0)
 	camera.position.y = 360.0
-	if player.locked:
+	if player.locked or intro_running:
 		return
 	# 走到警局门口且按住 W/↑ → 进入
 	if _near(police_door) and Input.is_action_pressed("move_up"):
@@ -60,7 +74,7 @@ func _update_prompt() -> void:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
 func _input(event: InputEvent) -> void:
-	if player.locked:
+	if player.locked or intro_running:
 		return
 	if event.is_action_pressed("move_up") and _near(community_door) and not _near(police_door):
 		if Game.state.has_key("home_address"):
@@ -84,3 +98,17 @@ func _show_toast(msg: String) -> void:
 	toast_tween = create_tween()
 	toast_tween.tween_interval(1.2)
 	toast_tween.tween_property(toast, "modulate:a", 0.0, 0.5)
+
+func _run_opening_arrival() -> void:
+	await get_tree().create_timer(0.8).timeout
+	Music.start_rain(Music.rain_volume_db, 2.2)
+	await get_tree().create_timer(0.45).timeout
+	var fade := create_tween()
+	fade.tween_property(intro_fade, "color:a", 0.0, 1.6)
+	await fade.finished
+	intro_fade.visible = false
+	intro_running = false
+	player.locked = false
+	Inv.visible = true
+	if Game.state.task_unread:
+		_show_toast("【周队】新任务已送达")

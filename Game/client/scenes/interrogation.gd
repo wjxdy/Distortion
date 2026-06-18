@@ -55,7 +55,7 @@ var _req_start := 0
 @onready var end_subtitle: Label = $EndSlide/VBox/Subtitle
 
 func _ready() -> void:
-	# BGM 挂载点（音乐由用户后期实现）：例如 Sfx.play_bgm("res://audio/interrogation_theme.ogg")
+	Music.play_police_ambience()
 	state = Game.state   # 用全局状态：手机/终端拿的线索跨场景保留
 
 	# 情绪精灵图切片：emo_frames[row][col]

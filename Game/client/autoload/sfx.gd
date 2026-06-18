@@ -10,13 +10,15 @@ var typing: AudioStream      # 老头对话打字机(循环；打字时播，打
 
 var _typing_player: AudioStreamPlayer  # 打字机专用持久 player，便于 start/stop
 var _typing_fade: Tween                # 起停淡入淡出，避免硬起硬停的爆音"嘣"
-const TYPING_VOL_DB := 0.0
-const TYPING_FADE := 0.06
+const TYPING_VOL_DB := -8.0
+const TYPING_SILENT_DB := -60.0
+const TYPING_FADE := 0.18
 
 func _ready() -> void:
 	blip = load("res://audio/blip.wav")
 	click = load("res://audio/click.wav")
-	reveal = load("res://audio/reveal.wav")
+	if ResourceLoader.exists("res://audio/reveal.wav"):
+		reveal = load("res://audio/reveal.wav")
 	door = load("res://audio/open_door.wav")
 	notify = load("res://audio/notify.wav")
 	typing = load("res://audio/typing.mp3")
@@ -51,16 +53,17 @@ func play_notify() -> void:
 	_play(notify)
 
 # 打字机音效：开始打字时调（已在播则不重复），打字结束时调 stop。
-# 起播淡入、停时淡出（~60ms），避免在波形高点硬起硬停产生的小爆音"嘣"。
+# 起播淡入、停时淡出，避免在波形高点硬起硬停产生的小爆音"嘣"。
 func start_typing() -> void:
 	if not _typing_player:
 		return
 	if _typing_fade and _typing_fade.is_valid():
 		_typing_fade.kill()
 	if _typing_player.playing:
-		_typing_player.volume_db = TYPING_VOL_DB
+		_typing_fade = create_tween()
+		_typing_fade.tween_property(_typing_player, "volume_db", TYPING_VOL_DB, TYPING_FADE)
 		return
-	_typing_player.volume_db = -40.0
+	_typing_player.volume_db = TYPING_SILENT_DB
 	_typing_player.play()
 	_typing_fade = create_tween()
 	_typing_fade.tween_property(_typing_player, "volume_db", TYPING_VOL_DB, TYPING_FADE)
@@ -71,5 +74,5 @@ func stop_typing() -> void:
 	if _typing_fade and _typing_fade.is_valid():
 		_typing_fade.kill()
 	_typing_fade = create_tween()
-	_typing_fade.tween_property(_typing_player, "volume_db", -40.0, TYPING_FADE)
+	_typing_fade.tween_property(_typing_player, "volume_db", TYPING_SILENT_DB, TYPING_FADE)
 	_typing_fade.tween_callback(_typing_player.stop)

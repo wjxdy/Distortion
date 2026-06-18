@@ -16,8 +16,7 @@ const ARCHIVE := "res://scenes/archive.tscn"
 @onready var phone: CanvasLayer = $Phone   # 走廊也能点开手机
 
 func _ready() -> void:
-	Music.stop()
-	Music.stop_rain()
+	Music.play_police_ambience()
 	prompt.visible = false
 	# 看手机时锁住走动（与 world 一致）
 	phone.opened.connect(func() -> void: player.locked = true)
