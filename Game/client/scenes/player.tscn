@@ -20,3 +20,5 @@ autoplay = "idle"
 [node name="Col" type="CollisionShape2D" parent="." unique_id=1978472095]
 position = Vector2(0, 56)
 shape = SubResource("RectFeet")
+
+[node name="FootstepPlayer" type="AudioStreamPlayer" parent="." unique_id=387423195]

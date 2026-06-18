@@ -1,5 +1,5 @@
 # 警局内部 · 走廊。移动/动画由 Player.tscn(player.gd) 负责；本脚本只管门口提示与切场景。
-# 三个交互点(按 x 区间)：最左=返回街道；审讯室门=进老人对话；终端室门=进终端室(占位)。
+# 四个交互点(从左到右)：返回街道 / 审讯室 / 电脑终端室 / 档案室。
 extends Control
 
 const STREET := "res://scenes/world.tscn"
@@ -16,7 +16,8 @@ const ARCHIVE := "res://scenes/archive.tscn"
 @onready var phone: CanvasLayer = $Phone   # 走廊也能点开手机
 
 func _ready() -> void:
-	# BGM 挂载点（音乐由用户后期实现）
+	Music.stop()
+	Music.stop_rain()
 	prompt.visible = false
 	# 看手机时锁住走动（与 world 一致）
 	phone.opened.connect(func() -> void: player.locked = true)

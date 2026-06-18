@@ -5,30 +5,41 @@
 # 进门由场景脚本调 enter_door()：锁住移动 + 播 walk_up；场景随后切场景。
 extends CharacterBody2D
 
+const FOOTSTEP_STREAM := preload("res://audio/footstep06.wav")
+
 @export var speed := 300.0
+@export var footstep_interval := 0.64
+@export var footstep_volume_db := -16.0
 
 var locked := false                 # 进门动画期间锁移动
 var idle_gap := 0.0
+var footstep_time := 0.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
+@onready var footstep_player: AudioStreamPlayer = $FootstepPlayer
 
 func _ready() -> void:
 	sprite.animation_finished.connect(_on_anim_finished)
 	sprite.play("idle")
 	idle_gap = randf_range(4.0, 8.0)
+	footstep_player.stream = FOOTSTEP_STREAM
+	footstep_player.volume_db = footstep_volume_db
 
 func _physics_process(delta: float) -> void:
 	if locked:
 		velocity = Vector2.ZERO
 		move_and_slide()
+		footstep_time = 0.0
 		return
 	var v := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = v * speed
 	move_and_slide()
 	if v != Vector2.ZERO:
 		_move_anim(v)
+		_update_footsteps(delta)
 		idle_gap = randf_range(4.0, 8.0)
 	else:
+		footstep_time = 0.0
 		_idle_behavior(delta)
 
 func _move_anim(v: Vector2) -> void:
@@ -59,7 +70,17 @@ func _on_anim_finished() -> void:
 		sprite.play("idle")
 		idle_gap = randf_range(4.0, 8.0)
 
+func _update_footsteps(delta: float) -> void:
+	footstep_time -= delta
+	if footstep_time > 0.0:
+		return
+	footstep_time = footstep_interval
+	footstep_player.pitch_scale = randf_range(0.92, 1.08)
+	footstep_player.volume_db = footstep_volume_db + randf_range(-2.0, 1.0)
+	footstep_player.play()
+
 # 场景调用：进门 —— 锁住移动并播放进门(向上)动作
 func enter_door() -> void:
 	locked = true
+	footstep_time = 0.0
 	sprite.play("walk_up")

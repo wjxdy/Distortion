@@ -18,7 +18,7 @@ const LEVEL_WIDTH := 2560.0
 var toast_tween: Tween
 
 func _ready() -> void:
-	# BGM 挂载点（音乐由用户后期实现）
+	Music.play_world_with_rain()
 	toast.modulate.a = 0.0
 	prompt.visible = false
 	# 看手机时锁住走动（手机自身管显隐/填字，这里只联动锁人）

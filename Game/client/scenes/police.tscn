@@ -57,21 +57,21 @@ position = Vector2(18, -187)
 shape = SubResource("ExitZone")
 
 [node name="InterrogationArea" type="Area2D" parent="." unique_id=635523579]
-position = Vector2(420, 640)
+position = Vector2(500, 640)
 
 [node name="Col" type="CollisionShape2D" parent="InterrogationArea" unique_id=1857610201]
 position = Vector2(-1, -193)
 shape = SubResource("DoorZone")
 
 [node name="TerminalArea" type="Area2D" parent="." unique_id=1220408478]
-position = Vector2(1035, 640)
+position = Vector2(775, 640)
 
 [node name="Col" type="CollisionShape2D" parent="TerminalArea" unique_id=1602348458]
 position = Vector2(8, -198)
 shape = SubResource("DoorZone")
 
 [node name="ArchiveArea" type="Area2D" parent="." unique_id=311010]
-position = Vector2(700, 640)
+position = Vector2(1060, 640)
 
 [node name="Col" type="CollisionShape2D" parent="ArchiveArea" unique_id=311011]
 position = Vector2(0, -198)
@@ -90,9 +90,9 @@ text = "← 街道"
 horizontal_alignment = 1
 
 [node name="InterrogationDoorLabel" type="Label" parent="." unique_id=311002]
-offset_left = 320.0
+offset_left = 400.0
 offset_top = 188.0
-offset_right = 520.0
+offset_right = 600.0
 offset_bottom = 222.0
 theme_override_colors/font_color = Color(1, 0.85, 0.6, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
@@ -102,9 +102,9 @@ text = "审讯室"
 horizontal_alignment = 1
 
 [node name="TerminalDoorLabel" type="Label" parent="." unique_id=311003]
-offset_left = 935.0
+offset_left = 675.0
 offset_top = 188.0
-offset_right = 1135.0
+offset_right = 875.0
 offset_bottom = 222.0
 theme_override_colors/font_color = Color(0.7, 1, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
@@ -114,9 +114,9 @@ text = "终端室"
 horizontal_alignment = 1
 
 [node name="ArchiveDoorLabel" type="Label" parent="." unique_id=311012]
-offset_left = 600.0
+offset_left = 960.0
 offset_top = 188.0
-offset_right = 800.0
+offset_right = 1160.0
 offset_bottom = 222.0
 theme_override_colors/font_color = Color(0.9, 0.85, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)

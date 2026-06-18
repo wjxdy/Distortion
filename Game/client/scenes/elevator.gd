@@ -9,6 +9,8 @@ const OLD_FLOOR := 7
 @onready var back_btn: Button = $BackBtn
 
 func _ready() -> void:
+	Music.stop()
+	Music.stop_rain()
 	back_btn.pressed.connect(_back)
 	for f in [3, 5, 7, 9]:
 		var b := get_node("Floors/F%d" % f) as Button

@@ -14,6 +14,7 @@ const ELEVATOR := "res://scenes/elevator.tscn"
 @onready var phone: CanvasLayer = $Phone
 
 func _ready() -> void:
+	Music.play_world_with_rain()
 	prompt.visible = false
 	npc_text.visible = false
 	phone.opened.connect(func() -> void: player.locked = true)

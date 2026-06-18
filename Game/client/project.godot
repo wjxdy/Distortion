@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 [autoload]
 
 Sfx="*res://autoload/sfx.gd"
+Music="*res://autoload/music.gd"
 Game="*res://game/game_global.gd"
 Inv="*res://scenes/inventory.tscn"
 
@@ -58,6 +59,8 @@ move_down={
 }
 
 [rendering]
+
+textures/vram_compression/import_etc2_astc=true
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
