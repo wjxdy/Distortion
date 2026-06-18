@@ -11,12 +11,12 @@ signal opened
 signal closed
 
 @onready var btn: Button = $PhoneBtn
-@onready var phone_dot: ColorRect = $PhoneBtn/Dot
+@onready var phone_dot: Panel = $PhoneBtn/Dot
 @onready var screen: Control = $Screen
 @onready var task_btn: Button = $Screen/Body/AppList/TaskBtn
-@onready var task_dot: ColorRect = $Screen/Body/AppList/TaskBtn/Dot
+@onready var task_dot: Panel = $Screen/Body/AppList/TaskBtn/Dot
 @onready var mowang_btn: Button = $Screen/Body/AppList/MowangBtn
-@onready var mowang_dot: ColorRect = $Screen/Body/AppList/MowangBtn/Dot
+@onready var mowang_dot: Panel = $Screen/Body/AppList/MowangBtn/Dot
 @onready var close_btn: Button = $Screen/Body/AppList/CloseBtn
 @onready var display: Label = $Screen/Body/DisplayBg/Scroll/Display
 @onready var scroll: ScrollContainer = $Screen/Body/DisplayBg/Scroll

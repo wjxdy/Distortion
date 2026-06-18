@@ -1,7 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://bxsc7ngs1gytp"]
+[gd_scene load_steps=5 format=3 uid="uid://bxsc7ngs1gytp"]
 
 [ext_resource type="Script" path="res://scenes/phone.gd" id="1_phone"]
 [ext_resource type="Texture2D" path="res://art/phone_logo.png" id="2_phone_logo"]
+
+[sub_resource type="StyleBoxEmpty" id="BtnEmpty"]
+
+[sub_resource type="StyleBoxFlat" id="DotStyle"]
+bg_color = Color(0.9, 0.2, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="Phone" type="CanvasLayer"]
 layer = 5
@@ -15,18 +24,22 @@ offset_bottom = 684.0
 theme_override_font_sizes/font_size = 40
 icon = ExtResource("2_phone_logo")
 expand_icon = true
+theme_override_styles/normal = SubResource("BtnEmpty")
+theme_override_styles/hover = SubResource("BtnEmpty")
+theme_override_styles/pressed = SubResource("BtnEmpty")
+theme_override_styles/focus = SubResource("BtnEmpty")
 
-[node name="Dot" type="ColorRect" parent="PhoneBtn"]
+[node name="Dot" type="Panel" parent="PhoneBtn"]
 visible = false
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -22.0
+offset_left = -20.0
 offset_top = 6.0
 offset_right = -6.0
-offset_bottom = 22.0
-color = Color(0.9, 0.2, 0.2, 1)
+offset_bottom = 20.0
+theme_override_styles/panel = SubResource("DotStyle")
 
 [node name="Screen" type="Control" parent="."]
 visible = false
@@ -70,17 +83,17 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "📋 任务"
 
-[node name="Dot" type="ColorRect" parent="Screen/Body/AppList/TaskBtn"]
+[node name="Dot" type="Panel" parent="Screen/Body/AppList/TaskBtn"]
 visible = false
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -22.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = 22.0
-color = Color(0.9, 0.2, 0.2, 1)
+offset_left = -20.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = 20.0
+theme_override_styles/panel = SubResource("DotStyle")
 
 [node name="MowangBtn" type="Button" parent="Screen/Body/AppList"]
 custom_minimum_size = Vector2(0, 60)
@@ -88,17 +101,17 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "💬 莫忘"
 
-[node name="Dot" type="ColorRect" parent="Screen/Body/AppList/MowangBtn"]
+[node name="Dot" type="Panel" parent="Screen/Body/AppList/MowangBtn"]
 visible = false
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -22.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = 22.0
-color = Color(0.9, 0.2, 0.2, 1)
+offset_left = -20.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = 20.0
+theme_override_styles/panel = SubResource("DotStyle")
 
 [node name="CloseBtn" type="Button" parent="Screen/Body/AppList"]
 custom_minimum_size = Vector2(0, 60)
