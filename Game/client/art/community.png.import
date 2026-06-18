@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dchqif0xk5gpn"
-path="res://.godot/imported/按键.png-eb3f4058a345a28761716407baf8dab1.ctex"
+uid="uid://bqsmjdgvr7i81"
+path="res://.godot/imported/community.png-823e556d8ca5a11a32cd8a385313e915.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/按键.png"
-dest_files=["res://.godot/imported/按键.png-eb3f4058a345a28761716407baf8dab1.ctex"]
+source_file="res://art/community.png"
+dest_files=["res://.godot/imported/community.png-823e556d8ca5a11a32cd8a385313e915.ctex"]
 
 [params]
 

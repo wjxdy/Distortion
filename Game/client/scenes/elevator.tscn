@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bkag80rylp7e5" path="res://scenes/elevator.gd" id="1_elev"]
 [ext_resource type="Texture2D" uid="uid://c017ns48j0pea" path="res://art/elevator.png" id="2_elev_bg"]
-[ext_resource type="Texture2D" uid="uid://dchqif0xk5gpn" path="res://art/按键.png" id="3_btn_key"]
+[ext_resource type="Texture2D" uid="uid://cduh45r6tjt8w" path="res://art/elevator_key.png" id="3_btn_key"]
 
 [sub_resource type="StyleBoxEmpty" id="EmptyStyle"]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://oemod6d6bsen"
-path="res://.godot/imported/combined_5x3_1170x1152_T0B0L0R0 (1).png-1df74d0ffb1a14f6231fdd2d82984a33.ctex"
+uid="uid://cduh45r6tjt8w"
+path="res://.godot/imported/elevator_key.png-acf4636ccfe1528677aa0e81ad9bfe56.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/npc/combined_5x3_1170x1152_T0B0L0R0 (1).png"
-dest_files=["res://.godot/imported/combined_5x3_1170x1152_T0B0L0R0 (1).png-1df74d0ffb1a14f6231fdd2d82984a33.ctex"]
+source_file="res://art/elevator_key.png"
+dest_files=["res://.godot/imported/elevator_key.png-acf4636ccfe1528677aa0e81ad9bfe56.ctex"]
 
 [params]
 
