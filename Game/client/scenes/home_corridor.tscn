@@ -36,43 +36,17 @@ offset_bottom = 720.0
 texture = ExtResource("4_corridor_bg")
 expand_mode = 2
 
-[node name="L701" type="Label" parent="." unique_id=224832255]
-layout_mode = 0
-offset_left = 200.0
-offset_top = 505.0
-offset_right = 320.0
-offset_bottom = 535.0
-theme_override_colors/font_color = Color(0.92, 0.92, 0.96, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 20
-text = "701"
-horizontal_alignment = 1
-
 [node name="L702" type="Label" parent="." unique_id=322037950]
 layout_mode = 0
-offset_left = 609.0
-offset_top = 498.0
-offset_right = 729.0
-offset_bottom = 528.0
+offset_left = 603.0
+offset_top = 199.0
+offset_right = 723.0
+offset_bottom = 229.0
 theme_override_colors/font_color = Color(1, 0.85, 0.6, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 20
 text = "702 周明远"
-horizontal_alignment = 1
-
-[node name="L703" type="Label" parent="." unique_id=2004728087]
-layout_mode = 0
-offset_left = 1007.0
-offset_top = 501.0
-offset_right = 1127.0
-offset_bottom = 531.0
-theme_override_colors/font_color = Color(0.92, 0.92, 0.96, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 20
-text = "703"
 horizontal_alignment = 1
 
 [node name="Walls" type="StaticBody2D" parent="." unique_id=58426100]
@@ -106,6 +80,26 @@ position = Vector2(620, 620)
 [node name="Col" type="CollisionShape2D" parent="HomeDoor" unique_id=2031404120]
 position = Vector2(54, -76)
 shape = SubResource("Zone")
+
+[node name="SignLabel" type="Label" parent="HomeDoor/Col" unique_id=1859943396]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -609.0
+offset_top = -201.0
+offset_right = -535.0
+offset_bottom = -84.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "←
+电梯
+
+走到这
+↑ 返回"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Player" parent="." unique_id=423890521 instance=ExtResource("2_player")]
 position = Vector2(255.00003, 658)
