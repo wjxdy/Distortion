@@ -1,6 +1,5 @@
-# 警局电脑终端：左侧案卷列表(静态按钮，在 terminal.tscn 里可拖) + 右侧详情显示。
-# 点案卷 → 显示内容；带 grants_key 的案卷查完会经全局 Game 发线索钥匙(跨场景保留)，
-# 回审讯室追问即可触发真相。现阶段不做门控、不做 AI 问询(后续再加)。
+# 警局电脑终端室：玩家先进一个可走房间，走到综合终端机前按 ↑/W 打开查询界面。
+# 查询界面沿用原来的案卷列表逻辑；关闭后回到房间，门口按 ↑/W 返回警局走廊。
 extends Control
 
 const POLICE := "res://scenes/police.tscn"
@@ -13,31 +12,90 @@ const FILE_HINTS := {
 	"address": "got_address",
 }
 
-@onready var display: Label = $DisplayBg/Display
-@onready var back_btn: Button = $BackBtn
+@onready var player: CharacterBody2D = $Player
+@onready var prompt: Label = $Prompt
+@onready var terminal_area: Area2D = $TerminalArea
+@onready var exit_area: Area2D = $ExitArea
+@onready var terminal_ui: Control = $TerminalUI
+@onready var display: Label = $TerminalUI/DisplayBg/Display
+@onready var back_btn: Button = $TerminalUI/BackBtn
 @onready var phone: CanvasLayer = $Phone
-@onready var submit_phone_btn: Button = $FileList/SubmitPhoneBtn
-@onready var log_view: Control = $LogView
-@onready var log_label: Label = $LogView/Panel/Line
-@onready var next_btn: Button = $LogView/Panel/NextBtn
-@onready var log_close: Button = $LogView/Panel/CloseBtn
+@onready var submit_phone_btn: Button = $TerminalUI/FileList/SubmitPhoneBtn
+@onready var log_view: Control = $TerminalUI/LogView
+@onready var log_label: Label = $TerminalUI/LogView/Panel/Line
+@onready var next_btn: Button = $TerminalUI/LogView/Panel/NextBtn
+@onready var log_close: Button = $TerminalUI/LogView/Panel/CloseBtn
 
 var log_idx := 0
 
 func _ready() -> void:
-	back_btn.pressed.connect(_back)
+	Music.play_police_ambience()
+	prompt.visible = false
+	terminal_ui.visible = false
+	back_btn.pressed.connect(_close_terminal)
 	# 各案卷按钮 -> 对应 TERMINAL_FILES 条目
-	($FileList/CaseBtn as Button).pressed.connect(_show.bind("case"))
-	($FileList/ZhouBtn as Button).pressed.connect(_show.bind("zhou"))
-	($FileList/AddressBtn as Button).pressed.connect(_show.bind("address"))
-	($FileList/WifeBtn as Button).pressed.connect(_show.bind("wife"))
-	($FileList/MedicalBtn as Button).pressed.connect(_show.bind("medical"))
+	($TerminalUI/FileList/CaseBtn as Button).pressed.connect(_show.bind("case"))
+	($TerminalUI/FileList/ZhouBtn as Button).pressed.connect(_show.bind("zhou"))
+	($TerminalUI/FileList/AddressBtn as Button).pressed.connect(_show.bind("address"))
+	($TerminalUI/FileList/WifeBtn as Button).pressed.connect(_show.bind("wife"))
+	($TerminalUI/FileList/MedicalBtn as Button).pressed.connect(_show.bind("medical"))
 	# 接入老人手机解锁日志
 	log_view.visible = false
 	submit_phone_btn.pressed.connect(_submit_phone)
 	next_btn.pressed.connect(_log_next)
 	log_close.pressed.connect(_close_log)
+	phone.opened.connect(func() -> void: player.locked = true)
+	phone.closed.connect(func() -> void: player.locked = terminal_ui.visible)
+	Game.place_player(self, player)
 	# 没拿到老人手机就别显示"接入手机"(也防止已解锁后重复解锁)
+	_refresh_terminal_actions()
+	_update_prompt()
+
+func _process(_delta: float) -> void:
+	if player.locked:
+		return
+	_update_prompt()
+
+func _at(area: Area2D) -> bool:
+	return area.overlaps_body(player)
+
+func _update_prompt() -> void:
+	if _at(terminal_area):
+		prompt.text = "↑ 使用  综合终端"
+		prompt.visible = true
+	elif _at(exit_area):
+		prompt.text = "↑ 返回  走廊"
+		prompt.visible = true
+	else:
+		prompt.visible = false
+	if prompt.visible:
+		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
+
+func _input(event: InputEvent) -> void:
+	if player.locked:
+		return
+	if not event.is_action_pressed("move_up"):
+		return
+	if _at(terminal_area):
+		_open_terminal()
+	elif _at(exit_area):
+		_back()
+
+func _open_terminal() -> void:
+	Sfx.play_click()
+	_refresh_terminal_actions()
+	terminal_ui.visible = true
+	player.locked = true
+	prompt.visible = false
+
+func _close_terminal() -> void:
+	Sfx.play_click()
+	log_view.visible = false
+	terminal_ui.visible = false
+	player.locked = false
+	_update_prompt()
+
+func _refresh_terminal_actions() -> void:
 	submit_phone_btn.visible = Game.state.has_item("oldman_phone") and not Game.state.has_key("molog")
 
 func _show(file_id: String) -> void:
@@ -79,7 +137,7 @@ func _log_next() -> void:
 
 func _finish_log() -> void:
 	Game.state.add_key("molog")   # 第二层真相钥匙
-	submit_phone_btn.visible = false
+	_refresh_terminal_actions()
 	if Game.state.fire_hint("go_confront", str(Content.MOWANG_HINTS["go_confront"])):
 		phone.notify_hint()
 

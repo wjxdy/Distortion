@@ -78,7 +78,7 @@ horizontal_alignment = 1
 [node name="Walls" type="StaticBody2D" parent="." unique_id=58426100]
 
 [node name="Top" type="CollisionShape2D" parent="Walls" unique_id=857000692]
-position = Vector2(642, 60)
+position = Vector2(628, 496)
 shape = SubResource("WallWide")
 
 [node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=1549513242]
@@ -86,29 +86,29 @@ position = Vector2(640, 772)
 shape = SubResource("WallWide")
 
 [node name="Left" type="CollisionShape2D" parent="Walls" unique_id=563493338]
-position = Vector2(25, 360)
+position = Vector2(-22, 364)
 shape = SubResource("WallTall")
 
 [node name="Right" type="CollisionShape2D" parent="Walls" unique_id=1467186781]
-position = Vector2(1255, 360)
+position = Vector2(1312, 356)
 shape = SubResource("WallTall")
 
 [node name="ExitArea" type="Area2D" parent="." unique_id=2100565304]
 position = Vector2(80, 620)
 
 [node name="Col" type="CollisionShape2D" parent="ExitArea" unique_id=1152967674]
-position = Vector2(-9.5, -92)
+position = Vector2(-5, -77)
 shape = SubResource("Zone")
 
 [node name="HomeDoor" type="Area2D" parent="." unique_id=581933710]
 position = Vector2(620, 620)
 
 [node name="Col" type="CollisionShape2D" parent="HomeDoor" unique_id=2031404120]
-position = Vector2(56, -113)
+position = Vector2(54, -76)
 shape = SubResource("Zone")
 
 [node name="Player" parent="." unique_id=423890521 instance=ExtResource("2_player")]
-position = Vector2(152.00005, 662.00006)
+position = Vector2(255.00003, 658)
 scale = Vector2(1.4, 1.4)
 
 [node name="Hint" type="Label" parent="." unique_id=266105841]
@@ -138,4 +138,4 @@ horizontal_alignment = 1
 position = Vector2(103, 609)
 
 [node name="from_home" type="Marker2D" parent="Spawns" unique_id=503683192]
-position = Vector2(616, 593)
+position = Vector2(668, 605)

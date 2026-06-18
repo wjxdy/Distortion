@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://b8lcbm8t6yu1v"]
 
-[ext_resource type="Script" path="res://scenes/archive.gd" id="1_arc"]
+[ext_resource type="Script" uid="uid://bl6m6e5eaa4bv" path="res://scenes/archive.gd" id="1_arc"]
 [ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="3_phone"]
+[ext_resource type="Texture2D" uid="uid://di1orhfb6avau" path="res://art/bg_archive_room.png" id="4_archive_bg"]
+[ext_resource type="Texture2D" uid="uid://bm2dxubvmk2fl" path="res://art/key_home.png" id="5_key_home"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
 size = Vector2(1300, 120)
@@ -11,91 +13,68 @@ size = Vector2(1300, 120)
 size = Vector2(70, 760)
 
 [sub_resource type="RectangleShape2D" id="Zone"]
-size = Vector2(170, 220)
+size = Vector2(158, 82)
 
-[node name="Archive" type="Control"]
+[node name="Archive" type="Control" unique_id=1598642817]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_arc")
 
-[node name="Bg" type="ColorRect" parent="."]
-offset_right = 1280.0
-offset_bottom = 720.0
-color = Color(0.08, 0.08, 0.09, 1)
+[node name="Bg" type="Sprite2D" parent="." unique_id=220389965]
+texture_filter = 1
+position = Vector2(640, 360)
+texture = ExtResource("4_archive_bg")
 
-[node name="Shelf1" type="ColorRect" parent="."]
-offset_left = 120.0
-offset_top = 150.0
-offset_right = 520.0
-offset_bottom = 520.0
-color = Color(0.14, 0.13, 0.12, 1)
+[node name="KeyObj" type="Sprite2D" parent="." unique_id=1640208385]
+texture_filter = 1
+position = Vector2(685.1816, 418.32883)
+rotation = 1.5306537
+scale = Vector2(0.4971815, 0.73513967)
+texture = ExtResource("5_key_home")
 
-[node name="Shelf2" type="ColorRect" parent="."]
-offset_left = 760.0
-offset_top = 150.0
-offset_right = 1160.0
-offset_bottom = 520.0
-color = Color(0.14, 0.13, 0.12, 1)
+[node name="Walls" type="StaticBody2D" parent="." unique_id=880025775]
 
-[node name="Floor" type="ColorRect" parent="."]
-offset_top = 540.0
-offset_right = 1280.0
-offset_bottom = 720.0
-color = Color(0.11, 0.11, 0.12, 1)
-
-[node name="KeyObj" type="ColorRect" parent="."]
-offset_left = 610.0
-offset_top = 460.0
-offset_right = 670.0
-offset_bottom = 510.0
-color = Color(0.9, 0.8, 0.35, 1)
-
-[node name="KeyLabel" type="Label" parent="KeyObj"]
-offset_left = -30.0
-offset_top = -34.0
-offset_right = 90.0
-offset_bottom = -4.0
-horizontal_alignment = 1
-text = "钥匙"
-
-[node name="Walls" type="StaticBody2D" parent="."]
-
-[node name="Top" type="CollisionShape2D" parent="Walls"]
-position = Vector2(640, 526)
+[node name="Top" type="CollisionShape2D" parent="Walls" unique_id=1254708662]
+position = Vector2(636, 435)
 shape = SubResource("WallWide")
 
-[node name="Bottom" type="CollisionShape2D" parent="Walls"]
+[node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=1276017389]
 position = Vector2(640, 772)
 shape = SubResource("WallWide")
 
-[node name="Left" type="CollisionShape2D" parent="Walls"]
-position = Vector2(25, 360)
+[node name="Left" type="CollisionShape2D" parent="Walls" unique_id=855482003]
+position = Vector2(-21, 357)
 shape = SubResource("WallTall")
 
-[node name="Right" type="CollisionShape2D" parent="Walls"]
-position = Vector2(1255, 360)
+[node name="Right" type="CollisionShape2D" parent="Walls" unique_id=713599740]
+position = Vector2(1311, 358)
 shape = SubResource("WallTall")
 
-[node name="KeyArea" type="Area2D" parent="."]
-position = Vector2(640, 620)
+[node name="KeyArea" type="Area2D" parent="." unique_id=1042248867]
+position = Vector2(642, 611)
 
-[node name="Col" type="CollisionShape2D" parent="KeyArea"]
+[node name="Col" type="CollisionShape2D" parent="KeyArea" unique_id=467766624]
+position = Vector2(47, -127)
 shape = SubResource("Zone")
 
-[node name="ExitArea" type="Area2D" parent="."]
+[node name="ExitArea" type="Area2D" parent="." unique_id=867008997]
 position = Vector2(80, 620)
 
-[node name="Col" type="CollisionShape2D" parent="ExitArea"]
+[node name="Col" type="CollisionShape2D" parent="ExitArea" unique_id=1118476272]
+position = Vector2(60, -142)
 shape = SubResource("Zone")
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
-position = Vector2(150, 620)
+[node name="Player" parent="." unique_id=1870858831 instance=ExtResource("2_player")]
+position = Vector2(340, 635)
 scale = Vector2(1.4, 1.4)
 
-[node name="Info" type="Label" parent="."]
+[node name="Info" type="Label" parent="." unique_id=180752280]
 visible = false
+layout_mode = 0
 offset_left = 300.0
 offset_top = 90.0
 offset_right = 980.0
@@ -108,7 +87,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Hint" type="Label" parent="."]
+[node name="Hint" type="Label" parent="." unique_id=1080100661]
+layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0
 offset_right = 1240.0
@@ -118,16 +98,17 @@ theme_override_font_sizes/font_size = 22
 text = "警局 · 档案 / 证物室     WASD / ↑↓←→ 移动     W/↑ 取物 / 返回"
 horizontal_alignment = 1
 
-[node name="Prompt" type="Label" parent="."]
+[node name="Prompt" type="Label" parent="." unique_id=2054090736]
+layout_mode = 0
 offset_right = 240.0
 offset_bottom = 32.0
 theme_override_font_sizes/font_size = 22
 text = "↑"
 horizontal_alignment = 1
 
-[node name="Phone" parent="." instance=ExtResource("3_phone")]
+[node name="Phone" parent="." unique_id=1929079176 instance=ExtResource("3_phone")]
 
-[node name="Spawns" type="Node2D" parent="."]
+[node name="Spawns" type="Node2D" parent="." unique_id=1966354789]
 
-[node name="from_police" type="Marker2D" parent="Spawns"]
-position = Vector2(170, 620)
+[node name="from_police" type="Marker2D" parent="Spawns" unique_id=127984288]
+position = Vector2(132, 569)
