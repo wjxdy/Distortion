@@ -3,7 +3,7 @@
 ## 基本信息
 - 项目名称：《失真 Distortion》
 - 当前阶段：开发早期 / MVP 垂直切片
-- 最后更新：2026-06-17
+- 最后更新：2026-06-18
 
 ## 当前状态
 - 项目目标是做一个 5-8 分钟的赛博朋克像素叙事侦探 demo：开场世界观、自由审讯、探索取证、揭示第一块真相、结尾钩子。
@@ -33,6 +33,7 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-18: **场景切换出生点修复·按来源门落到对应入口锚点**（已提交 43657fa）：用户报"进一个场景再出来，总弹回初始出生点，没有可调锚点"。根因=各场景 Player 出生点写死在 `.tscn`、切场景**不带"从哪个门进来"信息**，回到多门场景只会落到那个写死的点。**统一方案(可拖锚点)**：① `Game` 单例(`game_global.gd`)加导航字段 `spawn_point` + `place_player(scene,player)`——按名查 `Spawns/<id>` 的 Marker2D 把玩家摆过去后清空,空则保持 .tscn 默认(开局从序幕进街道)。② 每个可走场景 `.tscn` 加 `Spawns` 节点挂 `Marker2D` 入口锚点(**编辑器可拖微调**)：world(police/community)、police(from_world/interrogation/terminal/archive)、archive(from_police)、community(from_world/from_elevator)、home_corridor(from_elevator/from_home)、oldman_home(from_corridor)。③ 各场景脚本 `_ready` 调 `place_player`,切场景前出发方设好目标锚点名(如审讯室返回设 "interrogation"→警局落到审讯室门口)。interrogation/terminal/elevator 是纯 UI 无玩家不加锚点,但从它们返回会设好上一级的锚点。验证:单测 73/73、6 场景加载干净、12 锚点全解析(fail=0)。**锚点初始摆在各门附近,具体位置待用户 F5 拖着调。**
 - 2026-06-17: **终局对峙 + 三分支结局落地（剧本最后一块，用户 F5 确认体验 OK）**（分支 `feat/final-confrontation-ending`，10 个提交，spec/plan 见 `docs/superpowers/specs|plans/2026-06-17-final-confrontation-*`）：① **手机取证链改造**——老人房间查手机只拿 `oldman_phone` 道具+弹 `unlock_log` 提醒；**莫忘日志移到警局终端**，终端新增「📱接入老人的手机」按钮(gated on 持手机)逐条翻完→发 `molog`+弹 `go_confront`(逻辑更合理:锁着的旧手机要靠警局设备解锁)。② **莫忘日志重写为跳切蒙太奇**——废弃旧"肺病→医院→AI误诊"逻辑滑坡，改为答案在某天**毫无理由**从"她病了"跳成"是 AI 害死的"+点破空白旁白「没有前一天、没有任何理由」，更瘆人、更扣"选择相信"主题。③ **终局对峙**——拿到 molog 即 `in_finale()`，客户端发 `finale:true` 让后端**整套换 `FINALE_SYSTEM_PROMPT`**(替换非叠加)：老头先否认、玩家具体甩证据后卸防("我其实一直知道，宁可信谎因为有个能恨的好过什么都不能恨")。④ **三分支结局**(渐黑→幻灯片→统一字幕「记忆，是我们选择记住的版本。」)：A戳破/B顺着他=模型按玩家态度吐 `[[end:reveal/comfort]]` 判定；C沉默=「起身离开」按钮确定性触发。**结束从 `revealed>=TRUTHS.size()` 解耦**到对峙选择。⑤ `parseReply` 加 `[[end:xxx]]` 抽取 + 剥**任意位置**情绪标签(防终局把否认+卸防挤一条时泄漏)。**AI 对话全流程实测**(直连 /chat 模拟客户端时序)：A→reveal、B→comfort、C 按钮、无 hint/标签泄漏均通过；客户端 63/63、后端 27/27、3 场景加载干净。**已知残余**：纯模型判定下 A 路偶发不触发(用户接受，多说一句即可)。
 - 2026-06-17: **补全"去小区"前置引导链**（提交 9d77efe）：用户实测发现去小区前缺引导——不知道要先查住址(小区门 gated on home_address)、先拿钥匙(老人家门 gated on home_key)。改:`visit_community` 文案点明两个前提(先终端查户籍 + 档案室拿钥匙);新增 `got_address`(终端查户籍→提醒去拿钥匙)、`got_key`(档案室拿钥匙→提醒可去小区)两条确定性提醒(terminal FILE_HINTS 加 address→got_address;archive 取钥匙 fire got_key)。完整引导链:甩锅AI→去终端查死因→回去问→(亮证据仍咬定)去小区[先查户籍+拿钥匙]→查户籍→拿钥匙→小区→老人家→莫忘日志→回审讯对峙。验证 52/52。
 - 2026-06-17: **莫忘提醒加关键词兜底（修"模型沉默/漏吐就不弹"）**（已提交 5cc82cc）：实测发现提醒纯靠模型吐 `[[hint:ID]]`——模型一过载回「……」、或漏吐、或该 ID 已被去重，提醒就断，玩家卡住没引导(用户实测多次没弹)。诊断:逻辑正常(不过载时"凭什么确定是AI"稳定吐 investigate_death 3/3、有证据后吐 visit_community)，断点全在"模型这轮没真回/没吐标签"。**改成"模型驱动为主 + 确定性兜底"**:`interrogation._hint_fallback(reply)` 在每轮回复后,按老头回复含"AI/误诊" + 玩家是否已有 linxiulan/no_accident 钥匙(=查过终端) + 玩家问话关键词,确定性补发 investigate_death(没查→去终端)/visit_community(查过仍咬定→去小区)/protecting_app;`fire_hint` 自带去重,与模型标签不重复。模型正常照旧、哑火才兜底。注:钥匙(档案室)与提醒无关,不是卡点原因。验证 52/52、加载干净。
