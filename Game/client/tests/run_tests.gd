@@ -163,5 +163,15 @@ func _initialize() -> void:
 	var msgs_f = LLM.build_messages([], true)
 	_check("终局" in msgs_f[0]["content"], "build_messages 终局换 FINALE")
 
+	# --- 防"幽灵按键"：返回场景后玩家不被残留的移动键带着自动走 ---
+	# 复现 bug：审讯室打字时某移动键(方向键/WASD)的释放在同步切场景时丢失，
+	# 残留成"按住"留在全局 Input；新场景 Player 一进来就 get_vector 读到→自动走。
+	# 修复=Player 进场景调 clear_movement_input() 清掉残留(_ready 里调用，见 player.gd)。
+	var PlayerScript = load("res://scenes/player.gd")
+	Input.action_press("move_right")
+	_check(Input.is_action_pressed("move_right"), "幽灵按键已注入(复现前置)")
+	PlayerScript.clear_movement_input()
+	_check(not Input.is_action_pressed("move_right"), "Player.clear_movement_input 清除残留移动键(防返回后自动走)")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

@@ -18,7 +18,15 @@ var footstep_time := 0.0
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var footstep_player: AudioStreamPlayer = $FootstepPlayer
 
+# 防"幽灵按键"：上个场景(如审讯室打字用方向键/WASD)某移动键的释放事件，
+# 可能在同步 change_scene 的瞬间丢失，残留成"按住"留在全局 Input 单例里，
+# 导致新场景一加载就 get_vector 读到它→玩家没碰键盘也自动走。进场景时清掉残留。
+static func clear_movement_input() -> void:
+	for a in ["move_left", "move_right", "move_up", "move_down"]:
+		Input.action_release(a)
+
 func _ready() -> void:
+	clear_movement_input()
 	sprite.animation_finished.connect(_on_anim_finished)
 	sprite.play("idle")
 	idle_gap = randf_range(4.0, 8.0)
