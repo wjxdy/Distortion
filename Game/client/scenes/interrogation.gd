@@ -138,20 +138,23 @@ func _show_player_bubble(text: String) -> void:
 	player_label.text = text          # 玩家自己写的，整段直接显示
 	player_label.visible_ratio = 1.0
 
-func _show_zhou_bubble(text: String) -> void:
+func _show_zhou_bubble(text: String, play_sound: bool = true) -> void:
 	zhou_bubble.visible = true
 	zhou_label.text = text
 	zhou_label.visible_ratio = 0.0
-	_typewriter(zhou_label, text)
+	_typewriter(zhou_label, text, play_sound)
 
-func _typewriter(label: Label, full: String) -> void:
+# play_sound=false 时不播打字机音效——给保底沉默「……」用(他没在打字，别发那声"嘣")。
+func _typewriter(label: Label, full: String, play_sound: bool = true) -> void:
 	var dur: float = clampf(full.length() * 0.04, 0.4, 2.6)
 	if type_tween and type_tween.is_valid():
 		type_tween.kill()
-	Sfx.start_typing()   # 老头打字时循环播打字机音效
+	if play_sound:
+		Sfx.start_typing()   # 老头打字时循环播打字机音效
 	type_tween = create_tween()
 	type_tween.tween_property(label, "visible_ratio", 1.0, dur)
-	type_tween.tween_callback(Sfx.stop_typing)   # 打完即停
+	if play_sound:
+		type_tween.tween_callback(Sfx.stop_typing)   # 打完即停
 
 # ---------- 对话流程 ----------
 
@@ -221,13 +224,14 @@ func _on_reply(result: int, code: int, _headers: PackedStringArray, body: Packed
 	# 重试用尽 → 保底沉默(演成周明远装糊涂/阿尔茨海默)
 	Dbg.log_req(_attempt, false, code, reason + " → 重试用尽，保底沉默……", elapsed)
 	_set_busy(false)
-	_apply_reply(LLM.pick_silence())
+	_apply_reply(LLM.pick_silence(), true)   # silent=true：沉默「……」不播打字机音效(去掉那声"嘣")
 
 # 把一条(成功或沉默的)回复落地：切表情、弹气泡、进历史、判定真相/提醒/终局。
-func _apply_reply(parsed: Dictionary) -> void:
+# silent=true 用于保底沉默「……」：不播打字机音效。
+func _apply_reply(parsed: Dictionary, silent: bool = false) -> void:
 	_set_emotion(str(parsed.get("emotion", "calm")))
 	var reply := str(parsed.get("reply", "……"))
-	_show_zhou_bubble(reply)
+	_show_zhou_bubble(reply, not silent)
 	_log("[color=#e8e1c8]周明远：[/color]" + reply)
 	state.add_to_history("assistant", reply)
 	_check_truths()
