@@ -364,7 +364,7 @@ func _banner(text: String, col: Color, hold: float = 3.0) -> void:
 	tw.tween_callback(cc.queue_free)
 
 func _play_crack() -> void:
-	Sfx.play_reveal()
+	# 真相裂痕只保留画面演出，去掉那声难听的"嘣"(reveal 音效)。
 	crack.visible = true
 	crack.modulate = Color(1, 1, 1, 0.0)
 	crack.scale = Vector2(0.5, 0.5)
