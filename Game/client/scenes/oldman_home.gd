@@ -14,8 +14,6 @@ const Content = preload("res://game/content.gd")
 @onready var phone_area: Area2D = $PhoneArea
 @onready var exit_area: Area2D = $ExitArea
 
-var _doors_armed := false   # 反跳保护：先离开门区才允许踩门跳转
-
 func _ready() -> void:
 	prompt.visible = false
 	info.visible = false
@@ -25,12 +23,6 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if player.locked:
-		return
-	if not _doors_armed:
-		if not _at(exit_area):
-			_doors_armed = true
-	elif _at(exit_area):
-		_go(CORRIDOR, "from_home")
 		return
 	_update_prompt()
 
@@ -45,23 +37,24 @@ func _update_prompt() -> void:
 		prompt.text = "空格  查看手机"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "▶ 离开"
+		prompt.text = "↑ 离开"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 空格：查看合照 / 拿手机(物品交互保留按键，与踩门跳转区分)
+# 门按 W/↑ 进出；物品(合照/手机)按空格查看
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if not event.is_action_pressed("ui_select"):
-		return
-	if _at(photo_area):
-		_examine("photo")
-	elif _at(phone_area):
-		_take_phone()
+	if event.is_action_pressed("move_up") and _at(exit_area):
+		_go(CORRIDOR, "from_home")
+	elif event.is_action_pressed("ui_select"):
+		if _at(photo_area):
+			_examine("photo")
+		elif _at(phone_area):
+			_take_phone()
 
 func _go(scene_path: String, entry: String) -> void:
 	Game.spawn_point = entry

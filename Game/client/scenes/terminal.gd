@@ -27,7 +27,6 @@ const FILE_HINTS := {
 @onready var log_close: Button = $TerminalUI/LogView/Panel/CloseBtn
 
 var log_idx := 0
-var _doors_armed := false   # 反跳保护：先离开门区才允许踩门跳转
 
 func _ready() -> void:
 	Music.play_police_ambience()
@@ -55,13 +54,6 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if player.locked:
 		return
-	# 反跳保护后，踩到出口即返回走廊；终端机要按空格使用(见 _input)
-	if not _doors_armed:
-		if not _at(exit_area):
-			_doors_armed = true
-	elif _at(exit_area):
-		_go(POLICE, "terminal")
-		return
 	_update_prompt()
 
 func _at(area: Area2D) -> bool:
@@ -72,18 +64,20 @@ func _update_prompt() -> void:
 		prompt.text = "空格  使用终端"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "▶ 走廊"
+		prompt.text = "↑ 返回  走廊"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 空格：使用终端机(打开查询界面)。出口是踩到即返回。
+# 出口按 W/↑ 返回走廊；终端机按空格使用(打开查询界面)
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if event.is_action_pressed("ui_select") and _at(terminal_area) and not terminal_ui.visible:
+	if event.is_action_pressed("move_up") and _at(exit_area):
+		_go(POLICE, "terminal")
+	elif event.is_action_pressed("ui_select") and _at(terminal_area) and not terminal_ui.visible:
 		_open_terminal()
 
 func _open_terminal() -> void:
