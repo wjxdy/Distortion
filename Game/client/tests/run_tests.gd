@@ -185,8 +185,9 @@ func _initialize() -> void:
 	_check(sfx_t._typing_player.playing, "打字机开始→在播")
 	# 模拟中途离场没触发 tween 回调:循环仍在播(=bug 残留态)
 	_check(sfx_t._typing_player.playing, "未主动停→循环残留(复现:这正是退出后还响的原因)")
-	sfx_t.stop_typing()                # 修复动作:离场统一停
-	_check(not sfx_t._typing_player.playing, "stop_typing→循环停下(离场不再残留)")
+	sfx_t.stop_typing()                # 修复动作:离场统一停(现在带~60ms淡出避爆音,异步)
+	await create_timer(0.15).timeout   # 等淡出完成
+	_check(not sfx_t._typing_player.playing, "stop_typing(淡出后)→循环停下(离场不再残留)")
 	sfx_t.queue_free()
 
 	# --- 失败原因翻译(LLM.fail_reason)：调试日志据此告诉玩家是哪种失败 ---
