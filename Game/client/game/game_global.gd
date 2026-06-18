@@ -21,12 +21,13 @@ func reset() -> void:
 	state = GameState.new()
 
 # 目标场景在 _ready 里调：按 spawn_point 找 Spawns/<名字> 的 Marker2D（可在编辑器拖），
-# 把玩家移过去；没设或找不到锚点就保持 .tscn 默认位置。读完即清空，避免残留到下次。
+# 把玩家移过去。没指定来源（如开局从序幕进街道）则回退到 Spawns/start 锚点。
+# 出生点完全由锚点决定——Player 节点摆在编辑器哪儿都不影响。读完即清空，避免残留到下次。
 func place_player(scene: Node, player: Node2D) -> void:
 	var id := spawn_point
 	spawn_point = ""
 	if id == "":
-		return
+		id = "start"   # 没来源 → 用开局默认锚点
 	var marker := scene.get_node_or_null("Spawns/" + id) as Node2D
 	if marker:
 		player.position = marker.position
