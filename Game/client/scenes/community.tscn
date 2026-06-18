@@ -1,6 +1,6 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://ckdx74oy8ctfb"]
 
-[ext_resource type="Script" path="res://scenes/community.gd" id="1_comm"]
+[ext_resource type="Script" uid="uid://dd44mu722nl0n" path="res://scenes/community.gd" id="1_comm"]
 [ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="3_phone"]
 
@@ -11,28 +11,33 @@ size = Vector2(1300, 120)
 size = Vector2(70, 760)
 
 [sub_resource type="RectangleShape2D" id="Zone"]
-size = Vector2(200, 220)
+size = Vector2(143, 59)
 
-[node name="Community" type="Control"]
+[node name="Community" type="Control" unique_id=750797563]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_comm")
 
-[node name="Bg" type="ColorRect" parent="."]
+[node name="Bg" type="ColorRect" parent="." unique_id=1300378209]
+layout_mode = 0
 offset_right = 1280.0
 offset_bottom = 720.0
 color = Color(0.07, 0.08, 0.12, 1)
 
-[node name="Building1" type="ColorRect" parent="."]
+[node name="Building1" type="ColorRect" parent="." unique_id=1263901285]
+layout_mode = 0
 offset_left = 180.0
 offset_top = 110.0
 offset_right = 460.0
 offset_bottom = 560.0
 color = Color(0.13, 0.14, 0.2, 1)
 
-[node name="B1Label" type="Label" parent="Building1"]
+[node name="B1Label" type="Label" parent="Building1" unique_id=1531837297]
+layout_mode = 0
 offset_left = 90.0
 offset_top = 12.0
 offset_right = 250.0
@@ -40,14 +45,16 @@ offset_bottom = 44.0
 theme_override_font_sizes/font_size = 22
 text = "楼 ①"
 
-[node name="Building2" type="ColorRect" parent="."]
+[node name="Building2" type="ColorRect" parent="." unique_id=1468256965]
+layout_mode = 0
 offset_left = 760.0
 offset_top = 110.0
 offset_right = 1060.0
 offset_bottom = 560.0
 color = Color(0.16, 0.15, 0.19, 1)
 
-[node name="B2Label" type="Label" parent="Building2"]
+[node name="B2Label" type="Label" parent="Building2" unique_id=652982888]
+layout_mode = 0
 offset_left = 60.0
 offset_top = 12.0
 offset_right = 280.0
@@ -56,28 +63,32 @@ theme_override_colors/font_color = Color(1, 0.85, 0.6, 1)
 theme_override_font_sizes/font_size = 22
 text = "楼 ② · 老人的楼"
 
-[node name="Door2" type="ColorRect" parent="Building2"]
+[node name="Door2" type="ColorRect" parent="Building2" unique_id=134850422]
+layout_mode = 0
 offset_left = 110.0
 offset_top = 300.0
 offset_right = 200.0
 offset_bottom = 450.0
 color = Color(0.05, 0.05, 0.07, 1)
 
-[node name="Floor" type="ColorRect" parent="."]
-offset_top = 540.0
-offset_right = 1280.0
-offset_bottom = 720.0
+[node name="Floor" type="ColorRect" parent="." unique_id=172165125]
+layout_mode = 0
+offset_left = -9.0
+offset_top = 541.0
+offset_right = 1266.0
+offset_bottom = 721.0
 color = Color(0.1, 0.1, 0.13, 1)
 
-[node name="StreetSign" type="ColorRect" parent="."]
+[node name="StreetSign" type="ColorRect" parent="." unique_id=653465616]
+layout_mode = 0
 offset_left = 14.0
 offset_top = 300.0
 offset_right = 150.0
 offset_bottom = 430.0
 color = Color(0.18, 0.2, 0.26, 1)
 
-[node name="SignLabel" type="Label" parent="StreetSign"]
-anchors_preset = 15
+[node name="SignLabel" type="Label" parent="StreetSign" unique_id=258158224]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
@@ -90,22 +101,25 @@ text = "←
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Npc1" type="ColorRect" parent="."]
+[node name="Npc1" type="ColorRect" parent="." unique_id=551695129]
+layout_mode = 0
 offset_left = 250.0
 offset_top = 470.0
 offset_right = 300.0
 offset_bottom = 560.0
 color = Color(0.35, 0.4, 0.5, 1)
 
-[node name="Npc2" type="ColorRect" parent="."]
+[node name="Npc2" type="ColorRect" parent="." unique_id=975427008]
+layout_mode = 0
 offset_left = 340.0
 offset_top = 470.0
 offset_right = 390.0
 offset_bottom = 560.0
 color = Color(0.4, 0.36, 0.45, 1)
 
-[node name="NpcText" type="Label" parent="."]
+[node name="NpcText" type="Label" parent="." unique_id=1898626679]
 visible = false
+layout_mode = 0
 offset_left = 170.0
 offset_top = 360.0
 offset_right = 540.0
@@ -117,47 +131,51 @@ theme_override_font_sizes/font_size = 18
 text = "邻居：周老头最近怪得很，好久没回家了……常一个人对着手机说话。"
 autowrap_mode = 3
 
-[node name="Walls" type="StaticBody2D" parent="."]
+[node name="Walls" type="StaticBody2D" parent="." unique_id=1514010391]
 
-[node name="Top" type="CollisionShape2D" parent="Walls"]
-position = Vector2(640, 526)
+[node name="Top" type="CollisionShape2D" parent="Walls" unique_id=490881095]
+position = Vector2(636, 481)
 shape = SubResource("WallWide")
 
-[node name="Bottom" type="CollisionShape2D" parent="Walls"]
-position = Vector2(640, 772)
+[node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=1807452012]
+position = Vector2(646, 780)
 shape = SubResource("WallWide")
 
-[node name="Left" type="CollisionShape2D" parent="Walls"]
-position = Vector2(25, 360)
+[node name="Left" type="CollisionShape2D" parent="Walls" unique_id=944211442]
+position = Vector2(-37, 355)
 shape = SubResource("WallTall")
 
-[node name="Right" type="CollisionShape2D" parent="Walls"]
-position = Vector2(1255, 360)
+[node name="Right" type="CollisionShape2D" parent="Walls" unique_id=1765740759]
+position = Vector2(1317, 361)
 shape = SubResource("WallTall")
 
-[node name="ExitArea" type="Area2D" parent="."]
-position = Vector2(80, 620)
+[node name="ExitArea" type="Area2D" parent="." unique_id=1443333898]
+position = Vector2(76, 608)
 
-[node name="Col" type="CollisionShape2D" parent="ExitArea"]
+[node name="Col" type="CollisionShape2D" parent="ExitArea" unique_id=497907127]
+position = Vector2(3, -80)
 shape = SubResource("Zone")
 
-[node name="NpcArea" type="Area2D" parent="."]
-position = Vector2(320, 620)
+[node name="NpcArea" type="Area2D" parent="." unique_id=1430363851]
+position = Vector2(322, 611)
 
-[node name="Col" type="CollisionShape2D" parent="NpcArea"]
+[node name="Col" type="CollisionShape2D" parent="NpcArea" unique_id=820342896]
+position = Vector2(-2, -79)
 shape = SubResource("Zone")
 
-[node name="OldBuildingDoor" type="Area2D" parent="."]
-position = Vector2(870, 620)
+[node name="OldBuildingDoor" type="Area2D" parent="." unique_id=108362021]
+position = Vector2(873, 613)
 
-[node name="Col" type="CollisionShape2D" parent="OldBuildingDoor"]
+[node name="Col" type="CollisionShape2D" parent="OldBuildingDoor" unique_id=20030174]
+position = Vector2(48, -76)
 shape = SubResource("Zone")
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
-position = Vector2(150, 620)
+[node name="Player" parent="." unique_id=1162927524 instance=ExtResource("2_player")]
+position = Vector2(464.99997, 594)
 scale = Vector2(1.4, 1.4)
 
-[node name="Hint" type="Label" parent="."]
+[node name="Hint" type="Label" parent="." unique_id=886099336]
+layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0
 offset_right = 1240.0
@@ -167,19 +185,20 @@ theme_override_font_sizes/font_size = 22
 text = "老人的小区     WASD / ↑↓←→ 移动     W/↑ 进门 / 返回"
 horizontal_alignment = 1
 
-[node name="Prompt" type="Label" parent="."]
+[node name="Prompt" type="Label" parent="." unique_id=1203859241]
+layout_mode = 0
 offset_right = 240.0
 offset_bottom = 32.0
 theme_override_font_sizes/font_size = 22
 text = "↑ 进入"
 horizontal_alignment = 1
 
-[node name="Phone" parent="." instance=ExtResource("3_phone")]
+[node name="Phone" parent="." unique_id=35605920 instance=ExtResource("3_phone")]
 
-[node name="Spawns" type="Node2D" parent="."]
+[node name="Spawns" type="Node2D" parent="." unique_id=1564806458]
 
-[node name="from_world" type="Marker2D" parent="Spawns"]
-position = Vector2(170, 620)
+[node name="from_world" type="Marker2D" parent="Spawns" unique_id=1260271084]
+position = Vector2(97, 609)
 
-[node name="from_elevator" type="Marker2D" parent="Spawns"]
-position = Vector2(790, 620)
+[node name="from_elevator" type="Marker2D" parent="Spawns" unique_id=682589584]
+position = Vector2(927, 590)

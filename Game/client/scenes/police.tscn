@@ -12,10 +12,10 @@ size = Vector2(1300, 120)
 size = Vector2(70, 760)
 
 [sub_resource type="RectangleShape2D" id="ExitZone"]
-size = Vector2(150, 200)
+size = Vector2(150, 40)
 
 [sub_resource type="RectangleShape2D" id="DoorZone"]
-size = Vector2(178, 200)
+size = Vector2(178, 48)
 
 [node name="Police" type="Control" unique_id=1581297878]
 layout_mode = 3
@@ -34,11 +34,11 @@ texture = ExtResource("3_bg")
 [node name="Walls" type="StaticBody2D" parent="." unique_id=638362346]
 
 [node name="Top" type="CollisionShape2D" parent="Walls" unique_id=1689712092]
-position = Vector2(610, 448)
+position = Vector2(616, 445)
 shape = SubResource("WallWide")
 
 [node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=815100703]
-position = Vector2(640, 772)
+position = Vector2(636, 779)
 shape = SubResource("WallWide")
 
 [node name="Left" type="CollisionShape2D" parent="Walls" unique_id=584255393]
@@ -46,38 +46,39 @@ position = Vector2(-35, 354)
 shape = SubResource("WallTall")
 
 [node name="Right" type="CollisionShape2D" parent="Walls" unique_id=77160114]
-position = Vector2(1255, 360)
+position = Vector2(1309, 362)
 shape = SubResource("WallTall")
 
 [node name="ExitArea" type="Area2D" parent="." unique_id=1174620442]
 position = Vector2(130, 640)
 
 [node name="Col" type="CollisionShape2D" parent="ExitArea" unique_id=823731173]
-position = Vector2(18, -187)
+position = Vector2(30, -130)
 shape = SubResource("ExitZone")
 
 [node name="InterrogationArea" type="Area2D" parent="." unique_id=635523579]
-position = Vector2(500, 640)
+position = Vector2(490, 552)
 
 [node name="Col" type="CollisionShape2D" parent="InterrogationArea" unique_id=1857610201]
-position = Vector2(-1, -193)
+position = Vector2(3, -50)
 shape = SubResource("DoorZone")
 
 [node name="TerminalArea" type="Area2D" parent="." unique_id=1220408478]
 position = Vector2(775, 640)
 
 [node name="Col" type="CollisionShape2D" parent="TerminalArea" unique_id=1602348458]
-position = Vector2(8, -198)
+position = Vector2(-3, -134)
 shape = SubResource("DoorZone")
 
 [node name="ArchiveArea" type="Area2D" parent="." unique_id=311010]
 position = Vector2(1060, 640)
 
 [node name="Col" type="CollisionShape2D" parent="ArchiveArea" unique_id=311011]
-position = Vector2(0, -198)
+position = Vector2(-4, -140)
 shape = SubResource("DoorZone")
 
 [node name="ExitDoorLabel" type="Label" parent="." unique_id=311001]
+layout_mode = 0
 offset_left = 50.0
 offset_top = 188.0
 offset_right = 250.0
@@ -90,6 +91,7 @@ text = "← 街道"
 horizontal_alignment = 1
 
 [node name="InterrogationDoorLabel" type="Label" parent="." unique_id=311002]
+layout_mode = 0
 offset_left = 400.0
 offset_top = 188.0
 offset_right = 600.0
@@ -102,6 +104,7 @@ text = "审讯室"
 horizontal_alignment = 1
 
 [node name="TerminalDoorLabel" type="Label" parent="." unique_id=311003]
+layout_mode = 0
 offset_left = 675.0
 offset_top = 188.0
 offset_right = 875.0
@@ -114,6 +117,7 @@ text = "终端室"
 horizontal_alignment = 1
 
 [node name="ArchiveDoorLabel" type="Label" parent="." unique_id=311012]
+layout_mode = 0
 offset_left = 960.0
 offset_top = 188.0
 offset_right = 1160.0
@@ -126,7 +130,7 @@ text = "档案室"
 horizontal_alignment = 1
 
 [node name="Player" parent="." unique_id=414641871 instance=ExtResource("2_player")]
-position = Vector2(130.00002, 510)
+position = Vector2(921.99994, 849)
 scale = Vector2(1.4, 1.4)
 
 [node name="Hint" type="Label" parent="." unique_id=1750110365]
@@ -147,18 +151,18 @@ theme_override_font_sizes/font_size = 22
 text = "↑ 进入"
 horizontal_alignment = 1
 
-[node name="Phone" parent="." instance=ExtResource("4_phone")]
+[node name="Phone" parent="." unique_id=216763409 instance=ExtResource("4_phone")]
 
-[node name="Spawns" type="Node2D" parent="."]
+[node name="Spawns" type="Node2D" parent="." unique_id=1049515484]
 
-[node name="from_world" type="Marker2D" parent="Spawns"]
-position = Vector2(200, 510)
+[node name="from_world" type="Marker2D" parent="Spawns" unique_id=1578066323]
+position = Vector2(157, 558)
 
-[node name="interrogation" type="Marker2D" parent="Spawns"]
-position = Vector2(500, 510)
+[node name="interrogation" type="Marker2D" parent="Spawns" unique_id=1519528511]
+position = Vector2(504, 550)
 
-[node name="terminal" type="Marker2D" parent="Spawns"]
-position = Vector2(775, 510)
+[node name="terminal" type="Marker2D" parent="Spawns" unique_id=1515340159]
+position = Vector2(772, 566)
 
-[node name="archive" type="Marker2D" parent="Spawns"]
-position = Vector2(1010, 510)
+[node name="archive" type="Marker2D" parent="Spawns" unique_id=1866204761]
+position = Vector2(1058, 553)

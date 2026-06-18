@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="SpriteFrames" uid="uid://5yedbaha40to" path="res://art/world_rain_city.tres" id="3_far"]
 [ext_resource type="Texture2D" uid="uid://d1jbfumvndfwb" path="res://art/world_street_road.png" id="4_street"]
-[ext_resource type="PackedScene" uid="uid://c8phone0distort" path="res://scenes/phone.tscn" id="5_phone"]
+[ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="5_phone"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
 size = Vector2(2600, 130)
@@ -85,7 +85,7 @@ position = Vector2(-12, -98)
 shape = SubResource("DoorZone")
 
 [node name="CommunityDoor" type="Area2D" parent="." unique_id=1544897468]
-position = Vector2(2080, 610)
+position = Vector2(2078, 605)
 
 [node name="Col" type="CollisionShape2D" parent="CommunityDoor" unique_id=1937842236]
 position = Vector2(22, -63)
@@ -128,15 +128,15 @@ theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Phone" parent="." instance=ExtResource("5_phone")]
+[node name="Phone" parent="." unique_id=78586422 instance=ExtResource("5_phone")]
 
-[node name="Spawns" type="Node2D" parent="."]
+[node name="Spawns" type="Node2D" parent="." unique_id=1012107982]
 
-[node name="start" type="Marker2D" parent="Spawns"]
-position = Vector2(59, 599)
+[node name="start" type="Marker2D" parent="Spawns" unique_id=1851279430]
+position = Vector2(112, 657)
 
-[node name="police" type="Marker2D" parent="Spawns"]
-position = Vector2(360, 599)
+[node name="police" type="Marker2D" parent="Spawns" unique_id=2010088751]
+position = Vector2(361, 637)
 
-[node name="community" type="Marker2D" parent="Spawns"]
-position = Vector2(1990, 599)
+[node name="community" type="Marker2D" parent="Spawns" unique_id=766471991]
+position = Vector2(2109, 630)
