@@ -12,6 +12,10 @@ const Content = preload("res://game/content.gd")
 	$Panel/Bar/Slot0, $Panel/Bar/Slot1, $Panel/Bar/Slot2
 ]
 @onready var desc: Label = $Panel/Desc
+@onready var phone_view: ColorRect = $PhoneView          # 老人手机阅读面板(看今天的莫忘对话)
+@onready var pv_text: Label = $PhoneView/PVPanel/PVScroll/PVText
+@onready var pv_scroll: ScrollContainer = $PhoneView/PVPanel/PVScroll
+@onready var pv_close: Button = $PhoneView/PVPanel/PVClose
 
 var _desc_tween: Tween
 
@@ -19,7 +23,9 @@ func _ready() -> void:
 	toggle_btn.pressed.connect(_toggle)
 	for i in slots.size():
 		(slots[i] as Button).pressed.connect(_on_slot.bind(i))
+	pv_close.pressed.connect(_close_phone_view)
 	panel.visible = false   # 默认收起，只露右上角按钮
+	phone_view.visible = false
 	desc.visible = false
 	refresh()
 
@@ -51,7 +57,31 @@ func _on_slot(i: int) -> void:
 	if id == "":
 		return
 	Sfx.play_click()
+	if id == "oldman_phone":
+		_open_phone_view()   # 老人手机 → 看今天的莫忘对话(不是简单说明)
+		return
 	_show_desc(str(Content.ITEMS[id]["label"]) + "：" + str(Content.ITEMS[id]["desc"]))
+
+# 点开老人手机：看「今天」的莫忘对话；看完莫忘提醒去终端恢复完整历史。
+func _open_phone_view() -> void:
+	pv_text.text = "\n\n".join(Content.MOWANG_TODAY_LINES)
+	pv_scroll.set_deferred("scroll_vertical", 0)
+	phone_view.visible = true
+	_notify_hint("unlock_log")
+
+func _close_phone_view() -> void:
+	Sfx.play_click()
+	phone_view.visible = false
+
+# 发莫忘提醒(去重)：记进莫忘日志+红点；当前场景若有手机实例则顺带响一声/弹小字。
+func _notify_hint(id: String) -> void:
+	if not Content.MOWANG_HINTS.has(id):
+		return
+	if Game.state.fire_hint(id, str(Content.MOWANG_HINTS[id])):
+		var sc := get_tree().current_scene
+		var ph := sc.get_node_or_null("Phone") if sc else null
+		if ph and ph.has_method("notify_hint"):
+			ph.notify_hint()
 
 func _show_desc(t: String) -> void:
 	desc.text = t

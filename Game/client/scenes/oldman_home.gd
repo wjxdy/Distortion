@@ -72,7 +72,7 @@ func _take_phone() -> void:
 	Sfx.play_click()
 	Game.state.add_item("oldman_phone")   # 老人手机进道具栏
 	Inv.refresh()
-	info.text = "你拿起床头的手机——屏幕还亮着「莫忘」。它锁着，得回警局用终端接进去才能看里面的对话。"
+	info.text = "你拿起床头的手机——屏幕还亮着「莫忘」。在道具栏点开它，看看他和那个 AI 说了什么。"
 	info.visible = true
-	if Game.state.fire_hint("unlock_log", str(Content.MOWANG_HINTS["unlock_log"])):
+	if Game.state.fire_hint("check_phone", str(Content.MOWANG_HINTS["check_phone"])):
 		phone.notify_hint()

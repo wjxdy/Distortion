@@ -59,3 +59,49 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 15
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="PhoneView" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.72)
+
+[node name="PVPanel" type="ColorRect" parent="PhoneView"]
+offset_left = 380.0
+offset_top = 150.0
+offset_right = 900.0
+offset_bottom = 560.0
+color = Color(0.1, 0.12, 0.16, 1)
+
+[node name="PVTitle" type="Label" parent="PhoneView/PVPanel"]
+offset_left = 20.0
+offset_top = 14.0
+offset_right = 500.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.6, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "📱 老人的手机 · 莫忘（今天）"
+
+[node name="PVScroll" type="ScrollContainer" parent="PhoneView/PVPanel"]
+offset_left = 16.0
+offset_top = 58.0
+offset_right = 504.0
+offset_bottom = 348.0
+horizontal_scroll_mode = 0
+
+[node name="PVText" type="Label" parent="PhoneView/PVPanel/PVScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.92, 0.95, 0.98, 1)
+theme_override_constants/line_spacing = 8
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+
+[node name="PVClose" type="Button" parent="PhoneView/PVPanel"]
+offset_left = 20.0
+offset_top = 360.0
+offset_right = 200.0
+offset_bottom = 398.0
+theme_override_font_sizes/font_size = 18
+text = "关闭"

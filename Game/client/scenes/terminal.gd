@@ -55,11 +55,12 @@ func _show(file_id: String) -> void:
 		if Content.MOWANG_HINTS.has(hid) and Game.state.fire_hint(hid, str(Content.MOWANG_HINTS[hid])):
 			phone.notify_hint()
 
-# 接入老人的手机 → 打开莫忘日志逐条翻(取证解锁)
+# 接入老人的手机 → 终端恢复全部历史日志 → 打开莫忘滑坡日志逐条翻(取证解锁)
 func _submit_phone() -> void:
 	if not Game.state.has_item("oldman_phone"):
 		return
 	Sfx.play_click()
+	display.text = "接入成功。\n本地只剩今天的对话，正在从云端恢复……\n\n✅ 已恢复全部历史日志。"
 	log_idx = 0
 	log_label.text = str(Content.MOWANG_LOG_LINES[0])
 	next_btn.text = "下一条 ▼"

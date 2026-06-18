@@ -143,6 +143,14 @@ func _initialize() -> void:
 	_check("是 AI 害死的" in molog_blob, "日志含突兀跳变的'是 AI 害死的'")
 	_check(("没有前一天" in molog_blob) or ("没有任何理由" in molog_blob), "日志含点破空白的旁白")
 
+	# --- 莫忘"今天的对话"(道具栏看) + 提醒链:手机→道具栏→终端恢复历史 ---
+	_check(Content.MOWANG_TODAY_LINES.size() >= 2, "今天的对话有内容")
+	var today_blob := "\n".join(Content.MOWANG_TODAY_LINES)
+	_check("莫忘" in today_blob and "今天" in today_blob, "今天的对话含莫忘/今天")
+	_check(("锁" in today_blob) or ("读不出" in today_blob), "今天的对话点明更早记录锁住")
+	_check(Content.MOWANG_HINTS.has("check_phone") and "道具栏" in str(Content.MOWANG_HINTS["check_phone"]), "拿手机提醒→道具栏")
+	_check(("终端" in str(Content.MOWANG_HINTS["unlock_log"])) and ("恢复" in str(Content.MOWANG_HINTS["unlock_log"])), "看完今天提醒→终端恢复历史")
+
 	# --- LLM.parse_reply（客户端直连版，移植自后端 llm.js parseReply） ---
 	var r1 = LLM.parse_reply("[sad] 她……只是出门买点菜。 ")
 	_check(r1["reply"] == "她……只是出门买点菜。" and r1["emotion"] == "sad" and r1["hint"] == "" and r1["end"] == "", "解析句首情绪+去空白")
@@ -185,8 +193,8 @@ func _initialize() -> void:
 	_check(sfx_t._typing_player.playing, "打字机开始→在播")
 	# 模拟中途离场没触发 tween 回调:循环仍在播(=bug 残留态)
 	_check(sfx_t._typing_player.playing, "未主动停→循环残留(复现:这正是退出后还响的原因)")
-	sfx_t.stop_typing()                # 修复动作:离场统一停(现在带~60ms淡出避爆音,异步)
-	await create_timer(0.15).timeout   # 等淡出完成
+	sfx_t.stop_typing()                # 修复动作:离场统一停(现在带淡出避爆音,异步)
+	await create_timer(0.25).timeout   # 等淡出完成
 	_check(not sfx_t._typing_player.playing, "stop_typing(淡出后)→循环停下(离场不再残留)")
 	sfx_t.queue_free()
 
