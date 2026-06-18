@@ -18,7 +18,8 @@ signal closed
 @onready var mowang_btn: Button = $Screen/Body/AppList/MowangBtn
 @onready var mowang_dot: ColorRect = $Screen/Body/AppList/MowangBtn/Dot
 @onready var close_btn: Button = $Screen/Body/AppList/CloseBtn
-@onready var display: Label = $Screen/Body/DisplayBg/Display
+@onready var display: Label = $Screen/Body/DisplayBg/Scroll/Display
+@onready var scroll: ScrollContainer = $Screen/Body/DisplayBg/Scroll
 @onready var toast: Label = $Toast
 
 var _toast_tween: Tween
@@ -69,14 +70,19 @@ func close() -> void:
 	screen.visible = false
 	closed.emit()
 
+# 切到某 app：填内容并把滚动条拉回顶部(超长内容由 Scroll 提供纵向滚动)。
+func _set_display(t: String) -> void:
+	display.text = t
+	scroll.set_deferred("scroll_vertical", 0)   # 等内容重排后回到顶部
+
 func _show_task() -> void:
-	display.text = Content.BOSS_TASK
+	_set_display(Content.BOSS_TASK)
 	Game.state.read_task()   # 看过任务 → 红点清
 	refresh_badge()
 
 func _show_mowang() -> void:
 	# 莫忘 app：展示已触发的提醒；看过即转已读、红点清。
 	var log: Array = Game.state.mowang_log
-	display.text = "\n\n".join(log) if not log.is_empty() else "（暂无提醒。莫忘会在关键时刻提示你。）"
+	_set_display("\n\n".join(log) if not log.is_empty() else "（暂无提醒。莫忘会在关键时刻提示你。）")
 	Game.state.read_mowang()
 	refresh_badge()
