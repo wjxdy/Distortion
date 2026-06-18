@@ -346,6 +346,13 @@ func _back() -> void:
 	Sfx.play_door()
 	get_tree().change_scene_to_file(POLICE)
 
+# 离开审讯室(返回按钮/Esc/切场景任意路径)时统一停打字机循环音效。
+# 打字机用 Sfx(autoload 常驻)的循环 player,正常靠 tween 结束回调 stop;
+# 但老头还在打字时中途退出,tween 连同本场景被销毁→回调漏触发→音效残留到警局走廊。
+# _exit_tree 在节点离树时必触发,兜住所有离场路径。
+func _exit_tree() -> void:
+	Sfx.stop_typing()
+
 func _input(event: InputEvent) -> void:
 	# Esc 返回警局走廊
 	if event.is_action_pressed("ui_cancel"):

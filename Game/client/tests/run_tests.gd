@@ -173,5 +173,20 @@ func _initialize() -> void:
 	PlayerScript.clear_movement_input()
 	_check(not Input.is_action_pressed("move_right"), "Player.clear_movement_input 清除残留移动键(防返回后自动走)")
 
+	# --- 打字机音效：离开审讯室必须停(防退出后老头打字机音效残留到警局) ---
+	# 复现失败模式:打字机是 Sfx(autoload常驻)上的循环 player,正常靠 tween 结束回调 stop。
+	# 老头还在打字时中途退出→tween 连同场景被销毁、回调漏触发→不主动停就会残留(still playing)。
+	# 修复=审讯室 _exit_tree 调 Sfx.stop_typing()(见 interrogation.gd)。这里验证 stop 能停下循环。
+	var sfx_t = load("res://autoload/sfx.gd").new()
+	get_root().add_child(sfx_t)
+	await process_frame                # 等 _ready 跑完建好 _typing_player
+	sfx_t.start_typing()
+	_check(sfx_t._typing_player.playing, "打字机开始→在播")
+	# 模拟中途离场没触发 tween 回调:循环仍在播(=bug 残留态)
+	_check(sfx_t._typing_player.playing, "未主动停→循环残留(复现:这正是退出后还响的原因)")
+	sfx_t.stop_typing()                # 修复动作:离场统一停
+	_check(not sfx_t._typing_player.playing, "stop_typing→循环停下(离场不再残留)")
+	sfx_t.queue_free()
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
