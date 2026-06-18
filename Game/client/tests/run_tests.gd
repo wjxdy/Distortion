@@ -216,6 +216,12 @@ func _initialize() -> void:
 	_check(has_bearer, "headers 用运行时 key")
 	LLM.set_runtime_key("  sk-trim  ")
 	_check(LLM.active_key() == "sk-trim", "key 去首尾空格")
+	# key 指纹(诊断 401 用哪个 key)
+	LLM.set_runtime_key("")
+	_check("占位符" in LLM.key_fingerprint(), "没填→指纹标出占位符未注入")
+	LLM.set_runtime_key("sk-abcdef123456")
+	var fp = LLM.key_fingerprint()
+	_check("设置key" in fp and "len=" in fp and "sk-abc" in fp, "填了→指纹显示来源/长度/前缀")
 	LLM.set_runtime_key("")   # 复原，别影响其它测试
 
 	# --- 设置: 背景音乐开关(独立 Music 总线静音/取消静音) ---

@@ -50,6 +50,7 @@ func open() -> void:
 	_set_shown(true)
 
 func close() -> void:
+	_apply_key()   # 关闭也保存当前填的 key，免得粘贴了忘点「保存」导致没生效
 	Sfx.play_click()
 	_set_shown(false)
 
@@ -62,10 +63,13 @@ func _on_music_toggled(on: bool) -> void:
 	Music.set_enabled(on)
 	_save()
 
-func _on_save_key() -> void:
+func _apply_key() -> void:
 	_api_key = api_input.text.strip_edges()
 	LLM.set_runtime_key(_api_key)
 	_save()
+
+func _on_save_key() -> void:
+	_apply_key()
 	saved_hint.visible = true
 
 func _load() -> void:

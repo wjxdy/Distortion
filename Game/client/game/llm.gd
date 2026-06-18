@@ -20,6 +20,18 @@ static func set_runtime_key(k: String) -> void:
 static func active_key() -> String:
 	return _runtime_key if _runtime_key != "" else API_KEY
 
+# key 指纹(调试日志用,不泄露完整 key)：来源 + 长度 + 前缀；占位符/空会明确标出。
+# 用来排查 401 到底是"没填用了占位符" 还是 "填了但 key 无效"。
+static func key_fingerprint() -> String:
+	var src := "设置key" if _runtime_key != "" else "内置key"
+	var k := active_key()
+	if k == "":
+		return src + "(空!)"
+	if k.begins_with("REPLACE_WITH"):
+		return src + "(占位符·没填自己的key/未注入!)"
+	var head: String = k.substr(0, 6) if k.length() >= 6 else k
+	return "%s len=%d %s…" % [src, k.length(), head]
+
 const EMOTIONS := ["calm", "angry", "sinister", "sad"]
 const VALID_END := ["ready", "reveal", "comfort", "leave"]
 

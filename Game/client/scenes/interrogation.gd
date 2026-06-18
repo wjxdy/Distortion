@@ -213,6 +213,8 @@ func _on_reply(result: int, code: int, _headers: PackedStringArray, body: Packed
 		return
 	# 失败：先翻译原因，能重试就按递增延迟重试，用尽才保底沉默
 	var reason := LLM.fail_reason(result, code, body.get_string_from_utf8() if body.size() > 0 else "")
+	if code == 401 or code == 403:
+		reason += "  [" + LLM.key_fingerprint() + "]"   # 鉴权失败时标出用的哪个 key
 	if _attempt < MAX_TRIES and not finished:
 		var d: float = RETRY_DELAYS[mini(_attempt - 1, RETRY_DELAYS.size() - 1)]
 		Dbg.log_req(_attempt, false, code, "%s → %.1fs后重试" % [reason, d], elapsed)
