@@ -1,8 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://cm6n8jyvoc526"]
 
-[ext_resource type="Script" path="res://scenes/oldman_home.gd" id="1_home"]
+[ext_resource type="Script" uid="uid://uutt0lcvi6d3" path="res://scenes/oldman_home.gd" id="1_home"]
 [ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="3_phone"]
+[ext_resource type="Texture2D" uid="uid://c54nfy3ixqv3f" path="res://art/world_rain_city/oldroom.png" id="4_room_bg"]
+[ext_resource type="Texture2D" uid="uid://dwavkempols0b" path="res://art/phone.png" id="5_dcvvl"]
+[ext_resource type="Texture2D" uid="uid://cjhwtpvghlk6" path="res://art/Gemini_Generated_Image_sw8spwsw8spwsw8s.png" id="6_le26c"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
 size = Vector2(1300, 120)
@@ -13,95 +16,78 @@ size = Vector2(70, 760)
 [sub_resource type="RectangleShape2D" id="Zone"]
 size = Vector2(170, 220)
 
-[node name="OldmanHome" type="Control"]
+[node name="OldmanHome" type="Control" unique_id=1612901123]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_home")
 
-[node name="Bg" type="ColorRect" parent="."]
+[node name="Bg" type="ColorRect" parent="." unique_id=767298402]
+layout_mode = 0
 offset_right = 1280.0
 offset_bottom = 720.0
 color = Color(0.1, 0.09, 0.08, 1)
 
-[node name="Floor" type="ColorRect" parent="."]
-offset_top = 540.0
+[node name="RoomBg" type="TextureRect" parent="." unique_id=1017784364]
+layout_mode = 0
 offset_right = 1280.0
 offset_bottom = 720.0
-color = Color(0.14, 0.12, 0.1, 1)
+texture = ExtResource("4_room_bg")
+expand_mode = 2
 
-[node name="Photo" type="ColorRect" parent="."]
-offset_left = 250.0
-offset_top = 200.0
-offset_right = 410.0
-offset_bottom = 320.0
-color = Color(0.3, 0.32, 0.42, 1)
+[node name="Walls" type="StaticBody2D" parent="." unique_id=1234920387]
 
-[node name="PhotoLabel" type="Label" parent="Photo"]
-offset_top = -34.0
-offset_right = 160.0
-offset_bottom = -4.0
-horizontal_alignment = 1
-text = "合照"
-
-[node name="PhoneObj" type="ColorRect" parent="."]
-offset_left = 860.0
-offset_top = 420.0
-offset_right = 920.0
-offset_bottom = 520.0
-color = Color(0.3, 0.5, 0.55, 1)
-
-[node name="PhoneObjLabel" type="Label" parent="PhoneObj"]
-offset_left = -40.0
-offset_top = -34.0
-offset_right = 100.0
-offset_bottom = -4.0
-horizontal_alignment = 1
-text = "手机"
-
-[node name="Walls" type="StaticBody2D" parent="."]
-
-[node name="Top" type="CollisionShape2D" parent="Walls"]
-position = Vector2(640, 526)
+[node name="Top" type="CollisionShape2D" parent="Walls" unique_id=2057254647]
+position = Vector2(640, 438)
 shape = SubResource("WallWide")
 
-[node name="Bottom" type="CollisionShape2D" parent="Walls"]
+[node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=1359337224]
 position = Vector2(640, 772)
 shape = SubResource("WallWide")
 
-[node name="Left" type="CollisionShape2D" parent="Walls"]
+[node name="Left" type="CollisionShape2D" parent="Walls" unique_id=1161929994]
 position = Vector2(25, 360)
 shape = SubResource("WallTall")
 
-[node name="Right" type="CollisionShape2D" parent="Walls"]
-position = Vector2(1255, 360)
+[node name="Right" type="CollisionShape2D" parent="Walls" unique_id=172275168]
+position = Vector2(1245, 353)
 shape = SubResource("WallTall")
 
-[node name="PhotoArea" type="Area2D" parent="."]
+[node name="PhotoArea" type="Area2D" parent="." unique_id=802765087]
 position = Vector2(330, 620)
 
-[node name="Col" type="CollisionShape2D" parent="PhotoArea"]
+[node name="Col" type="CollisionShape2D" parent="PhotoArea" unique_id=149568908]
+position = Vector2(-30, -249)
 shape = SubResource("Zone")
 
-[node name="PhoneArea" type="Area2D" parent="."]
+[node name="PhoneArea" type="Area2D" parent="." unique_id=1808174099]
 position = Vector2(890, 620)
 
-[node name="Col" type="CollisionShape2D" parent="PhoneArea"]
+[node name="Col" type="CollisionShape2D" parent="PhoneArea" unique_id=1656699847]
+position = Vector2(6, -207)
 shape = SubResource("Zone")
 
-[node name="ExitArea" type="Area2D" parent="."]
+[node name="ExitArea" type="Area2D" parent="." unique_id=1695131764]
 position = Vector2(80, 620)
 
-[node name="Col" type="CollisionShape2D" parent="ExitArea"]
+[node name="Col" type="CollisionShape2D" parent="ExitArea" unique_id=2108710711]
 shape = SubResource("Zone")
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
-position = Vector2(150, 620)
+[node name="Phone2" type="Sprite2D" parent="." unique_id=299274861]
+position = Vector2(890, 384)
+scale = Vector2(0.044270806, 0.044270806)
+texture = ExtResource("5_dcvvl")
+
+[node name="Player" parent="." unique_id=2143951481 instance=ExtResource("2_player")]
+position = Vector2(146, 670)
 scale = Vector2(1.4, 1.4)
 
-[node name="Info" type="Label" parent="."]
+[node name="Info" type="Label" parent="." unique_id=1324372682]
 visible = false
+layout_mode = 0
 offset_left = 300.0
 offset_top = 90.0
 offset_right = 980.0
@@ -114,7 +100,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Hint" type="Label" parent="."]
+[node name="Hint" type="Label" parent="." unique_id=538724543]
+layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0
 offset_right = 1240.0
@@ -124,34 +111,39 @@ theme_override_font_sizes/font_size = 22
 text = "周明远家     WASD / ↑↓←→ 移动     W/↑ 查看 / 离开"
 horizontal_alignment = 1
 
-[node name="Prompt" type="Label" parent="."]
+[node name="Prompt" type="Label" parent="." unique_id=1866045933]
+layout_mode = 0
 offset_right = 240.0
 offset_bottom = 32.0
 theme_override_font_sizes/font_size = 22
 text = "↑ 查看"
 horizontal_alignment = 1
 
-[node name="LogView" type="Control" parent="."]
+[node name="LogView" type="Control" parent="." unique_id=791296262]
 visible = false
-layout_mode = 3
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Dim" type="ColorRect" parent="LogView"]
-anchors_preset = 15
+[node name="Dim" type="ColorRect" parent="LogView" unique_id=877463508]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0, 0, 0, 0.78)
 
-[node name="Panel" type="ColorRect" parent="LogView"]
+[node name="Panel" type="ColorRect" parent="LogView" unique_id=2012445122]
+layout_mode = 0
 offset_left = 280.0
 offset_top = 130.0
 offset_right = 1000.0
 offset_bottom = 600.0
 color = Color(0.07, 0.1, 0.12, 1)
 
-[node name="Title" type="Label" parent="LogView/Panel"]
+[node name="Title" type="Label" parent="LogView/Panel" unique_id=945846645]
+layout_mode = 0
 offset_left = 24.0
 offset_top = 16.0
 offset_right = 696.0
@@ -160,7 +152,8 @@ theme_override_colors/font_color = Color(0.6, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 22
 text = "💬 莫忘 · 对话日志"
 
-[node name="Line" type="Label" parent="LogView/Panel"]
+[node name="Line" type="Label" parent="LogView/Panel" unique_id=472329656]
+layout_mode = 0
 offset_left = 30.0
 offset_top = 80.0
 offset_right = 690.0
@@ -170,7 +163,8 @@ theme_override_constants/line_spacing = 8
 theme_override_font_sizes/font_size = 20
 autowrap_mode = 3
 
-[node name="NextBtn" type="Button" parent="LogView/Panel"]
+[node name="NextBtn" type="Button" parent="LogView/Panel" unique_id=557600440]
+layout_mode = 0
 offset_left = 470.0
 offset_top = 400.0
 offset_right = 690.0
@@ -178,7 +172,8 @@ offset_bottom = 450.0
 theme_override_font_sizes/font_size = 22
 text = "下一条 ▼"
 
-[node name="CloseBtn" type="Button" parent="LogView/Panel"]
+[node name="CloseBtn" type="Button" parent="LogView/Panel" unique_id=4306600]
+layout_mode = 0
 offset_left = 30.0
 offset_top = 400.0
 offset_right = 170.0
@@ -186,9 +181,40 @@ offset_bottom = 450.0
 theme_override_font_sizes/font_size = 20
 text = "✕ 关闭"
 
-[node name="Phone" parent="." instance=ExtResource("3_phone")]
+[node name="Phone" parent="." unique_id=1159827068 instance=ExtResource("3_phone")]
 
-[node name="Spawns" type="Node2D" parent="."]
+[node name="Spawns" type="Node2D" parent="." unique_id=850013466]
 
-[node name="from_corridor" type="Marker2D" parent="Spawns"]
+[node name="from_corridor" type="Marker2D" parent="Spawns" unique_id=1893757232]
 position = Vector2(170, 620)
+
+[node name="PhoneObjLabel" type="Label" parent="." unique_id=232967559]
+layout_mode = 0
+offset_left = 773.0
+offset_top = 337.0
+offset_right = 993.0
+offset_bottom = 367.0
+theme_override_colors/font_color = Color(0.35, 0.55, 0.65, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "手机"
+horizontal_alignment = 1
+
+[node name="GeminiGeneratedImageSw8Spwsw8Spwsw8s" type="Sprite2D" parent="." unique_id=2061779463]
+position = Vector2(293, 183)
+scale = Vector2(0.17073572, 0.17073572)
+texture = ExtResource("6_le26c")
+
+[node name="PhotoLabel" type="Label" parent="." unique_id=546924231]
+layout_mode = 0
+offset_left = 219.0
+offset_top = 91.0
+offset_right = 379.0
+offset_bottom = 121.0
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "合照"
+horizontal_alignment = 1
