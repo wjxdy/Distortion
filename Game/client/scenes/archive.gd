@@ -18,6 +18,7 @@ func _ready() -> void:
 	key_obj.visible = not Game.state.has_item("home_key")   # 已取过就不再显示
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
+	Game.place_player(self, player)   # 从警局走廊进来时，落到入口锚点
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -47,6 +48,7 @@ func _input(event: InputEvent) -> void:
 	if _at(key_area) and not Game.state.has_item("home_key"):
 		_take_key()
 	elif _at(exit_area):
+		Game.spawn_point = "archive"   # 回警局时落到档案室门口
 		Sfx.play_door()
 		get_tree().change_scene_to_file(POLICE)
 

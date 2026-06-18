@@ -187,3 +187,8 @@ theme_override_font_sizes/font_size = 20
 text = "✕ 关闭"
 
 [node name="Phone" parent="." instance=ExtResource("3_phone")]
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="from_corridor" type="Marker2D" parent="Spawns"]
+position = Vector2(170, 620)

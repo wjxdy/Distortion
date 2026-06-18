@@ -8,9 +8,25 @@ const GameState = preload("res://game/game_state.gd")
 
 var state: GameState
 
+# 场景切换导航：出发场景在切场景前设好"目标场景里的入口锚点名"，
+# 目标场景 _ready 调 place_player 把玩家摆到对应 Marker2D 后清空。
+# 为空（如开局从序幕进街道）则保持目标 .tscn 里的默认出生点。
+var spawn_point: String = ""
+
 func _ready() -> void:
 	reset()
 
 # 开新游戏时调用（开场 opening 会调）：清空钥匙/真相/历史。
 func reset() -> void:
 	state = GameState.new()
+
+# 目标场景在 _ready 里调：按 spawn_point 找 Spawns/<名字> 的 Marker2D（可在编辑器拖），
+# 把玩家移过去；没设或找不到锚点就保持 .tscn 默认位置。读完即清空，避免残留到下次。
+func place_player(scene: Node, player: Node2D) -> void:
+	var id := spawn_point
+	spawn_point = ""
+	if id == "":
+		return
+	var marker := scene.get_node_or_null("Spawns/" + id) as Node2D
+	if marker:
+		player.position = marker.position

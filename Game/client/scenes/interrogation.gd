@@ -342,6 +342,7 @@ func _play_crack() -> void:
 	tw.tween_callback(func() -> void: crack.visible = false)
 
 func _back() -> void:
+	Game.spawn_point = "interrogation"   # 回警局时落到审讯室门口
 	Sfx.play_door()
 	get_tree().change_scene_to_file(POLICE)
 

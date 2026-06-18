@@ -19,12 +19,14 @@ func _ready() -> void:
 func _pick(floor_num: int) -> void:
 	Sfx.play_click()
 	if floor_num == OLD_FLOOR:
+		Game.spawn_point = "from_elevator"   # 楼道里落到电梯口
 		Sfx.play_door()
 		get_tree().change_scene_to_file(CORRIDOR)
 	else:
 		info.text = "%d 层……不是他家。（他住 7 层）" % floor_num
 
 func _back() -> void:
+	Game.spawn_point = "from_elevator"   # 回小区时落到老人楼门口
 	Sfx.play_door()
 	get_tree().change_scene_to_file(COMMUNITY)
 

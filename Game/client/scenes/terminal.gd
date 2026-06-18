@@ -87,6 +87,7 @@ func _close_log() -> void:
 	log_view.visible = false
 
 func _back() -> void:
+	Game.spawn_point = "terminal"   # 回警局时落到终端室门口
 	Sfx.play_door()
 	get_tree().change_scene_to_file(POLICE)
 

@@ -14,6 +14,7 @@ func _ready() -> void:
 	prompt.visible = false
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
+	Game.place_player(self, player)   # 从电梯/老人家回来时，落到对应入口锚点
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -42,11 +43,13 @@ func _input(event: InputEvent) -> void:
 		return
 	if _at(home_door):
 		if Game.state.has_item("home_key"):
+			Game.spawn_point = "from_corridor"   # 老人家里落到门口
 			Sfx.play_door()
 			get_tree().change_scene_to_file(HOME)
 		else:
 			Sfx.play_click()
 			prompt.text = "门锁着——去警局档案室拿钥匙"
 	elif _at(exit_area):
+		Game.spawn_point = ""   # 电梯是纯 UI，无需锚点；清掉以防残留
 		Sfx.play_door()
 		get_tree().change_scene_to_file(ELEVATOR)

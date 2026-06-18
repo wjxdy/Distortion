@@ -19,6 +19,7 @@ func _ready() -> void:
 	info.visible = false
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
+	Game.place_player(self, player)   # 从楼道进来时，落到门口锚点
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -53,6 +54,7 @@ func _input(event: InputEvent) -> void:
 	elif _at(phone_area):
 		_take_phone()
 	elif _at(exit_area):
+		Game.spawn_point = "from_home"   # 回楼道时落到 702 门口
 		Sfx.play_door()
 		get_tree().change_scene_to_file(CORRIDOR)
 

@@ -24,6 +24,7 @@ func _ready() -> void:
 	# 看手机时锁住走动（手机自身管显隐/填字，这里只联动锁人）
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
+	Game.place_player(self, player)   # 从别的场景回来时，落到对应入口锚点
 	_update_prompt()
 	# 开局有未读任务 → 响一声通知音，提示玩家点手机看任务
 	if Game.state.task_unread:
@@ -37,7 +38,7 @@ func _process(_delta: float) -> void:
 		return
 	# 走到警局门口且按住 W/↑ → 进入
 	if _near(police_door) and Input.is_action_pressed("move_up"):
-		_enter_door(POLICE)
+		_enter_door(POLICE, "from_world")
 		return
 	_update_prompt()
 
@@ -63,12 +64,13 @@ func _input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("move_up") and _near(community_door) and not _near(police_door):
 		if Game.state.has_key("home_address"):
-			_enter_door(COMMUNITY)
+			_enter_door(COMMUNITY, "from_world")
 		else:
 			Sfx.play_click()
 			_show_toast("还不知道他住哪——先去警局终端查他的户籍。")
 
-func _enter_door(scene_path: String) -> void:
+func _enter_door(scene_path: String, entry: String = "") -> void:
+	Game.spawn_point = entry   # 告诉目标场景：玩家该落在哪个入口锚点
 	player.enter_door()
 	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout

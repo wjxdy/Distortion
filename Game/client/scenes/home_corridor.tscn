@@ -123,3 +123,11 @@ text = "↑ 进入"
 horizontal_alignment = 1
 
 [node name="Phone" parent="." instance=ExtResource("3_phone")]
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="from_elevator" type="Marker2D" parent="Spawns"]
+position = Vector2(170, 620)
+
+[node name="from_home" type="Marker2D" parent="Spawns"]
+position = Vector2(540, 620)

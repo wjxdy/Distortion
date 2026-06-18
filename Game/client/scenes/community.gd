@@ -19,6 +19,7 @@ func _ready() -> void:
 	npc_text.visible = false
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
+	Game.place_player(self, player)   # 从街道/电梯回来时，落到对应入口锚点
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -47,8 +48,10 @@ func _input(event: InputEvent) -> void:
 	if not event.is_action_pressed("move_up"):
 		return
 	if _at(building_door):
+		Game.spawn_point = ""   # 电梯是纯 UI，无需锚点；清掉以防残留
 		Sfx.play_door()
 		get_tree().change_scene_to_file(ELEVATOR)
 	elif _at(exit_area):
+		Game.spawn_point = "community"   # 回街道时落到小区门口
 		Sfx.play_door()
 		get_tree().change_scene_to_file(WORLD)
