@@ -29,7 +29,4 @@ func _back() -> void:
 	Game.spawn_point = "from_elevator"   # 回小区时落到老人楼门口
 	Sfx.play_door()
 	get_tree().change_scene_to_file(COMMUNITY)
-
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		_back()
+# ESC 现在专用于打开设置；返回小区用屏幕上的「返回」按钮。

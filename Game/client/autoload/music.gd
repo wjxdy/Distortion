@@ -3,6 +3,7 @@ extends Node
 
 const MAIN_WORLD := "res://audio/bgm/main_world.ogg"
 const RAIN_WORLD := "res://audio/ambience/rain_world.ogg"
+const MUSIC_BUS := "Music"   # BGM+雨声走这条独立总线，设置里开关=静音它(不影响音效)
 
 @export var default_volume_db := -13.0
 @export var fade_seconds := 0.8
@@ -16,7 +17,27 @@ var _rain_player: AudioStreamPlayer
 var _rain_tween: Tween
 
 func _ready() -> void:
+	_setup_bus()
 	_ensure_player()
+
+# 运行时建一条 "Music" 音频总线(发送到 Master)，BGM/雨声 player 都走它。
+func _setup_bus() -> void:
+	if AudioServer.get_bus_index(MUSIC_BUS) != -1:
+		return
+	AudioServer.add_bus()
+	var idx := AudioServer.get_bus_count() - 1
+	AudioServer.set_bus_name(idx, MUSIC_BUS)
+	AudioServer.set_bus_send(idx, "Master")
+
+# 设置界面调：开关背景音乐(静音/取消静音整条 Music 总线，音效不受影响)。
+func set_enabled(on: bool) -> void:
+	var idx := AudioServer.get_bus_index(MUSIC_BUS)
+	if idx != -1:
+		AudioServer.set_bus_mute(idx, not on)
+
+func is_enabled() -> bool:
+	var idx := AudioServer.get_bus_index(MUSIC_BUS)
+	return idx == -1 or not AudioServer.is_bus_mute(idx)
 
 func play_world() -> void:
 	fade_to(MAIN_WORLD)
@@ -89,6 +110,7 @@ func _ensure_player() -> void:
 		return
 	_player = AudioStreamPlayer.new()
 	_player.name = "BgmPlayer"
+	_player.bus = MUSIC_BUS
 	add_child(_player)
 
 func _ensure_rain_player() -> void:
@@ -96,6 +118,7 @@ func _ensure_rain_player() -> void:
 		return
 	_rain_player = AudioStreamPlayer.new()
 	_rain_player.name = "RainPlayer"
+	_rain_player.bus = MUSIC_BUS
 	add_child(_rain_player)
 
 func _start_stream(path: String, stream: AudioStream, target_volume_db: float) -> void:

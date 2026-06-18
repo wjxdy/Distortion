@@ -204,5 +204,30 @@ func _initialize() -> void:
 	var ln_ok = Dbg.format_line(1, true, 200, "正常回复", 4.2)
 	_check("OK" in ln_ok and "code=200" in ln_ok, "format_line: 成功行含 OK/code=200")
 
+	# --- 设置: API key 运行时覆盖(设置里填了优先,没填用内置) ---
+	LLM.set_runtime_key("")
+	_check(LLM.active_key() == LLM.API_KEY, "没填→用内置 key")
+	LLM.set_runtime_key("sk-test-123")
+	_check(LLM.active_key() == "sk-test-123", "填了→用填的 key")
+	var has_bearer := false
+	for line in LLM.headers():
+		if line == "Authorization: Bearer sk-test-123":
+			has_bearer = true
+	_check(has_bearer, "headers 用运行时 key")
+	LLM.set_runtime_key("  sk-trim  ")
+	_check(LLM.active_key() == "sk-trim", "key 去首尾空格")
+	LLM.set_runtime_key("")   # 复原，别影响其它测试
+
+	# --- 设置: 背景音乐开关(独立 Music 总线静音/取消静音) ---
+	var mus = load("res://autoload/music.gd").new()
+	get_root().add_child(mus)
+	await process_frame   # _ready → _setup_bus 建 "Music" 总线
+	_check(mus.is_enabled(), "音乐默认开")
+	mus.set_enabled(false)
+	_check(not mus.is_enabled(), "关→Music 总线静音")
+	mus.set_enabled(true)
+	_check(mus.is_enabled(), "开→取消静音")
+	mus.queue_free()
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

@@ -10,6 +10,16 @@ const MODEL := "moonshot-v1-32k"
 const TEMPERATURE := 0.6
 const CHAT_URL := BASE_URL + "/chat/completions"
 
+# 运行时 key 覆盖：设置界面填了就用填的，没填(空)用内置 API_KEY。
+# Settings autoload 在启动/修改时调 set_runtime_key 推进来。
+static var _runtime_key := ""
+
+static func set_runtime_key(k: String) -> void:
+	_runtime_key = k.strip_edges()
+
+static func active_key() -> String:
+	return _runtime_key if _runtime_key != "" else API_KEY
+
 const EMOTIONS := ["calm", "angry", "sinister", "sad"]
 const VALID_END := ["ready", "reveal", "comfort", "leave"]
 
@@ -112,7 +122,7 @@ static func build_messages(history: Array, finale: bool) -> Array:
 static func headers() -> PackedStringArray:
 	return PackedStringArray([
 		"Content-Type: application/json",
-		"Authorization: Bearer " + API_KEY,
+		"Authorization: Bearer " + active_key(),
 	])
 
 static func request_body(history: Array, finale: bool) -> String:

@@ -21,6 +21,7 @@ Music="*res://autoload/music.gd"
 Game="*res://game/game_global.gd"
 Inv="*res://scenes/inventory.tscn"
 Dbg="*res://scenes/debug.tscn"
+Settings="*res://scenes/settings.tscn"
 
 [display]
 

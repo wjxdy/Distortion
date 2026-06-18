@@ -392,10 +392,7 @@ func _exit_tree() -> void:
 	Sfx.stop_typing()
 
 func _input(event: InputEvent) -> void:
-	# Esc 返回警局走廊
-	if event.is_action_pressed("ui_cancel"):
-		_back()
-		return
+	# ESC 现在专用于打开设置(Settings autoload)；返回走廊用屏幕上的「返回」按钮。
 	# 【临时调试】F1-F4 切换表情，方便验收效果；接好 LLM emotion 后可删
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
