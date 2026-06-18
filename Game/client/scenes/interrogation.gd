@@ -28,6 +28,13 @@ var last_user_msg := ""
 var type_tween: Tween
 var finished := false
 
+# 失败重试：任何失败都重试，共 MAX_TRIES 次、递增延迟，用尽才出保底沉默「……」。
+const MAX_TRIES := 3
+const RETRY_DELAYS := [0.6, 1.2]   # 第1次失败后等0.6s重试，第2次失败后等1.2s重试
+var _req_body := ""
+var _attempt := 0
+var _req_start := 0
+
 @onready var portrait: TextureRect = $Portrait
 @onready var crack: TextureRect = $Crack
 @onready var status_label: Label = $Status
@@ -173,24 +180,51 @@ func _send() -> void:
 		if prog != "":
 			to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)
-	var body := LLM.request_body(to_send, state.in_finale())
-	var err := http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, body)
+	_req_body = LLM.request_body(to_send, state.in_finale())
+	_attempt = 0
+	_do_request()
+
+# 发一次请求（带尝试计数/计时）。失败/重试逻辑统一在 _on_reply 里。
+func _do_request() -> void:
+	_attempt += 1
+	_req_start = Time.get_ticks_msec()
+	var err := http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, _req_body)
 	if err != OK:
-		_show_zhou_bubble("……")   # 请求都发不出去→保底沉默(演成装糊涂)
-		_set_busy(false)
+		# 连请求都发不出去：当作一次失败，交给统一的失败/重试处理
+		_on_reply(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedStringArray(), PackedByteArray())
 
 func _on_reply(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
-	_set_busy(false)
-	# 直连大模型：成功则取 choices[0].message.content 解析；任何失败(超时/网络/结构异常/非200)
-	# 都不报错给玩家，而是「保底沉默」演成周明远装糊涂(阿尔茨海默)。
+	var elapsed := (Time.get_ticks_msec() - _req_start) / 1000.0
+	# 直连大模型：成功则取 choices[0].message.content 解析。
 	var parsed: Dictionary = {}
 	if result == HTTPRequest.RESULT_SUCCESS and code == 200 and body.size() > 0:
 		var data = JSON.parse_string(body.get_string_from_utf8())
 		var content := LLM.extract_content(data)
 		if content != "":
 			parsed = LLM.parse_reply(content)
-	if parsed.is_empty():
-		parsed = LLM.pick_silence()
+	# 成功：拿到非空回复
+	if not parsed.is_empty() and not str(parsed.get("reply", "")).is_empty():
+		Dbg.log_req(_attempt, true, code, "正常回复", elapsed)
+		_set_busy(false)
+		_apply_reply(parsed)
+		return
+	# 失败：先翻译原因，能重试就按递增延迟重试，用尽才保底沉默
+	var reason := LLM.fail_reason(result, code, body.get_string_from_utf8() if body.size() > 0 else "")
+	if _attempt < MAX_TRIES and not finished:
+		var d: float = RETRY_DELAYS[mini(_attempt - 1, RETRY_DELAYS.size() - 1)]
+		Dbg.log_req(_attempt, false, code, "%s → %.1fs后重试" % [reason, d], elapsed)
+		await get_tree().create_timer(d).timeout
+		if finished:
+			return
+		_do_request()
+		return
+	# 重试用尽 → 保底沉默(演成周明远装糊涂/阿尔茨海默)
+	Dbg.log_req(_attempt, false, code, reason + " → 重试用尽，保底沉默……", elapsed)
+	_set_busy(false)
+	_apply_reply(LLM.pick_silence())
+
+# 把一条(成功或沉默的)回复落地：切表情、弹气泡、进历史、判定真相/提醒/终局。
+func _apply_reply(parsed: Dictionary) -> void:
 	_set_emotion(str(parsed.get("emotion", "calm")))
 	var reply := str(parsed.get("reply", "……"))
 	_show_zhou_bubble(reply)

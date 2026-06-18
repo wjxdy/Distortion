@@ -74,6 +74,34 @@ const SILENCE_FALLBACKS := [
 static func pick_silence() -> Dictionary:
 	return SILENCE_FALLBACKS[randi() % SILENCE_FALLBACKS.size()].duplicate()
 
+# 把一次失败翻译成人话(给调试日志看，定位"秒回点点点"到底是哪种失败)。
+# result=HTTPRequest 结果码, code=HTTP 状态码, body_text=响应体文本(可空)。
+static func fail_reason(result: int, code: int, body_text: String) -> String:
+	if result != HTTPRequest.RESULT_SUCCESS:
+		match result:
+			HTTPRequest.RESULT_TIMEOUT: return "超时(模型迟迟不回)"
+			HTTPRequest.RESULT_CANT_CONNECT: return "连不上服务器"
+			HTTPRequest.RESULT_CANT_RESOLVE: return "域名解析失败(断网/代理?)"
+			HTTPRequest.RESULT_CONNECTION_ERROR: return "连接中断"
+			HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR: return "TLS握手失败"
+			_: return "网络错误(result=%d)" % result
+	# 走到这说明 result 成功，但 HTTP 非 200 或响应没内容
+	var et := ""
+	if body_text != "":
+		var data = JSON.parse_string(body_text)
+		if typeof(data) == TYPE_DICTIONARY and data.has("error") and typeof(data["error"]) == TYPE_DICTIONARY:
+			var e: Dictionary = data["error"]
+			et = str(e.get("type", ""))
+			if et == "":
+				et = str(e.get("message", ""))
+	if code == 401 or code == 403:
+		return "HTTP %d 鉴权失败(key无效/未注入/被轮换?) %s" % [code, et]
+	if code == 429:
+		return "HTTP 429 过载或限流(Moonshot忙/撞消费上限?) %s" % et
+	if code != 200:
+		return "HTTP %d %s" % [code, et]
+	return "响应空/解析失败"
+
 # 拼 OpenAI 兼容 messages：系统提示在最前(终局换 FINALE)，历史顺序不变。
 static func build_messages(history: Array, finale: bool) -> Array:
 	var sys: String = FINALE_SYSTEM_PROMPT if finale else SYSTEM_PROMPT

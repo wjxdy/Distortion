@@ -7,6 +7,7 @@ const Content = preload("res://game/content.gd")
 const Triggers = preload("res://game/triggers.gd")
 const Explore = preload("res://game/explore.gd")
 const LLM = preload("res://game/llm.gd")
+const Dbg = preload("res://scenes/debug.gd")
 
 var _pass := 0
 var _fail := 0
@@ -187,6 +188,20 @@ func _initialize() -> void:
 	sfx_t.stop_typing()                # 修复动作:离场统一停
 	_check(not sfx_t._typing_player.playing, "stop_typing→循环停下(离场不再残留)")
 	sfx_t.queue_free()
+
+	# --- 失败原因翻译(LLM.fail_reason)：调试日志据此告诉玩家是哪种失败 ---
+	var r_429 = LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 429, '{"error":{"type":"engine_overloaded_error"}}')
+	_check("429" in r_429 and ("过载" in r_429 or "限流" in r_429), "fail_reason: 429→过载/限流")
+	var r_401 = LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 401, '{"error":{"message":"invalid api key"}}')
+	_check("401" in r_401 and "鉴权" in r_401, "fail_reason: 401→鉴权失败(key问题)")
+	_check("超时" in LLM.fail_reason(HTTPRequest.RESULT_TIMEOUT, 0, ""), "fail_reason: 超时")
+	_check("解析失败" in LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 200, ""), "fail_reason: 200但响应空→解析失败")
+
+	# --- 调试日志行格式(Dbg.format_line) ---
+	var ln_fail = Dbg.format_line(2, false, 429, "过载", 0.3)
+	_check("第2次" in ln_fail and "FAIL" in ln_fail and "code=429" in ln_fail, "format_line: 失败行含 第2次/FAIL/code")
+	var ln_ok = Dbg.format_line(1, true, 200, "正常回复", 4.2)
+	_check("OK" in ln_ok and "code=200" in ln_ok, "format_line: 成功行含 OK/code=200")
 
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
