@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bxsc7ngs1gytp" path="res://scenes/phone.tscn" id="3_phone"]
 [ext_resource type="Texture2D" uid="uid://c54nfy3ixqv3f" path="res://art/world_rain_city/oldroom.png" id="4_room_bg"]
 [ext_resource type="Texture2D" uid="uid://dwavkempols0b" path="res://art/phone.png" id="5_dcvvl"]
-[ext_resource type="Texture2D" uid="uid://cjhwtpvghlk6" path="res://art/Gemini_Generated_Image_sw8spwsw8spwsw8s.png" id="6_le26c"]
+[ext_resource type="Texture2D" uid="uid://okvubfbgxvel" path="res://art/photo_couple.png" id="6_le26c"]
 
 [sub_resource type="RectangleShape2D" id="WallWide"]
 size = Vector2(1300, 120)
@@ -201,7 +201,7 @@ theme_override_font_sizes/font_size = 20
 text = "手机"
 horizontal_alignment = 1
 
-[node name="GeminiGeneratedImageSw8Spwsw8Spwsw8s" type="Sprite2D" parent="." unique_id=2061779463]
+[node name="PhotoSprite" type="Sprite2D" parent="." unique_id=2061779463]
 position = Vector2(293, 183)
 scale = Vector2(0.17073572, 0.17073572)
 texture = ExtResource("6_le26c")
