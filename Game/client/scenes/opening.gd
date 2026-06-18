@@ -19,6 +19,7 @@ func _ready() -> void:
 	# BGM 挂载点（音乐由用户后期实现）
 	Game.reset()   # 开新游戏：清空线索/真相/对话历史
 	Inv.refresh()  # 清空道具栏显示
+	Inv.visible = false   # 序幕(幻灯片)期间不显示道具栏，进主世界再显示
 	for c in slides_root.get_children():
 		slides.append(c)
 		c.visible = false
@@ -74,6 +75,7 @@ func _finish_typing() -> void:
 	create_tween().tween_property(hint, "modulate:a", 0.3, 0.4)
 
 func _go_world() -> void:
+	Inv.visible = true   # 进主世界 → 恢复道具栏(右上角按钮，默认收起)
 	Sfx.play_door()
 	get_tree().change_scene_to_file(WORLD)
 

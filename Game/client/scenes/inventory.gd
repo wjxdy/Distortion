@@ -1,22 +1,34 @@
-# 道具栏（autoload 全局 HUD = Inv）。底部常驻几个格子，显示已拿到的道具；点格子看说明。
-# 全局单例 → 天然在每个场景都在，不用各场景实例化。色块占位，inventory.tscn 里可拖。
-# 拿到新道具的地方调 Inv.refresh() 刷新。
+# 道具栏（autoload 全局 HUD = Inv）。右上角一个"道具"按钮，点开才展开格子面板(默认收起)；
+# 再点按钮收起。点具体道具看说明。全局单例 → 天然在每个场景都在。
+# 静态结构在 inventory.tscn 里(可拖)：右上角按钮=ToggleBtn，展开的面板=Panel(里面 Bar 三格 + Desc)。
+# 拿到新道具的地方调 Inv.refresh() 刷新。序幕里用 Inv.visible=false 隐藏整条。
 extends CanvasLayer
 
 const Content = preload("res://game/content.gd")
 
+@onready var toggle_btn: Button = $ToggleBtn
+@onready var panel: ColorRect = $Panel
 @onready var slots: Array = [
-	$Bar/Slot0, $Bar/Slot1, $Bar/Slot2
+	$Panel/Bar/Slot0, $Panel/Bar/Slot1, $Panel/Bar/Slot2
 ]
-@onready var desc: Label = $Desc
+@onready var desc: Label = $Panel/Desc
 
 var _desc_tween: Tween
 
 func _ready() -> void:
+	toggle_btn.pressed.connect(_toggle)
 	for i in slots.size():
 		(slots[i] as Button).pressed.connect(_on_slot.bind(i))
+	panel.visible = false   # 默认收起，只露右上角按钮
 	desc.visible = false
 	refresh()
+
+# 点右上角按钮：展开/收起道具面板。
+func _toggle() -> void:
+	Sfx.play_click()
+	panel.visible = not panel.visible
+	if not panel.visible:
+		desc.visible = false   # 收起时一并清掉说明
 
 # 道具变化后调用：把已拥有的道具填进格子，空格子置灰。
 func refresh() -> void:
