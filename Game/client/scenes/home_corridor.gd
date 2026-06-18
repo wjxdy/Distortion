@@ -10,6 +10,8 @@ const HOME := "res://scenes/oldman_home.tscn"
 @onready var home_door: Area2D = $HomeDoor
 @onready var phone: CanvasLayer = $Phone
 
+var _doors_armed := false   # 反跳保护：先离开门区才允许踩门跳转
+
 func _ready() -> void:
 	prompt.visible = false
 	phone.opened.connect(func() -> void: player.locked = true)
@@ -19,37 +21,42 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if player.locked:
 		return
+	if not _doors_armed:
+		if not _on_any_door():
+			_doors_armed = true
+	elif _check_doors():
+		return
 	_update_prompt()
 
 func _at(area: Area2D) -> bool:
 	return area.overlaps_body(player)
 
+func _on_any_door() -> bool:
+	return _at(exit_area) or _at(home_door)
+
+func _check_doors() -> bool:
+	if _at(exit_area):
+		_go(ELEVATOR, ""); return true
+	# 老人家门：踩到且有钥匙才进；没钥匙不跳(提示门锁着)
+	if _at(home_door) and Game.state.has_item("home_key"):
+		_go(HOME, "from_corridor"); return true
+	return false
+
 func _update_prompt() -> void:
 	if _at(home_door):
-		prompt.text = "↑ 进入  702 · 周明远家" if Game.state.has_item("home_key") else "702 · 门锁着（需要钥匙）"
+		prompt.text = "▶ 702 · 周明远家" if Game.state.has_item("home_key") else "702 · 门锁着（去档案室拿钥匙）"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 返回  电梯"
+		prompt.text = "▶ 电梯"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-func _input(event: InputEvent) -> void:
-	if player.locked:
-		return
-	if not event.is_action_pressed("move_up"):
-		return
-	if _at(home_door):
-		if Game.state.has_item("home_key"):
-			Game.spawn_point = "from_corridor"   # 老人家里落到门口
-			Sfx.play_door()
-			get_tree().change_scene_to_file(HOME)
-		else:
-			Sfx.play_click()
-			prompt.text = "门锁着——去警局档案室拿钥匙"
-	elif _at(exit_area):
-		Game.spawn_point = ""   # 电梯是纯 UI，无需锚点；清掉以防残留
-		Sfx.play_door()
-		get_tree().change_scene_to_file(ELEVATOR)
+func _go(scene_path: String, entry: String) -> void:
+	Game.spawn_point = entry
+	player.enter_door()
+	Sfx.play_door()
+	await get_tree().create_timer(0.45).timeout
+	get_tree().change_scene_to_file(scene_path)

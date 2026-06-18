@@ -18,6 +18,7 @@ const LEVEL_WIDTH := 2560.0
 
 var toast_tween: Tween
 var intro_running := false
+var _doors_armed := false   # 反跳保护：先离开门区才允许踩门跳转
 
 func _ready() -> void:
 	var intro_from_opening := Game.world_intro_from_opening
@@ -50,10 +51,17 @@ func _process(_delta: float) -> void:
 	camera.position.y = 360.0
 	if player.locked or intro_running:
 		return
-	# 走到警局门口且按住 W/↑ → 进入
-	if _near(police_door) and Input.is_action_pressed("move_up"):
-		_enter_door(POLICE, "from_world")
-		return
+	# 反跳保护后，踩到门区即进入(无需按键)
+	if not _doors_armed:
+		if not (_near(police_door) or _near(community_door)):
+			_doors_armed = true
+	else:
+		if _near(police_door):
+			_enter_door(POLICE, "from_world")
+			return
+		if _near(community_door):
+			_enter_door(COMMUNITY, "from_world")
+			return
 	_update_prompt()
 
 func _near(area: Area2D) -> bool:
@@ -62,22 +70,16 @@ func _near(area: Area2D) -> bool:
 
 func _update_prompt() -> void:
 	if _near(police_door):
-		prompt.text = "↑ 进入  警察局"
+		prompt.text = "▶ 警察局"
 		prompt.visible = true
 	elif _near(community_door):
-		prompt.text = "↑ 进入  晚晴小区"
+		prompt.text = "▶ 晚晴小区"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		# 提示是世界空间 Control，跟随玩家头顶(随相机一起滚)
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
-
-func _input(event: InputEvent) -> void:
-	if player.locked or intro_running:
-		return
-	if event.is_action_pressed("move_up") and _near(community_door) and not _near(police_door):
-		_enter_door(COMMUNITY, "from_world")   # 小区自由进入(去掉查户籍门禁);老头家门仍需钥匙
 
 func _enter_door(scene_path: String, entry: String = "") -> void:
 	Game.spawn_point = entry   # 告诉目标场景：玩家该落在哪个入口锚点

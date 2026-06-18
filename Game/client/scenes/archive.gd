@@ -12,6 +12,8 @@ const Content = preload("res://game/content.gd")
 @onready var exit_area: Area2D = $ExitArea
 @onready var phone: CanvasLayer = $Phone
 
+var _doors_armed := false   # 反跳保护：先离开门区才允许踩门跳转
+
 func _ready() -> void:
 	prompt.visible = false
 	info.visible = false
@@ -23,6 +25,13 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if player.locked:
 		return
+	# 反跳保护后，踩到出口即返回走廊
+	if not _doors_armed:
+		if not _at(exit_area):
+			_doors_armed = true
+	elif _at(exit_area):
+		_go(POLICE, "archive")
+		return
 	_update_prompt()
 
 func _at(area: Area2D) -> bool:
@@ -30,27 +39,29 @@ func _at(area: Area2D) -> bool:
 
 func _update_prompt() -> void:
 	if _at(key_area) and not Game.state.has_item("home_key"):
-		prompt.text = "↑ 取走  钥匙"
+		prompt.text = "空格  取走钥匙"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 返回  走廊"
+		prompt.text = "▶ 走廊"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
+# 空格：拾取钥匙(物品交互保留按键，与踩门跳转区分)
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if not event.is_action_pressed("move_up"):
-		return
-	if _at(key_area) and not Game.state.has_item("home_key"):
+	if event.is_action_pressed("ui_select") and _at(key_area) and not Game.state.has_item("home_key"):
 		_take_key()
-	elif _at(exit_area):
-		Game.spawn_point = "archive"   # 回警局时落到档案室门口
-		Sfx.play_door()
-		get_tree().change_scene_to_file(POLICE)
+
+func _go(scene_path: String, entry: String) -> void:
+	Game.spawn_point = entry
+	player.enter_door()
+	Sfx.play_door()
+	await get_tree().create_timer(0.45).timeout
+	get_tree().change_scene_to_file(scene_path)
 
 func _take_key() -> void:
 	Sfx.play_click()

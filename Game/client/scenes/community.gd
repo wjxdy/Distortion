@@ -21,6 +21,7 @@ const IDLE_FRAMES: int = 5
 var npc_frame: int = 0
 var npc_timer: float = 0.0
 var npc2_offset: int = 2   # NPC2 相位偏移，避免同步
+var _doors_armed := false   # 反跳保护：先离开门区才允许踩门跳转
 
 func _ready() -> void:
 	Music.play_world_with_rain()
@@ -34,7 +35,22 @@ func _process(delta: float) -> void:
 	_animate_npcs(delta)
 	if player.locked:
 		return
+	if not _doors_armed:
+		if not _on_any_door():
+			_doors_armed = true
+	elif _check_doors():
+		return
 	_update_prompt()
+
+func _on_any_door() -> bool:
+	return _at(building_door) or _at(exit_area)
+
+func _check_doors() -> bool:
+	if _at(building_door):
+		_go(ELEVATOR, ""); return true
+	if _at(exit_area):
+		_go(WORLD, "community"); return true
+	return false
 
 func _animate_npcs(delta: float) -> void:
 	npc_timer += delta
@@ -50,26 +66,19 @@ func _at(area: Area2D) -> bool:
 func _update_prompt() -> void:
 	npc_text.visible = _at(npc_area)   # 走到楼①底下 → 听见邻居议论
 	if _at(building_door):
-		prompt.text = "↑ 进入  老人的楼"
+		prompt.text = "▶ 老人的楼"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 返回  街道"
+		prompt.text = "▶ 街道"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-func _input(event: InputEvent) -> void:
-	if player.locked:
-		return
-	if not event.is_action_pressed("move_up"):
-		return
-	if _at(building_door):
-		Game.spawn_point = ""   # 电梯是纯 UI，无需锚点；清掉以防残留
-		Sfx.play_door()
-		get_tree().change_scene_to_file(ELEVATOR)
-	elif _at(exit_area):
-		Game.spawn_point = "community"   # 回街道时落到小区门口
-		Sfx.play_door()
-		get_tree().change_scene_to_file(WORLD)
+func _go(scene_path: String, entry: String) -> void:
+	Game.spawn_point = entry
+	player.enter_door()
+	Sfx.play_door()
+	await get_tree().create_timer(0.45).timeout
+	get_tree().change_scene_to_file(scene_path)

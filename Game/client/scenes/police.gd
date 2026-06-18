@@ -15,6 +15,8 @@ const ARCHIVE := "res://scenes/archive.tscn"
 @onready var archive_area: Area2D = $ArchiveArea
 @onready var phone: CanvasLayer = $Phone   # 走廊也能点开手机
 
+var _doors_armed := false   # 反跳保护：先离开出生门区才允许踩门跳转
+
 func _ready() -> void:
 	Music.play_police_ambience()
 	prompt.visible = false
@@ -27,48 +29,54 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if player.locked:
 		return
+	# 反跳保护：刚进场景可能站在门口锚点(在门区内)，先离开所有门区再允许踩门跳转
+	if not _doors_armed:
+		if not _on_any_door():
+			_doors_armed = true
+	elif _check_doors():
+		return
 	_update_prompt()
 
 func _at(area: Area2D) -> bool:
 	# 只有人物的碰撞体(Player/Col)真正叠到触发区才算
 	return area.overlaps_body(player)
 
+func _on_any_door() -> bool:
+	return _at(exit_area) or _at(interrogation_area) or _at(terminal_area) or _at(archive_area)
+
+# 脚踩到某个门区即跳转(无需按键)。返回 true 表示已触发。
+func _check_doors() -> bool:
+	if _at(exit_area):
+		_go(STREET, "police"); return true
+	if _at(interrogation_area):
+		_go(INTERROGATION, ""); return true
+	if _at(terminal_area):
+		_go(TERMINAL, ""); return true
+	if _at(archive_area):
+		_go(ARCHIVE, "from_police"); return true
+	return false
+
 func _update_prompt() -> void:
 	if _at(exit_area):
-		prompt.text = "↑ 返回  街道"
+		prompt.text = "▶ 街道"
 		prompt.visible = true
 	elif _at(interrogation_area):
-		prompt.text = "↑ 进入  审讯室"
+		prompt.text = "▶ 审讯室"
 		prompt.visible = true
 	elif _at(terminal_area):
-		prompt.text = "↑ 进入  终端室"
+		prompt.text = "▶ 终端室"
 		prompt.visible = true
 	elif _at(archive_area):
-		prompt.text = "↑ 进入  档案室"
+		prompt.text = "▶ 档案室"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 130.0)
 
-func _input(event: InputEvent) -> void:
-	if player.locked:
-		return
-	if not event.is_action_pressed("move_up"):
-		return
-	if _at(exit_area):
-		Game.spawn_point = "police"   # 回街道时落到警局门口
-		Sfx.play_door()
-		get_tree().change_scene_to_file(STREET)      # 出门回街道，直接切
-	elif _at(interrogation_area):
-		_enter_door(INTERROGATION)
-	elif _at(terminal_area):
-		_enter_door(TERMINAL)
-	elif _at(archive_area):
-		_enter_door(ARCHIVE, "from_police")
-
-func _enter_door(scene_path: String, entry: String = "") -> void:
-	Game.spawn_point = entry   # 告诉目标场景：玩家该落在哪个入口锚点
+# 踩门跳转：锁住玩家+播进门动画，0.45s 后切场景。
+func _go(scene_path: String, entry: String) -> void:
+	Game.spawn_point = entry
 	player.enter_door()
 	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout

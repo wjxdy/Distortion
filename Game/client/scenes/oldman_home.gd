@@ -14,6 +14,8 @@ const Content = preload("res://game/content.gd")
 @onready var phone_area: Area2D = $PhoneArea
 @onready var exit_area: Area2D = $ExitArea
 
+var _doors_armed := false   # 反跳保护：先离开门区才允许踩门跳转
+
 func _ready() -> void:
 	prompt.visible = false
 	info.visible = false
@@ -24,6 +26,12 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if player.locked:
 		return
+	if not _doors_armed:
+		if not _at(exit_area):
+			_doors_armed = true
+	elif _at(exit_area):
+		_go(CORRIDOR, "from_home")
+		return
 	_update_prompt()
 
 func _at(area: Area2D) -> bool:
@@ -31,32 +39,36 @@ func _at(area: Area2D) -> bool:
 
 func _update_prompt() -> void:
 	if _at(photo_area):
-		prompt.text = "↑ 查看  合照"
+		prompt.text = "空格  查看合照"
 		prompt.visible = true
 	elif _at(phone_area):
-		prompt.text = "↑ 查看  老人的手机"
+		prompt.text = "空格  查看手机"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 离开"
+		prompt.text = "▶ 离开"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
+# 空格：查看合照 / 拿手机(物品交互保留按键，与踩门跳转区分)
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if not event.is_action_pressed("move_up"):
+	if not event.is_action_pressed("ui_select"):
 		return
 	if _at(photo_area):
 		_examine("photo")
 	elif _at(phone_area):
 		_take_phone()
-	elif _at(exit_area):
-		Game.spawn_point = "from_home"   # 回楼道时落到 702 门口
-		Sfx.play_door()
-		get_tree().change_scene_to_file(CORRIDOR)
+
+func _go(scene_path: String, entry: String) -> void:
+	Game.spawn_point = entry
+	player.enter_door()
+	Sfx.play_door()
+	await get_tree().create_timer(0.45).timeout
+	get_tree().change_scene_to_file(scene_path)
 
 func _examine(id: String) -> void:
 	Sfx.play_click()
