@@ -95,11 +95,12 @@ shape = SubResource("DoorZone")
 position = Vector2(59.00003, 599)
 scale = Vector2(1.2734375, 1.3828121)
 
-[node name="PoliceSign" type="Label" parent="."]
+[node name="PoliceSign" type="Label" parent="." unique_id=238962619]
+layout_mode = 0
 offset_left = 269.0
-offset_top = 428.0
+offset_top = 252.0
 offset_right = 489.0
-offset_bottom = 472.0
+offset_bottom = 290.0
 theme_override_colors/font_color = Color(0.72, 0.86, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.95)
 theme_override_constants/outline_size = 8
@@ -108,11 +109,12 @@ text = "警 察 局"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CommunitySign" type="Label" parent="."]
+[node name="CommunitySign" type="Label" parent="." unique_id=2057771453]
+layout_mode = 0
 offset_left = 1948.0
-offset_top = 418.0
+offset_top = 300.0
 offset_right = 2208.0
-offset_bottom = 462.0
+offset_bottom = 344.0
 theme_override_colors/font_color = Color(1, 0.88, 0.6, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.95)
 theme_override_constants/outline_size = 8
@@ -156,10 +158,10 @@ vertical_alignment = 1
 
 [node name="Phone" parent="." unique_id=78586422 instance=ExtResource("5_phone")]
 
-[node name="IntroFadeLayer" type="CanvasLayer" parent="."]
+[node name="IntroFadeLayer" type="CanvasLayer" parent="." unique_id=30161706]
 layer = 10
 
-[node name="IntroFade" type="ColorRect" parent="IntroFadeLayer"]
+[node name="IntroFade" type="ColorRect" parent="IntroFadeLayer" unique_id=936339197]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0

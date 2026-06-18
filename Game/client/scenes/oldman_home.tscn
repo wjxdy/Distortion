@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cm6n8jyvoc526"]
+[gd_scene format=3 uid="uid://bm6xpanf13s88"]
 
 [ext_resource type="Script" uid="uid://uutt0lcvi6d3" path="res://scenes/oldman_home.gd" id="1_home"]
 [ext_resource type="PackedScene" uid="uid://dwuj216251xft" path="res://scenes/player.tscn" id="2_player"]
@@ -14,7 +14,7 @@ size = Vector2(1300, 120)
 size = Vector2(70, 760)
 
 [sub_resource type="RectangleShape2D" id="Zone"]
-size = Vector2(170, 220)
+size = Vector2(170, 169)
 
 [node name="OldmanHome" type="Control" unique_id=1612901123]
 layout_mode = 3
@@ -41,7 +41,7 @@ expand_mode = 2
 [node name="Walls" type="StaticBody2D" parent="." unique_id=1234920387]
 
 [node name="Top" type="CollisionShape2D" parent="Walls" unique_id=2057254647]
-position = Vector2(640, 438)
+position = Vector2(647, 326)
 shape = SubResource("WallWide")
 
 [node name="Bottom" type="CollisionShape2D" parent="Walls" unique_id=1359337224]
@@ -49,25 +49,25 @@ position = Vector2(640, 772)
 shape = SubResource("WallWide")
 
 [node name="Left" type="CollisionShape2D" parent="Walls" unique_id=1161929994]
-position = Vector2(25, 360)
+position = Vector2(-26, 358)
 shape = SubResource("WallTall")
 
 [node name="Right" type="CollisionShape2D" parent="Walls" unique_id=172275168]
-position = Vector2(1245, 353)
+position = Vector2(1309, 361)
 shape = SubResource("WallTall")
 
 [node name="PhotoArea" type="Area2D" parent="." unique_id=802765087]
 position = Vector2(330, 620)
 
 [node name="Col" type="CollisionShape2D" parent="PhotoArea" unique_id=149568908]
-position = Vector2(-30, -249)
+position = Vector2(-37, -274)
 shape = SubResource("Zone")
 
 [node name="PhoneArea" type="Area2D" parent="." unique_id=1808174099]
 position = Vector2(890, 620)
 
 [node name="Col" type="CollisionShape2D" parent="PhoneArea" unique_id=1656699847]
-position = Vector2(6, -207)
+position = Vector2(-8, -157)
 shape = SubResource("Zone")
 
 [node name="ExitArea" type="Area2D" parent="." unique_id=1695131764]

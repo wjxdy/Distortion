@@ -156,7 +156,7 @@ horizontal_alignment = 1
 [node name="Spawns" type="Node2D" parent="." unique_id=1049515484]
 
 [node name="from_world" type="Marker2D" parent="Spawns" unique_id=1578066323]
-position = Vector2(157, 558)
+position = Vector2(149, 571)
 
 [node name="interrogation" type="Marker2D" parent="Spawns" unique_id=1519528511]
 position = Vector2(504, 550)
