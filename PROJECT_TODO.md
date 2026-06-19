@@ -7,6 +7,7 @@
   - [x] **Task B1**（24469c0）：content.gd 新增 4 张证据手牌 EVIDENCE_CARDS + 结局兜底正文 ENDING_FALLBACK（TDD 105/105）
   - [x] **Task B2+C0**（faa7b50）：game_state.gd 新增 presented/present_evidence/presented_proofs + 删 investigation_summary/PROGRESS_FACTS；interrogation.gd:182 最小替换；run_tests.gd 清旧断言+加新断言（TDD 105/105）
   - [x] **Task C1**（a6678c9）：llm.gd SYSTEM_PROMPT 改失踪妻子人设 + FINALE_SYSTEM_PROMPT 改 roleplay 只演不吐结局（含逐层卸防）；run_tests.gd 加三条断言（TDD 108/108）
+  - [x] **Task C2**（d8489bf）：parse_reply 移除旧 end 标签逻辑（删 VALID_END + end 剥离块 + end 字段）；run_tests.gd 加4条断言/更新3条（TDD 111/111）
   - [ ] **Task B（剩余）**：上司任务 + hint 文案改版
   - [ ] **Task D3**：hint_fallback 逻辑改失踪语境 + 老头/裁判双调用结局系统
   - **延后第二阶段(留接口)**：通话记录"打通了"恐怖反转+当场打电话结局+AI合成语音。
