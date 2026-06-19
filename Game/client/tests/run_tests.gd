@@ -272,5 +272,15 @@ func _initialize() -> void:
 	_check(mus.is_enabled(), "开→取消静音")
 	mus.queue_free()
 
+	# --- 裁判 parse_director + build_director_messages ---
+	var d1 := LLM.parse_director('{"end": true, "kind": "truth", "epilogue": "他没再说话。"}')
+	_check(d1["end"] == true and d1["kind"] == "truth" and "没再说话" in d1["epilogue"], "裁判正常JSON解析")
+	var d2 := LLM.parse_director("这不是JSON")
+	_check(d2["end"] == false, "裁判畸形输出当不结束")
+	var d3 := LLM.parse_director('前缀 {"end": false, "kind":"", "epilogue":""} 后缀')
+	_check(d3["end"] == false, "裁判能从噪声里抠出JSON且不结束")
+	var dm := LLM.build_director_messages([{"role":"user","content":"她去世了"}], "（侦探出示了死亡证明）", 4)
+	_check(dm.size() >= 2 and dm[0]["role"] == "system", "裁判messages带系统提示")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

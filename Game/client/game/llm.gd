@@ -176,6 +176,49 @@ static func extract_content(data) -> String:
 		return ""
 	return str(msg.get("content", ""))
 
+const DIRECTOR_PROMPT := """你是一部叙事侦探游戏最后一幕的"导演/裁判"。你不扮演任何角色，只做冷静判断。
+背景：老人周明远坚信妻子林秀兰"只是走丢了、会回来"，但真相是她长期重病、X 年前已自然病逝；"她会回来"是他手机 App「莫忘」一遍遍喂给他的——他其实心底一直隐约知道，是选择相信，因为"等她回来"比"她再也不回来了"好受。
+现在侦探(玩家)在终局审讯他。给你：①这场对峙的完整对话；②侦探已经把哪些【实物证据】拍在桌上（没列的就是没出示）；③已进行的玩家发言轮数。
+判断这场对峙是否已走到真正的戏剧性了结点，只输出 JSON（别的都不要）：
+{"end": true 或 false, "kind": "truth" 或 "comfort" 或 "", "epilogue": "结局正文或空串"}
+规则：
+- 玩家发言轮数 < 4 → end 必须 false。
+- kind="truth"：侦探已把关键实物（尤其【莫忘日志】，通常还有【死亡证明】【安葬记录】）摆到面前并反复点破，老人拿不出新的有效反驳、只剩重复/崩溃/动摇——他在这场对峙里已经输了（被夺走"等她回来"的盼头）。
+- kind="comfort"：侦探明确顺从、安慰老人（"她会回来的、再等等"），老人松了口气——而玩家由此成了下一个"莫忘"。
+- 其余（证据不全、老人仍有有效反驳、既没说服也没安慰）→ end=false, kind="", epilogue=""。
+- end=true 时写 epilogue：2-4 短句旁白体，文学、克制、留白，落在"记忆，是我们选择记住的版本"的余味。可黑暗、绝望，但点到为止、留白暗示，绝不直给血腥或自杀的具体画面，不堆砌辞藻、不煽情。comfort 收尾带"玩家成了下一个莫忘"的反讽。"""
+
+static func build_director_messages(history: Array, presented_summary: String, turns: int) -> Array:
+	var transcript := ""
+	for m in history:
+		var who := "玩家" if str(m.get("role")) == "user" else "周明远"
+		transcript += who + "：" + str(m.get("content")) + "\n"
+	var ctx := "【已出示实物证据】%s\n【玩家发言轮数】%d\n【对峙对话记录】\n%s" % [
+		(presented_summary if presented_summary != "" else "（侦探什么都没出示）"), turns, transcript]
+	return [{"role": "system", "content": DIRECTOR_PROMPT}, {"role": "user", "content": ctx}]
+
+static func director_request_body(history: Array, presented_summary: String, turns: int) -> String:
+	return JSON.stringify({
+		"model": MODEL,
+		"messages": build_director_messages(history, presented_summary, turns),
+		"temperature": 0.3,
+	})
+
+# 从裁判回复里抠出 JSON 判定；任何异常都当"不结束"。
+static func parse_director(content: String) -> Dictionary:
+	var text := str(content)
+	var lb := text.find("{")
+	var rb := text.rfind("}")
+	if lb >= 0 and rb > lb:
+		var data = JSON.parse_string(text.substr(lb, rb - lb + 1))
+		if typeof(data) == TYPE_DICTIONARY:
+			return {
+				"end": bool(data.get("end", false)),
+				"kind": str(data.get("kind", "")),
+				"epilogue": str(data.get("epilogue", "")),
+			}
+	return {"end": false, "kind": "", "epilogue": ""}
+
 # 解析模型回复 → {reply, emotion, hint}。结局不再由老头台词判定（改裁判调用）。
 static func parse_reply(content: String) -> Dictionary:
 	var text := str(content).strip_edges()
