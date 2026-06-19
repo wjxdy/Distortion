@@ -48,6 +48,9 @@ var _req_start := 0
 @onready var emo_timer: Timer = $EmoTimer
 @onready var http: HTTPRequest = $Http
 @onready var back_btn: Button = $BackBtn
+@onready var ev_panel: Panel = $Evidence
+@onready var director_http: HTTPRequest = $DirectorHttp
+var _card_btns := {}   # id -> Button
 @onready var fade_overlay: ColorRect = $FadeOverlay
 @onready var end_slide: Control = $EndSlide
 @onready var end_body: Label = $EndSlide/VBox/Body
@@ -83,6 +86,13 @@ func _ready() -> void:
 	phone.closed.connect(func() -> void: _bar_enabled(not finished))
 	input.grab_focus()
 
+	# 证据手牌：按 state 钥匙点亮对应按钮
+	for c in Content.EVIDENCE_CARDS:
+		var b: Button = ev_panel.get_node("VBox/Card_" + str(c["id"]))
+		_card_btns[c["id"]] = b
+		b.visible = state.has_key(str(c["key"]))
+	_refresh_cards()
+
 	# 开场：首次进来 → 周明远喃喃自语(记忆错乱)；带着历史回访 → 接上他上一句，不重置
 	var last_zhou := ""
 	for i in range(state.history.size() - 1, -1, -1):
@@ -96,6 +106,16 @@ func _ready() -> void:
 
 func _log(_line: String) -> void:
 	pass   # 回看记录功能已移除；保留调用点为空操作，不影响其它逻辑
+
+func _refresh_cards() -> void:
+	var any_unlocked := false
+	for c in Content.EVIDENCE_CARDS:
+		var b: Button = _card_btns.get(c["id"])
+		if b:
+			b.visible = state.has_key(str(c["key"]))
+			if b.visible:
+				any_unlocked = true
+	ev_panel.visible = any_unlocked   # 无证据时隐藏整个面板，不留空盒子
 
 func _bar_enabled(b: bool) -> void:
 	input.editable = b
@@ -158,26 +178,36 @@ func _on_submit(_t: String) -> void:
 	_send()
 
 func _send() -> void:
-	if finished:
-		return
+	if finished: return
+	# 结算已按下(armed)的证据牌
+	var armed := []
+	for c in Content.EVIDENCE_CARDS:
+		var b: Button = _card_btns.get(c["id"])
+		if b and b.visible and b.button_pressed:
+			armed.append(c)
 	var msg := input.text.strip_edges()
-	if msg == "":
+	if msg == "" and armed.is_empty():
 		return
+	if msg == "" and not armed.is_empty():
+		var names := []
+		for c in armed: names.append(str(c["label"]))
+		msg = "（你把%s推到他面前。）" % "、".join(names)
+	for c in armed:
+		state.present_evidence(str(c["id"]))
+		var b: Button = _card_btns.get(c["id"])
+		if b: b.button_pressed = false   # 出示后复位
 	last_user_msg = msg
 	Sfx.play_click()
 	_show_player_bubble(msg)
-	zhou_bubble.visible = false        # 切到新一轮：清掉他上一句气泡
-	_log("[color=#8fd0ff]你：[/color]" + msg)
+	zhou_bubble.visible = false
 	state.add_to_history("user", msg)
 	input.text = ""
 	_set_busy(true)
-	# 直连大模型：非终局把"已出示证据"系统旁白拼在历史最前(让老头知道玩家拿出了什么,不写进持久化历史)；
-	# 终局由 LLM.build_messages 自动换成 FINALE 提示，这里不注入旁白。
+	# 整审讯注入 presented 旁白（不分终局）
 	var to_send: Array = []
-	if not state.in_finale():
-		var prog = state.presented_proofs()
-		if prog != "":
-			to_send.append({"role": "system", "content": prog})
+	var prog: String = state.presented_proofs()
+	if prog != "":
+		to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)
 	_req_body = LLM.request_body(to_send, state.in_finale())
 	_attempt = 0

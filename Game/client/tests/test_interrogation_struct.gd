@@ -3,7 +3,7 @@ func _initialize() -> void:
 	var ps := load("res://scenes/interrogation.tscn")
 	var root = ps.instantiate()
 	var ok := true
-	for p in ["Evidence", "Evidence/VBox/Card_death", "Evidence/VBox/Card_molog", "DirectorHttp"]:
+	for p in ["Evidence", "Evidence/VBox/Card_photo", "Evidence/VBox/Card_death", "Evidence/VBox/Card_farewell", "Evidence/VBox/Card_molog", "DirectorHttp"]:
 		if root.get_node_or_null(p) == null:
 			push_error("缺节点 " + p); ok = false
 	if root.get_node_or_null("LeaveBtn") != null:
