@@ -50,8 +50,9 @@ func _initialize() -> void:
 		world.free()
 
 	_check("【周队 · 新任务】" in Content.BOSS_TASK, "手机任务标题为周队新任务")
-	_check("周明远" in Content.BOSS_TASK and "仁济医院" in Content.BOSS_TASK, "手机任务包含周明远案件")
-	_check("为什么会记住一件没发生过的事" in Content.BOSS_TASK, "手机任务抛出核心谜题")
+	_check("周明远" in Content.BOSS_TASK, "手机任务点名周明远")
+	_check(("走丢" in Content.BOSS_TASK) or ("报案" in Content.BOSS_TASK) or ("找" in Content.BOSS_TASK), "手机任务=报案找妻子的钩子(不剧透死亡)")
+	_check(not ("去世" in Content.BOSS_TASK) and not ("死亡" in Content.BOSS_TASK), "手机任务不剧透她已病逝")
 
 	print("\n开场文案测试: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
