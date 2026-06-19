@@ -33,18 +33,18 @@ func _update_prompt() -> void:
 		prompt.text = "空格  取走钥匙"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "← 返回  走廊"
+		prompt.text = "↑ 返回  走廊"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 返回走廊出口在左边→←/A(容忍 W)；物品(钥匙)按空格拾取
+# 返回走廊门在前方→只按 ↑/W；物品(钥匙)按空格拾取
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if (event.is_action_pressed("move_left") or event.is_action_pressed("move_up")) and _at(exit_area):
+	if event.is_action_pressed("move_up") and _at(exit_area):
 		_go(POLICE, "archive")
 	elif event.is_action_pressed("ui_select") and _at(key_area) and not Game.state.has_item("home_key"):
 		_take_key()
