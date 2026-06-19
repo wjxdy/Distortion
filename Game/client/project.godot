@@ -19,6 +19,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 Sfx="*res://autoload/sfx.gd"
 Music="*res://autoload/music.gd"
 Game="*res://game/game_global.gd"
+Titles="*res://game/titles.gd"
 Inv="*res://scenes/inventory.tscn"
 Dbg="*res://scenes/debug.tscn"
 Settings="*res://scenes/settings.tscn"

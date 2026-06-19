@@ -282,5 +282,24 @@ func _initialize() -> void:
 	var dm := LLM.build_director_messages([{"role":"user","content":"她去世了"}], "（侦探出示了死亡证明）", 4)
 	_check(dm.size() >= 2 and dm[0]["role"] == "system", "裁判messages带系统提示")
 
+	# --- Titles 称号收藏 ---
+	var Tt = preload("res://game/titles.gd")
+	var tt = Tt.new()
+	_check(tt._register("真相揭穿者"), "首次注册称号=新")
+	_check(not tt._register("真相揭穿者"), "重复注册同名=非新(去重)")
+	_check(not tt._register("  真相揭穿者  "), "去空格后仍判重复")
+	_check(not tt._register(""), "空称号不注册")
+	_check(tt.count() == 1, "去重后只 1 个")
+	tt._register("下一个莫忘")
+	_check(tt.all_titles() == ["真相揭穿者", "下一个莫忘"], "按获得顺序返回")
+	# 存档 round-trip(临时路径,不污染真实存档)
+	var tmp := "user://_test_ach.cfg"
+	tt._save_to(tmp)
+	var tt2 = Tt.new()
+	tt2._load_from(tmp)
+	_check(tt2.all_titles() == ["真相揭穿者", "下一个莫忘"], "存档读档 round-trip 一致")
+	_check(not tt2._register("真相揭穿者"), "读档后仍去重")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(tmp))
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
