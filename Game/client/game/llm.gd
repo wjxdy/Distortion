@@ -197,6 +197,46 @@ static func build_director_messages(history: Array, presented_summary: String, t
 		(presented_summary if presented_summary != "" else "（侦探什么都没出示）"), turns, transcript]
 	return [{"role": "system", "content": DIRECTOR_PROMPT}, {"role": "user", "content": ctx}]
 
+const TITLE_PROMPT := """你是这个赛博朋克叙事侦探游戏的"称号评定官"。
+玩家是审讯老人周明远的侦探。根据玩家这一局与老人的【全部对话】和【结局类型】，
+给玩家评定一个称号：凝练、有态度、有点冷峻或反讽，像游戏成就里的称号。
+【硬性要求】不超过 10 个字；只输出称号本身，不要任何解释、前后缀、标点包裹或引号。"""
+
+static func build_title_messages(history: Array, ending_kind: String) -> Array:
+	var transcript := ""
+	for m in history:
+		var who := "玩家" if str(m.get("role")) == "user" else "周明远"
+		transcript += who + "：" + str(m.get("content")) + "\n"
+	var ctx := "【结局类型】%s\n【这一局的全部对话】\n%s\n给玩家起一个不超过10个字的称号，只输出称号本身。" % [ending_kind, transcript]
+	return [{"role": "system", "content": TITLE_PROMPT}, {"role": "user", "content": ctx}]
+
+static func title_request_body(history: Array, ending_kind: String) -> String:
+	return JSON.stringify({
+		"model": MODEL,
+		"messages": build_title_messages(history, ending_kind),
+		"temperature": 0.7,
+	})
+
+# 解析称号：取首行、剥首尾引号/标点、截断到 ≤10 字；异常返回 ""(调用方兜底)。
+static func parse_title(content: String) -> String:
+	var t := str(content).strip_edges()
+	var nl := t.find("\n")
+	if nl >= 0:
+		t = t.substr(0, nl).strip_edges()
+	var wrap := ["\"", "'", "「", "」", "『", "』", "《", "》", "【", "】", "“", "”", "‘", "’", "。", ".", "：", ":", "、", "，", ","]
+	var changed := true
+	while changed:
+		changed = false
+		for c in wrap:
+			if t.begins_with(c):
+				t = t.substr(c.length()); changed = true
+			if t.ends_with(c):
+				t = t.substr(0, t.length() - c.length()); changed = true
+		t = t.strip_edges()
+	if t.length() > 10:
+		t = t.substr(0, 10)
+	return t
+
 static func director_request_body(history: Array, presented_summary: String, turns: int) -> String:
 	return JSON.stringify({
 		"model": MODEL,

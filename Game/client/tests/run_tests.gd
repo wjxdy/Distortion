@@ -282,6 +282,15 @@ func _initialize() -> void:
 	var dm := LLM.build_director_messages([{"role":"user","content":"她去世了"}], "（侦探出示了死亡证明）", 4)
 	_check(dm.size() >= 2 and dm[0]["role"] == "system", "裁判messages带系统提示")
 
+	# --- 称号评定 ---
+	_check(LLM.parse_title("「真相揭穿者」") == "真相揭穿者", "剥书名/引号包裹")
+	_check(LLM.parse_title("固执的等待者。").length() <= 10, "截断到≤10字")
+	_check(LLM.parse_title("下一个莫忘\n（解释...）") == "下一个莫忘", "只取第一行")
+	_check(LLM.parse_title("   ") == "", "空白→空串")
+	_check(LLM.parse_title("一二三四五六七八九十十一十二") == "一二三四五六七八九十", "超10字截断到10")
+	var tm := LLM.build_title_messages([{"role":"user","content":"她去世了"}], "truth")
+	_check(tm.size() == 2 and tm[0]["role"] == "system" and "truth" in tm[1]["content"], "称号messages带提示+结局类型")
+
 	# --- Titles 称号收藏 ---
 	var Tt = preload("res://game/titles.gd")
 	var tt = Tt.new()
