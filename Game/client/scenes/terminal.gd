@@ -8,7 +8,7 @@ const Content = preload("res://game/content.gd")
 # 查到某案卷 → 莫忘弹一条提醒引导回去问老头(确定性双向提示)
 const FILE_HINTS := {
 	"wife": "ask_wife_death",
-	"medical": "ask_no_accident",
+	"medical": "ask_farewell",
 	"address": "got_address",
 }
 

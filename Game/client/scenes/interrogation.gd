@@ -267,7 +267,7 @@ func _challenges_ai(m: String) -> bool:
 # fire_hint 自带去重，所以和模型不会重复触发。
 func _hint_fallback(reply: String) -> void:
 	var blames_ai: bool = ("AI" in reply) or ("Ａｉ" in reply) or ("误诊" in reply)
-	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("no_accident")
+	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("farewell")
 	if blames_ai:
 		# 去小区要等你「当面质问 AI 说法」而他仍咬定时才弹——否则你刚查完回来他随口提 AI 就提早触发。
 		if has_evidence and _challenges_ai(last_user_msg):
