@@ -28,6 +28,11 @@ var last_user_msg := ""
 var type_tween: Tween
 var finished := false
 
+# 终局裁判编排
+var _finale_turns := 0       # 终局里老头每次回复后 +1
+var _pending_end := {}       # 裁判返回"结束"时存放裁判结果，等打字机完成后触发
+var _typing_done := false    # 打字机是否已完成（防止打断老头台词直接渐黑）
+
 # 失败重试：任何失败都重试，共 MAX_TRIES 次、递增延迟，用尽才出保底沉默「……」。
 const MAX_TRIES := 3
 const RETRY_DELAYS := [0.6, 1.2]   # 第1次失败后等0.6s重试，第2次失败后等1.2s重试
@@ -79,6 +84,7 @@ func _ready() -> void:
 	http.request_completed.connect(_on_reply)
 	http.timeout = 25.0   # 超时→保底沉默(原后端 14s,直连放宽到 25s 容 Moonshot 偶发慢)
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
+	director_http.request_completed.connect(_on_director)
 	end_slide.visible = false
 	fade_overlay.visible = false
 	# 看手机时禁用盘问输入栏（查档案在手机里）
@@ -158,6 +164,7 @@ func _show_zhou_bubble(text: String, play_sound: bool = true) -> void:
 	zhou_bubble.visible = true
 	zhou_label.text = text
 	zhou_label.visible_ratio = 0.0
+	_typing_done = false   # 新打字机启动，标记未完成
 	_typewriter(zhou_label, text, play_sound)
 
 # play_sound=false 时不播打字机音效——给保底沉默「……」用(他没在打字，别发那声"嘣")。
@@ -171,6 +178,11 @@ func _typewriter(label: Label, full: String, play_sound: bool = true) -> void:
 	type_tween.tween_property(label, "visible_ratio", 1.0, dur)
 	if play_sound:
 		type_tween.tween_callback(Sfx.stop_typing)   # 打完即停
+	# 打字完成后置标记，若裁判已先到则在此触发结局（修"话没说完就跳幻灯片"的打断 bug）
+	type_tween.tween_callback(func() -> void:
+		_typing_done = true
+		_maybe_finish_after_typing()
+	)
 
 # ---------- 对话流程 ----------
 
@@ -265,7 +277,12 @@ func _apply_reply(parsed: Dictionary, silent: bool = false) -> void:
 	_check_truths()
 	_handle_hint(parsed)        # 模型吐的 hint 标签
 	_hint_fallback(reply)       # 兜底：按对话内容+进度确定性补发
-	_handle_end(parsed)         # 终局：[[end:reveal/comfort]] → 触发结局
+	# 终局：过 4 轮才让裁判评估是否收尾
+	if state.in_finale():
+		_finale_turns += 1
+		if _finale_turns >= 4:
+			var body := LLM.director_request_body(state.history, state.presented_proofs(), _finale_turns)
+			director_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, body)
 
 # 统一发提醒：去重(整局只一次)后弹右上角小字 + 手机响声红点。
 func _fire_hint(id: String) -> void:
@@ -279,24 +296,18 @@ func _handle_hint(data) -> void:
 	if typeof(data) == TYPE_DICTIONARY and data.has("hint"):
 		_fire_hint(str(data["hint"]))
 
-# 玩家这一句是否在「当面质疑 AI 说法 / 亮证据对质」(用于 visit_community 闸门)：
-# 要么质问 AI 的确定性，要么主张她是自然病逝/查无事故。措辞放宽，尽量覆盖自由输入。
-func _challenges_ai(m: String) -> bool:
-	var mentions_ai: bool = ("AI" in m) or ("Ａｉ" in m) or ("人工智能" in m)
-	var doubts: bool = ("为什么" in m) or ("凭什么" in m) or ("确定" in m) or ("怎么知道" in m) or ("怎么确定" in m) or ("真的" in m)
-	if mentions_ai and doubts:
-		return true
-	return ("病死" in m) or ("病逝" in m) or ("自然" in m) or ("不是AI" in m) or ("不是 AI" in m) \
-		or ("诊断" in m) or ("没有事故" in m) or ("查无" in m) or ("没事故" in m) or ("证据" in m)
+# 玩家这一句是否在「当面主张妻子死亡/不会回来/亮实物证据」(用于 visit_community 闸门)。
+func _challenges_truth(m: String) -> bool:
+	return ("死" in m) or ("去世" in m) or ("病逝" in m) or ("不会回来" in m) or ("回不来" in m) \
+		or ("不在了" in m) or ("走不了" in m) or ("安葬" in m) or ("墓" in m) or ("证据" in m)
 
 # 兜底：模型没吐标签(过载/漏吐/被去重)时，按老头这轮回复 + 玩家问话 + 调查进度确定性补发。
 # fire_hint 自带去重，所以和模型不会重复触发。
 func _hint_fallback(reply: String) -> void:
-	var blames_ai: bool = ("AI" in reply) or ("Ａｉ" in reply) or ("误诊" in reply)
+	var insists_back: bool = ("回来" in reply) or ("走丢" in reply) or ("出门" in reply) or ("在路上" in reply) or ("等她" in reply)
 	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("farewell")
-	if blames_ai:
-		# 去小区要等你「当面质问 AI 说法」而他仍咬定时才弹——否则你刚查完回来他随口提 AI 就提早触发。
-		if has_evidence and _challenges_ai(last_user_msg):
+	if insists_back:
+		if has_evidence and _challenges_truth(last_user_msg):
 			_fire_hint("visit_community")     # 查过死因 + 当面质问仍咬定 → 去小区
 		elif not has_evidence:
 			_fire_hint("investigate_death")   # 还没查 → 去终端查死因
@@ -304,36 +315,48 @@ func _hint_fallback(reply: String) -> void:
 	if ("莫忘" in m) or ("手机" in m) or ("app" in m) or ("APP" in m) or ("为什么用" in m) or ("天天" in m):
 		_fire_hint("protecting_app")
 
-# 终局：模型按玩家态度吐 [[end:reveal/comfort]] → 触发对应结局。
-# (ready 已弃用;若模型偶吐别的值,这里不处理即忽略。leave 分支已移除。)
-func _handle_end(data) -> void:
-	if typeof(data) != TYPE_DICTIONARY:
-		return
-	var e := str(data.get("end", ""))
-	if e == "reveal" or e == "comfort":
-		_trigger_ending(e)
+# 裁判回调：从服务端解析导演判定，若决定结束则存储并等打字机完成后触发收尾。
+func _on_director(_result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if finished: return
+	if code != 200: return
+	var data = JSON.parse_string(body.get_string_from_utf8())
+	var content := LLM.extract_content(data)
+	var verdict := LLM.parse_director(content)
+	if not verdict.get("end", false): return
+	_pending_end = verdict
+	_maybe_finish_after_typing()
 
-# 渐黑 → 幻灯片(分支正文 + 统一字幕)。结局唯一入口；结束在此锁死。
-func _trigger_ending(branch: String) -> void:
-	if finished:
+# 等打字机完成 + 裁判结果双双就绪，再停一拍让台词落地，然后触发涌现结局。
+func _maybe_finish_after_typing() -> void:
+	if _pending_end.is_empty(): return
+	if not _typing_done:
+		await get_tree().create_timer(0.2).timeout
+		_maybe_finish_after_typing()
 		return
+	await get_tree().create_timer(1.2).timeout   # 停一拍，让谢幕台词落地
+	if finished: return
+	var epi := str(_pending_end.get("epilogue", ""))
+	if epi == "": epi = Content.ENDING_FALLBACK
+	_trigger_ending_emergent(epi)
+
+# 涌现结局入口：渐黑 → 幻灯片(AI 生成的 epilogue + 统一字幕)。
+func _trigger_ending_emergent(epilogue: String) -> void:
+	if finished: return
 	finished = true
 	input.editable = false
 	send_btn.disabled = true
-	# 渐黑
 	fade_overlay.visible = true
 	fade_overlay.modulate.a = 0.0
 	var tw := create_tween()
 	tw.tween_property(fade_overlay, "modulate:a", 1.0, 1.4)
-	tw.tween_callback(func() -> void: _show_end_slide(branch))
+	tw.tween_callback(func() -> void: _show_end_slide(epilogue))
 
-func _show_end_slide(branch: String) -> void:
-	end_body.text = str(Content.ENDING_SLIDES.get(branch, ""))
+func _show_end_slide(epilogue: String) -> void:
+	end_body.text = epilogue
 	end_subtitle.text = str(Content.ENDING)
 	end_slide.visible = true
 	end_slide.modulate.a = 0.0
-	var tw := create_tween()
-	tw.tween_property(end_slide, "modulate:a", 1.0, 1.2)
+	create_tween().tween_property(end_slide, "modulate:a", 1.0, 1.2)
 
 func _check_truths() -> void:
 	# 静默记录真相(供结局/存档判定)。结束不再绑定"集齐真相"——只由终局对峙的玩家选择触发。

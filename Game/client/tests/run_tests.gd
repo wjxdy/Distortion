@@ -134,13 +134,13 @@ func _initialize() -> void:
 	s8.add_key("molog")
 	_check(s8.in_finale(), "拿到 molog → 进入终局")
 
-	# --- 终局：日志蒙太奇 + 新提醒 + 三分支结局文案 ---
+	# --- 终局：日志蒙太奇 + 新提醒 + 涌现结局 ---
 	_check(Content.MOWANG_HINTS.has("unlock_log"), "新增提醒 unlock_log(拿到手机→去终端解锁)")
 	_check(Content.MOWANG_HINTS.has("go_confront"), "新增提醒 go_confront(解锁日志→回审讯对峙)")
 	_check(not Content.MOWANG_HINTS.has("confront_molog"), "废弃提醒 confront_molog 已移除")
-	_check(Content.ENDING_SLIDES.size() >= 3, "ENDING_SLIDES 三分支文案存在")
-	for b in ["reveal", "comfort", "leave"]:
-		_check(Content.ENDING_SLIDES.has(b) and str(Content.ENDING_SLIDES[b]) != "", "结局幻灯片有 " + b)
+	# ENDING_SLIDES 已由 AI 涌现结局(裁判 epilogue + ENDING_FALLBACK)取代，不再校验
+	_check(str(Content.ENDING_FALLBACK).length() > 0, "结局兜底正文 ENDING_FALLBACK 存在")
+	_check(str(Content.ENDING).length() > 0, "统一收尾字幕 ENDING 存在")
 	# 日志蒙太奇：新滑坡("她走丢/在回来的路上")，不再有旧设定"误诊/AI害死"
 	var molog_blob := "\n".join(Content.MOWANG_LOG_LINES)
 	_check("走丢" in molog_blob or "回来的路上" in molog_blob, "莫忘日志=她走丢了/在回来的路上")
