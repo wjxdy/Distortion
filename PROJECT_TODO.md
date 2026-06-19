@@ -11,10 +11,10 @@
   - [x] **Task C3**（4ef995d）：llm.gd 新增 DIRECTOR_PROMPT + build_director_messages + director_request_body + parse_director（JSON容错）；run_tests.gd 加4条断言（TDD 115/115）
   - [x] **Task D1**（186bdce）：interrogation.tscn 删 LeaveBtn + 加 Evidence 面板(4 toggle Button) + DirectorHttp；interrogation.gd 删 leave_btn 全部引用；新建 test_interrogation_struct.gd（TDD 115/115）
   - [x] **Task D2**（77b5f6b）：interrogation.gd 证据手牌点亮/出示结算 + _send 重写 + presented旁白整审讯注入；_refresh_cards() 含空面板隐藏；test_interrogation_struct.gd 补全4张牌断言（TDD 115/115）
-  - [ ] **Task B（剩余）**：上司任务 + hint 文案改版
-  - [ ] **Task D3**：hint_fallback 逻辑改失踪语境 + 老头/裁判双调用结局系统（DirectorHttp 已在 tscn 中，@onready 已在 D2 接好）
+  - [x] **Task D3**（c1da615）：终局裁判双调用编排 + 打字机完成后再渐黑(修打断bug) + hint_fallback改失踪妻子逻辑 + 删ENDING_SLIDES（TDD 113/113）
   - **延后第二阶段(留接口)**：通话记录"打通了"恐怖反转+当场打电话结局+AI合成语音。
-- [ ] **合并终局分支**：`feat/final-confrontation-ending`(10 提交，用户 F5 确认 OK) 合回 main。注意：合并前 main 工作区有用户并行在做的脚步声/BGM/music autoload 等未提交改动，别误带。
+- [ ] **【下一步】合并终局分支**：`feat/finale-emergent-ending`（A1~D3 全部完成，11 个任务提交）合回 main。合并前确认 main 无冲突改动；合并后在编辑器 Reload Saved Scene(interrogation.tscn)，F5 实机走终局流程（拿到 molog → 终局 → 出示证据 4 轮 → 等裁判 → 谢幕台词打完 → 渐黑 → 幻灯片）。
+- [ ] **合并旧分支**：`feat/final-confrontation-ending`(10 提交，用户 F5 确认 OK) 也已有全量替代，确认是否还需合并或可直接丢弃。
 - [x] ~~剧情去邪教版【客户端】全流程落地~~（已完成）：步骤A数据→手机中枢→phone复用→警局终端→小区支线→道具栏/钥匙→**终局对峙+三分支结局**(A戳破/B顺着他=模型 [[end:reveal/comfort]]/C沉默按钮，结束已解耦)。
 - [ ] **剧本零碎收尾(可选打磨)**：线索1「我没有家人」开场、线索7「记记日常」回避目前靠 LLM 人设演，未做成固定脚本节点；出示证据(合照/诊断书)未做显式交互；B 分支"输入框渐变成莫忘样式"暂以幻灯片正文表达，可后补 UI 渐变。
 - [ ] 小区/档案室/终端日志面板等场景**美术替换**(现全色块占位) + 房间证物/邻居可再丰富。
