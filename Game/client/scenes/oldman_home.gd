@@ -25,6 +25,7 @@ func _ready() -> void:
 	if Game.state.has_item("oldman_phone"):
 		_hide_phone_obj()
 	Game.place_player(self, player)   # 从楼道进来时，落到门口锚点
+	Game.show_controls_hint_once($Hint)
 
 func _hide_phone_obj() -> void:
 	phone_obj.visible = false

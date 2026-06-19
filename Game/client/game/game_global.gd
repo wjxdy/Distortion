@@ -13,6 +13,7 @@ var state: GameState
 # 为空（如开局从序幕进街道）则保持目标 .tscn 里的默认出生点。
 var spawn_point: String = ""
 var world_intro_from_opening := false
+var controls_hint_shown := false   # WASD 操作提示整局只在第一个场景显示一次
 
 func _ready() -> void:
 	reset()
@@ -21,6 +22,22 @@ func _ready() -> void:
 func reset() -> void:
 	state = GameState.new()
 	world_intro_from_opening = false
+	controls_hint_shown = false
+
+# WASD 操作提示：整局只在进入的第一个可走场景显示一次、几秒后自动淡出；之后所有场景都不再显示。
+func show_controls_hint_once(node) -> void:
+	if node == null:
+		return
+	if controls_hint_shown:
+		node.visible = false
+		return
+	controls_hint_shown = true
+	node.visible = true
+	node.modulate.a = 1.0
+	var tw: Tween = node.create_tween()
+	tw.tween_interval(3.5)
+	tw.tween_property(node, "modulate:a", 0.0, 1.2)
+	tw.tween_callback(func() -> void: node.visible = false)
 
 # 目标场景在 _ready 里调：按 spawn_point 找 Spawns/<名字> 的 Marker2D（可在编辑器拖），
 # 把玩家移过去。没指定来源（如开局从序幕进街道）则回退到 Spawns/start 锚点。

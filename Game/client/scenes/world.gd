@@ -39,6 +39,7 @@ func _ready() -> void:
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从别的场景回来时，落到对应入口锚点
+	Game.show_controls_hint_once($UI/Hint)
 	_update_prompt()
 	# 开局有未读任务 → 只弹文字提示；不播通知音，避免打断开场入场。
 	if Game.state.task_unread and not intro_from_opening:

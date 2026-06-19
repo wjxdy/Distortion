@@ -29,6 +29,7 @@ func _ready() -> void:
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从街道/电梯回来时，落到对应入口锚点
+	Game.show_controls_hint_once($Hint)
 
 func _process(delta: float) -> void:
 	_animate_npcs(delta)

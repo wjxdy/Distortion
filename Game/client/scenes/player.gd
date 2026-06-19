@@ -40,7 +40,8 @@ func _physics_process(delta: float) -> void:
 		footstep_time = 0.0
 		return
 	var v := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	velocity = v * speed
+	var spd := speed * (1.5 if Input.is_key_pressed(KEY_SHIFT) else 1.0)   # 按住 Shift = 1.5 倍移速
+	velocity = v * spd
 	move_and_slide()
 	if v != Vector2.ZERO:
 		_move_anim(v)
