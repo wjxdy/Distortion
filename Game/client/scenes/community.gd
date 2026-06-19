@@ -64,7 +64,7 @@ func _update_prompt() -> void:
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if (event.is_action_pressed("move_left") or event.is_action_pressed("move_up")) and _at(exit_area):
+	if event.is_action_pressed("move_left") and _at(exit_area):
 		_go(WORLD, "community")
 		return
 	if event.is_action_pressed("move_up") and _at(building_door):

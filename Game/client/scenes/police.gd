@@ -35,7 +35,7 @@ func _at(area: Area2D) -> bool:
 
 func _update_prompt() -> void:
 	if _at(exit_area):
-		prompt.text = "← 返回  街道"
+		prompt.text = "↑ 返回  街道"
 		prompt.visible = true
 	elif _at(interrogation_area):
 		prompt.text = "↑ 进入  审讯室"
@@ -51,18 +51,15 @@ func _update_prompt() -> void:
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 130.0)
 
-# 门方向跟跳转点位置走：左边的"返回街道"出口按 ←/A，前方房间门按 ↑/W(W 全程容忍兜底)。
+# 警局四个门(含返回街道)都在前方/墙上，统一按 ↑/W 进出。
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	# 左侧返回街道
-	if (event.is_action_pressed("move_left") or event.is_action_pressed("move_up")) and _at(exit_area):
-		_go(STREET, "police")
-		return
-	# 前方各房间门
 	if not event.is_action_pressed("move_up"):
 		return
-	if _at(interrogation_area):
+	if _at(exit_area):
+		_go(STREET, "police")
+	elif _at(interrogation_area):
 		_go(INTERROGATION, "")
 	elif _at(terminal_area):
 		_go(TERMINAL, "")

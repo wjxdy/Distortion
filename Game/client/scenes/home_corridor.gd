@@ -40,8 +40,8 @@ func _update_prompt() -> void:
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	# 返回电梯在左边→←/A(容忍 W)
-	if (event.is_action_pressed("move_left") or event.is_action_pressed("move_up")) and _at(exit_area):
+	# 返回电梯在左边→只按 ←/A
+	if event.is_action_pressed("move_left") and _at(exit_area):
 		_go(ELEVATOR, "")
 		return
 	# 老人家门在前方→↑/W
