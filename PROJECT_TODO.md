@@ -1,6 +1,10 @@
 # 项目待办
 
 ## 下一步
+- [x] **Task 1**（cb7679e）：Titles autoload 称号去重持久化 `game/titles.gd` + `project.godot` autoload 注册 + `run_tests.gd` 断言（TDD 120/120）
+- [ ] **Task 2（待实现）**：AI 称号生成 — interrogation.gd 在裁判判定结局时调 LLM 生成称号文本，调用 `Titles.add_title(t)` 存储。
+- [ ] **Task 3（待实现）**：成就菜单/面板场景 — 展示 `Titles.all_titles()` 的场景节点（按 `.tscn` 规则，静态节点 + 脚本填字）。
+
 - [ ] **【进行中·分支 feat/finale-emergent-ending】终局重构 + 失踪妻子剧情改版**：设计稿已定+提交(62db481)，实现计划已拆任务。范围见 spec `docs/superpowers/specs/2026-06-19-finale-emergent-ending-design.md`。
   - [x] **Task A1**（8986a6a）：content.gd 终端/档案文案 + no_accident→farewell + 两层真相关键词（TDD 98/98）
   - [x] **Task A2**（1604d34）：莫忘滑坡日志改"她走丢了会回来" + 今日对话 + BOSS_TASK + MOWANG_HINTS + 邻居台词对齐失踪妻子剧情（TDD 99/99）
