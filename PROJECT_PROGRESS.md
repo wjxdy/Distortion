@@ -33,6 +33,8 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-19: **【SDD Task 3 完成】主菜单场景 `scenes/main_menu.tscn` + `.gd`，设为 run/main_scene（提交 6d21ef8，TDD 126/126）**：新建 `Control` 根场景；静态节点树：`BG`(ColorRect 深蓝色占位背景) + `Title`(Label「失真 Distortion」，48px) + `Buttons`(VBoxContainer，含 `StartBtn`「开始游戏」/`AchieveBtn`「成就」/`QuitBtn`「退出」，各 240×40)。`main_menu.gd` 连接三按钮 pressed 信号：Start → `Sfx.play_click()` + `change_scene_to_file(opening.tscn)`；Achieve → `play_click()` + `change_scene_to_file(achievements.tscn)`（Task 4 建，连接已到位）；Quit → `quit()`；`_ready` 调 `Music.play_opening()` + `start_btn.grab_focus()`。`project.godot run/main_scene` 改为 `main_menu.tscn`。新建 `tests/test_main_menu.gd` 结构测试（验证 `Buttons/StartBtn`/`AchieveBtn`/`QuitBtn` 节点存在）。TDD RED（场景不存在）→ GREEN；场景无头加载 exit 0；全套 126/126 零回归。
+
 - 2026-06-19: **【Task 2 完成】llm.gd 称号评定调用（提交 572f150，TDD 126/126）**：新增 `TITLE_PROMPT` 常量（称号评定官系统提示，硬性≤10字、只输出称号本身）；`build_title_messages(history, ending_kind) -> Array` 把全局对话记录+结局类型拼成 `[system, user]` 消息组；`title_request_body(...)` 用 temperature=0.7 构建请求体；`parse_title(content) -> String` 取首行、while循环剥首尾引号/标点/书名号、超10字截断、空白→""。TDD RED（parse error 函数不存在）→ GREEN 126/126，零回归。函数位于 director 系列正上方，`interrogation.gd` 接线留 Task 3。
 
 - 2026-06-19: **【Task 1 完成】Titles autoload 称号去重持久化（提交 cb7679e，TDD 120/120）**：新增 `game/titles.gd`（`extends Node`，`user://achievements.cfg` via ConfigFile）；接口 `add_title/all_titles/count/has`（对外）+ `_register/_save_to/_load_from`（内部，测试用）；去重基于 `strip_edges()` 后比较；`_ready()` 自动读档，`add_title` 写入成功才落盘。`project.godot [autoload]` 加 `Titles="*res://game/titles.gd"`（Game 之后）；`run_tests.gd` 新增 8 条断言含 round-trip 临时路径测试（`user://_test_ach.cfg`，用后自动删除）。TDD RED（parse error 文件不存在）→ GREEN 120/120，零回归。

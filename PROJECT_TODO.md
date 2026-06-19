@@ -3,8 +3,9 @@
 ## 下一步
 - [x] **Task 1**（cb7679e）：Titles autoload 称号去重持久化 `game/titles.gd` + `project.godot` autoload 注册 + `run_tests.gd` 断言（TDD 120/120）
 - [x] **Task 2**（572f150）：llm.gd 称号评定 LLM 调用 — `TITLE_PROMPT` + `build_title_messages` + `title_request_body` + `parse_title`(≤10字剥引号截断)（TDD 126/126）
-- [ ] **Task 3（待实现）**：称号评定接线 + 成就菜单 — interrogation.gd 在裁判判定结局后调 `LLM.title_request_body` + `Titles.add_title(t)` 存储；新建成就菜单/面板场景展示 `Titles.all_titles()`。
-- [ ] **Task 3（待实现）**：成就菜单/面板场景 — 展示 `Titles.all_titles()` 的场景节点（按 `.tscn` 规则，静态节点 + 脚本填字）。
+- [x] **SDD Task 3**（6d21ef8）：主菜单场景 `scenes/main_menu.tscn` + `.gd` + `tests/test_main_menu.gd` + `project.godot run/main_scene` 改为 main_menu（TDD 126/126）
+- [ ] **SDD Task 4（待实现）**：成就菜单场景 `scenes/achievements.tscn` — 展示 `Titles.all_titles()` 的场景节点（静态 `.tscn` 节点 + 脚本填字），AchieveBtn 已连接等待此场景。
+- [ ] **称号评定接线**（原 Task 3 未拆出部分）：interrogation.gd 在裁判判定结局后调 `LLM.title_request_body` + `Titles.add_title(t)` 存储。
 
 - [ ] **【进行中·分支 feat/finale-emergent-ending】终局重构 + 失踪妻子剧情改版**：设计稿已定+提交(62db481)，实现计划已拆任务。范围见 spec `docs/superpowers/specs/2026-06-19-finale-emergent-ending-design.md`。
   - [x] **Task A1**（8986a6a）：content.gd 终端/档案文案 + no_accident→farewell + 两层真相关键词（TDD 98/98）
