@@ -33,6 +33,8 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-19: **【Task C1 完成】llm.gd 两段提示词改失踪妻子新剧情**（提交 a6678c9，TDD 108/108）：`SYSTEM_PROMPT` 核心信念改为"妻子三年前病逝、被莫忘骗成'走丢了/会回来'、天天报案等她"；删旧"AI误诊害死"；保留情绪标签 + hint 机制，hint ID 语义改新剧情（`investigate_death`=坚持走丢会回来、`visit_community`=被亮证据仍死撑、`protecting_app`=回避手机App）。`FINALE_SYSTEM_PROMPT` 全改 roleplay 版：老头只演不判结局、绝不吐任何 `[[end...]]` 标签（收尾交独立裁判调用）；新增"你只知道摆到眼前的证据"机制 + 逐层卸防节奏（合照→松口有妻子/死亡证明→撑不住会回来/莫忘日志→承认被App骗着等）。`run_tests.gd` 新增三条断言（走丢/回来在SYSTEM_PROMPT + 无误诊 + FINALE不含[[end）TDD RED→GREEN 108/108。
+
 - 2026-06-19: **【Task B2+C0 完成】game_state.gd 新增 presented 证据追踪 + 删 investigation_summary 上帝视角旁白**（提交 faa7b50，TDD 105/105）：新增 `presented` 字典 + `present_evidence(id)` + `presented_proofs()`（迭代 EVIDENCE_CARDS 拼系统旁白，只含玩家真正出示过的牌，空则返回空串）；删除 `PROGRESS_FACTS` 常量与 `investigation_summary()` 方法（上帝视角旁白退役）；`interrogation.gd:182` 最小替换 `investigation_summary()` → `presented_proofs()`（D2 完整重写 _send 前的过渡，目前 presented 为空故注入为 no-op）；`run_tests.gd` 删旧 investigation_summary 断言（C0）+ 新增 presented_proofs 断言（B2）。TDD：RED（方法不存在）→ GREEN 105/105。注：`game_global.gd` reset() 是否需要清 `presented` 待 D 系任务确认。
 
 - 2026-06-19: **【Task B1 完成】content.gd 新增 4 张证据手牌 EVIDENCE_CARDS + 结局兜底正文 ENDING_FALLBACK**（提交 24469c0，TDD 105/105）：`EVIDENCE_CARDS` 含 4 张牌（合照/死亡证明/安葬记录/莫忘日志），各持 `id/label/key/proof` 字段，key 复用现有线索钥匙（photo/linxiulan/farewell/molog）；`ENDING_FALLBACK` 提供裁判未给 epilogue 时的兜底正文。TDD：RED（EVIDENCE_CARDS/ENDING_FALLBACK 不存在，parse error）→ GREEN 105/105。

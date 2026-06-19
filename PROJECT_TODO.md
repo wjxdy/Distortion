@@ -6,8 +6,8 @@
   - [x] **Task A2**（1604d34）：莫忘滑坡日志改"她走丢了会回来" + 今日对话 + BOSS_TASK + MOWANG_HINTS + 邻居台词对齐失踪妻子剧情（TDD 99/99）
   - [x] **Task B1**（24469c0）：content.gd 新增 4 张证据手牌 EVIDENCE_CARDS + 结局兜底正文 ENDING_FALLBACK（TDD 105/105）
   - [x] **Task B2+C0**（faa7b50）：game_state.gd 新增 presented/present_evidence/presented_proofs + 删 investigation_summary/PROGRESS_FACTS；interrogation.gd:182 最小替换；run_tests.gd 清旧断言+加新断言（TDD 105/105）
+  - [x] **Task C1**（a6678c9）：llm.gd SYSTEM_PROMPT 改失踪妻子人设 + FINALE_SYSTEM_PROMPT 改 roleplay 只演不吐结局（含逐层卸防）；run_tests.gd 加三条断言（TDD 108/108）
   - [ ] **Task B（剩余）**：上司任务 + hint 文案改版
-  - [ ] **Task C1**：证据手牌面板节点（审讯室 .tscn）+ 发牌/出示逻辑
   - [ ] **Task D3**：hint_fallback 逻辑改失踪语境 + 老头/裁判双调用结局系统
   - **延后第二阶段(留接口)**：通话记录"打通了"恐怖反转+当场打电话结局+AI合成语音。
 - [ ] **合并终局分支**：`feat/final-confrontation-ending`(10 提交，用户 F5 确认 OK) 合回 main。注意：合并前 main 工作区有用户并行在做的脚步声/BGM/music autoload 等未提交改动，别误带。
