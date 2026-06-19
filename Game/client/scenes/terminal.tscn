@@ -169,7 +169,7 @@ text = "📁 林秀兰 死亡记录"
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "📁 医疗事故记录"
+text = "📁 林秀兰 安葬记录"
 
 [node name="SubmitPhoneBtn" type="Button" parent="TerminalUI/FileList" unique_id=1758379244]
 custom_minimum_size = Vector2(0, 64)
