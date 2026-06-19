@@ -233,6 +233,17 @@ func _initialize() -> void:
 	_check("设置key" in fp and "len=" in fp and "sk-abc" in fp, "填了→指纹显示来源/长度/前缀")
 	LLM.set_runtime_key("")   # 复原，别影响其它测试
 
+	# --- 证据手牌 ---
+	_check(Content.EVIDENCE_CARDS.size() == 4, "4 张证据牌")
+	var card_keys := {}
+	for c in Content.EVIDENCE_CARDS:
+		card_keys[c["id"]] = c["key"]
+	_check(card_keys.get("death") == "linxiulan", "死亡证明牌挂 linxiulan")
+	_check(card_keys.get("farewell") == "farewell", "安葬记录牌挂 farewell")
+	_check(card_keys.get("molog") == "molog", "莫忘日志牌挂 molog")
+	_check(card_keys.get("photo") == "photo", "合照牌挂 photo")
+	_check(str(Content.ENDING_FALLBACK).length() > 0, "有结局兜底正文")
+
 	# --- 设置: 背景音乐开关(独立 Music 总线静音/取消静音) ---
 	var mus = load("res://autoload/music.gd").new()
 	get_root().add_child(mus)

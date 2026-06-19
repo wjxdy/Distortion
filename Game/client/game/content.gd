@@ -177,3 +177,18 @@ const ENDING_SLIDES := {
 
 # 统一收尾字幕（A 告诉真相 / B 顺着他 / C 沉默 三分支共用）。
 const ENDING := "记忆，是我们选择记住的版本。"
+
+# 证据手牌：复用现有钥匙发放点，出示后 proof 喂模型。
+const EVIDENCE_CARDS := [
+	{"id": "photo", "label": "合照", "key": "photo",
+	 "proof": "周明远与林秀兰的合照——她确实是他妻子。"},
+	{"id": "death", "label": "死亡证明", "key": "linxiulan",
+	 "proof": "林秀兰的死亡证明：X 年前因慢性肺病去世——她不是走丢了，是去世了。"},
+	{"id": "farewell", "label": "安葬记录", "key": "farewell",
+	 "proof": "她的骨灰安放记录，经办人是周明远本人——是他亲手送的她。"},
+	{"id": "molog", "label": "莫忘日志", "key": "molog",
+	 "proof": "莫忘的历史日志：是它一遍遍说'她只是走丢了、会回来'——它在哄他等一个不会回来的人。"},
+]
+
+# 结局兜底正文：裁判没给 epilogue 时用，仍落统一字幕。
+const ENDING_FALLBACK := "他没有再说话。\n屏幕暗下去的时候，那个名字还停在他嘴边。"
