@@ -140,7 +140,7 @@ func _initialize() -> void:
 	_check(not Content.MOWANG_HINTS.has("confront_molog"), "废弃提醒 confront_molog 已移除")
 	# ENDING_SLIDES 已由 AI 涌现结局(裁判 epilogue + ENDING_FALLBACK)取代，不再校验
 	_check(str(Content.ENDING_FALLBACK).length() > 0, "结局兜底正文 ENDING_FALLBACK 存在")
-	_check(str(Content.ENDING).length() > 0, "统一收尾字幕 ENDING 存在")
+	# 固定点题字幕 ENDING 已删除（任何残留 Content.ENDING 引用都会 parse error，编译即校验）
 	# 日志蒙太奇：新滑坡("她走丢/在回来的路上")，不再有旧设定"误诊/AI害死"
 	var molog_blob := "\n".join(Content.MOWANG_LOG_LINES)
 	_check("走丢" in molog_blob or "回来的路上" in molog_blob, "莫忘日志=她走丢了/在回来的路上")

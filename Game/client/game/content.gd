@@ -161,8 +161,7 @@ const BOSS_TASK := "【周队 · 新任务】
 你去接待一下，
 配合他，帮他找找人。"
 
-# 统一收尾字幕（涌现结局共用；AI 裁判生成 epilogue 正文，兜底见 ENDING_FALLBACK）。
-const ENDING := "记忆，是我们选择记住的版本。"
+# 结局正文由 AI 裁判生成 epilogue（兜底见 ENDING_FALLBACK）；不再加任何固定点题字幕。
 
 # 证据手牌：复用现有钥匙发放点，出示后 proof 喂模型。
 const EVIDENCE_CARDS := [

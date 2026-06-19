@@ -358,7 +358,7 @@ func _trigger_ending_emergent(epilogue: String) -> void:
 
 func _show_end_slide(epilogue: String) -> void:
 	end_body.text = epilogue
-	end_subtitle.text = str(Content.ENDING)
+	end_subtitle.visible = false   # 去掉固定点题字幕，只留 AI 现写的留白结局正文
 	end_slide.visible = true
 	end_slide.modulate.a = 0.0
 	create_tween().tween_property(end_slide, "modulate:a", 1.0, 1.2)
