@@ -13,13 +13,22 @@ const Content = preload("res://game/content.gd")
 @onready var photo_area: Area2D = $PhotoArea
 @onready var phone_area: Area2D = $PhoneArea
 @onready var exit_area: Area2D = $ExitArea
+@onready var phone_obj: Sprite2D = $Phone2          # 床头那部手机的图
+@onready var phone_obj_label: Label = $PhoneObjLabel
 
 func _ready() -> void:
 	prompt.visible = false
 	info.visible = false
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
+	# 已经拿过手机(回访房间) → 床头不再显示那部手机
+	if Game.state.has_item("oldman_phone"):
+		_hide_phone_obj()
 	Game.place_player(self, player)   # 从楼道进来时，落到门口锚点
+
+func _hide_phone_obj() -> void:
+	phone_obj.visible = false
+	phone_obj_label.visible = false
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -33,7 +42,7 @@ func _update_prompt() -> void:
 	if _at(photo_area):
 		prompt.text = "空格  查看合照"
 		prompt.visible = true
-	elif _at(phone_area):
+	elif _at(phone_area) and not Game.state.has_item("oldman_phone"):
 		prompt.text = "空格  查看手机"
 		prompt.visible = true
 	elif _at(exit_area):
@@ -74,8 +83,11 @@ func _examine(id: String) -> void:
 
 # 查老人手机 → 只拿到手机道具 + 莫忘提醒去警局终端解锁日志(日志在终端看)
 func _take_phone() -> void:
+	if Game.state.has_item("oldman_phone"):
+		return
 	Sfx.play_click()
 	Game.state.add_item("oldman_phone")   # 老人手机进道具栏
+	_hide_phone_obj()                      # 拿走后床头不再显示那部手机
 	Inv.refresh()
 	info.text = "你拿起床头的手机——屏幕还亮着「莫忘」。在道具栏点开它，看看他和那个 AI 说了什么。"
 	info.visible = true
