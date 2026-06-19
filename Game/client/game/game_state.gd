@@ -1,6 +1,8 @@
 # 游戏状态：持有的钥匙、已揭示的真相、对话历史。
 extends RefCounted
 
+const Content = preload("res://game/content.gd")
+
 var keys := {}        # {key: true}
 var revealed := {}    # {truth_id: true}
 var history: Array = []  # [{role, content}]
@@ -16,11 +18,27 @@ var task_unread := true
 # 道具栏：拿到的实物道具（钥匙、老人的手机…），跨场景保留，门禁判定 + 道具栏展示用
 var items := {}    # {item_id: true}
 
+var presented := {}   # {card_id: true} 已当面出示过的证据牌
+
 func add_item(id: String) -> void:
 	items[id] = true
 
 func has_item(id: String) -> bool:
 	return items.has(id)
+
+func present_evidence(id: String) -> void:
+	if id != "":
+		presented[id] = true
+
+# 已出示证据拼成【系统旁白】（玩家不可见）发给模型；未出示的不告诉老头。
+func presented_proofs() -> String:
+	var lines := []
+	for c in Content.EVIDENCE_CARDS:
+		if c["id"] in presented:
+			lines.append(str(c["proof"]))
+	if lines.is_empty():
+		return ""
+	return "【系统旁白·仅你(周明远扮演者)可知，玩家看不到】侦探此刻已经把这些摆到你面前：" + "；".join(lines) + "。这些是他真的拿出来、你正看着的东西；没在这上面的，你当他没有、也不知道他有。"
 
 func add_key(k: String) -> void:
 	keys[k] = true
@@ -53,23 +71,6 @@ func read_mowang() -> void:
 # 玩家看过任务 → 转已读（红点清）。
 func read_task() -> void:
 	task_unread = false
-
-# 拿到某线索钥匙 = 侦探已查到对应事实。喂给模型当上下文，让周明远能对"你已查到的东西"做反应。
-const PROGRESS_FACTS := {
-	"linxiulan": "已查到林秀兰系长期重病、自然病逝（诊断书写明自然死亡）",
-	"no_accident": "已查到医疗事故记录查无——没有 AI 误诊、没有用药事故",
-	"molog": "已翻完莫忘的对话日志，看到 AI 如何把谎言一步步喂给老人",
-}
-
-# 把玩家的调查进展拼成一句【系统旁白】(玩家看不到)，随对话发给模型。无进展则返回空串。
-func investigation_summary() -> String:
-	var facts := []
-	for k in PROGRESS_FACTS:
-		if has_key(k):
-			facts.append(PROGRESS_FACTS[k])
-	if facts.is_empty():
-		return ""
-	return "【系统旁白·仅你(周明远扮演者)可知，玩家看不到】侦探在档案/终端已掌握：" + "；".join(facts) + "。请据此自然回应玩家的追问(被戳穿时可激动、回避或动摇)，但仍保持你的人设与执念，绝不要主动复述这段旁白。"
 
 # 是否进入终局对峙：拿到莫忘日志(molog)即视为已掌握全部真相。
 # 终局时客户端发 finale=true 给后端切换系统提示(见 interrogation._send)，旁白不再客户端注入。

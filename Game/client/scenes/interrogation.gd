@@ -175,11 +175,11 @@ func _send() -> void:
 	state.add_to_history("user", msg)
 	input.text = ""
 	_set_busy(true)
-	# 直连大模型：非终局把"调查进展"系统旁白拼在历史最前(让老头知道你查到了什么,不写进持久化历史)；
+	# 直连大模型：非终局把"已出示证据"系统旁白拼在历史最前(让老头知道玩家拿出了什么,不写进持久化历史)；
 	# 终局由 LLM.build_messages 自动换成 FINALE 提示，这里不注入旁白。
 	var to_send: Array = []
 	if not state.in_finale():
-		var prog = state.investigation_summary()
+		var prog = state.presented_proofs()
 		if prog != "":
 			to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)

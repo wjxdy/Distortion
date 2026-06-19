@@ -97,16 +97,19 @@ func _initialize() -> void:
 		s4.read_mowang()
 		_check(not s4.mowang_unread, "读过莫忘后转已读")
 
-	# --- 调查进展摘要（喂给模型，让老头知道玩家查到了什么） ---
-	var s5 = GameState.new()
-	_check(s5.has_method("investigation_summary"), "GameState 有 investigation_summary")
-	if s5.has_method("investigation_summary"):
-		_check(s5.investigation_summary() == "", "无线索时进展摘要为空")
-		s5.add_key("linxiulan")
-		s5.add_key("no_accident")
-		var summ = s5.investigation_summary()
-		_check(("林秀兰" in summ) or ("自然" in summ), "摘要含林秀兰死因")
-		_check(("查无" in summ) or ("事故" in summ), "摘要含医疗事故查无")
+	# --- 已出示证据 ---
+	var s5b = GameState.new()
+	_check(s5b.presented_proofs() == "", "未出示时旁白为空")
+	s5b.present_evidence("death")
+	var p6 := s5b.presented_proofs()
+	_check("死亡证明" in p6, "出示死亡证明后旁白含其 proof")
+	_check(not ("骨灰" in p6), "未出示安葬记录则旁白不含它")
+	s5b.present_evidence("death")  # 去重
+	var cnt := 0
+	for c in Content.EVIDENCE_CARDS:
+		if c["id"] in s5b.presented:
+			cnt += 1
+	_check(cnt == 1, "重复出示同一张只记一次")
 
 	# --- 开局任务红点（上司任务默认未读，看过转已读） ---
 	var s6 = GameState.new()
