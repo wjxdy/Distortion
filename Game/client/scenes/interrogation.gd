@@ -361,7 +361,10 @@ func _trigger_ending_emergent(epilogue: String) -> void:
 	# 并行发称号请求（不阻塞渐黑/幻灯片流程）
 	var kind := str(_pending_end.get("kind", ""))
 	title_label.text = ""
-	title_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.title_request_body(state.history, kind))
+	var terr := title_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.title_request_body(state.history, kind))
+	if terr != OK:
+		# 请求都没发出去：直接走 _on_title 的兜底("过客")，别让称号栏空着
+		_on_title(0, 0, PackedStringArray(), PackedByteArray())
 	fade_overlay.visible = true
 	fade_overlay.modulate.a = 0.0
 	var tw := create_tween()
