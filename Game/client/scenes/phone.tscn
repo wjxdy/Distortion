@@ -1,7 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bxsc7ngs1gytp"]
+[gd_scene format=3 uid="uid://bxsc7ngs1gytp"]
 
-[ext_resource type="Script" path="res://scenes/phone.gd" id="1_phone"]
-[ext_resource type="Texture2D" path="res://art/phone_logo.png" id="2_phone_logo"]
+[ext_resource type="Script" uid="uid://iku6nehhcodw" path="res://scenes/phone.gd" id="1_phone"]
+[ext_resource type="Texture2D" uid="uid://bdhdohdhetjia" path="res://art/phone_logo.png" id="2_phone_logo"]
 
 [sub_resource type="StyleBoxEmpty" id="BtnEmpty"]
 
@@ -12,24 +12,24 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="Phone" type="CanvasLayer"]
+[node name="Phone" type="CanvasLayer" unique_id=147968243]
 layer = 5
 script = ExtResource("1_phone")
 
-[node name="PhoneBtn" type="Button" parent="."]
-offset_left = 36.0
-offset_top = 596.0
-offset_right = 132.0
-offset_bottom = 684.0
+[node name="PhoneBtn" type="Button" parent="." unique_id=212053806]
+offset_left = 3.0
+offset_top = 572.0
+offset_right = 72.0
+offset_bottom = 642.0
 theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("BtnEmpty")
+theme_override_styles/pressed = SubResource("BtnEmpty")
+theme_override_styles/hover = SubResource("BtnEmpty")
+theme_override_styles/focus = SubResource("BtnEmpty")
 icon = ExtResource("2_phone_logo")
 expand_icon = true
-theme_override_styles/normal = SubResource("BtnEmpty")
-theme_override_styles/hover = SubResource("BtnEmpty")
-theme_override_styles/pressed = SubResource("BtnEmpty")
-theme_override_styles/focus = SubResource("BtnEmpty")
 
-[node name="Dot" type="Panel" parent="PhoneBtn"]
+[node name="Dot" type="Panel" parent="PhoneBtn" unique_id=739951245]
 visible = false
 layout_mode = 1
 anchors_preset = 1
@@ -39,30 +39,37 @@ offset_left = -20.0
 offset_top = 6.0
 offset_right = -6.0
 offset_bottom = 20.0
+grow_horizontal = 0
 theme_override_styles/panel = SubResource("DotStyle")
 
-[node name="Screen" type="Control" parent="."]
+[node name="Screen" type="Control" parent="." unique_id=406775484]
 visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Dim" type="ColorRect" parent="Screen"]
+[node name="Dim" type="ColorRect" parent="Screen" unique_id=1157495122]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0, 0, 0, 0.7)
 
-[node name="Body" type="ColorRect" parent="Screen"]
+[node name="Body" type="ColorRect" parent="Screen" unique_id=1236876754]
+layout_mode = 0
 offset_left = 360.0
 offset_top = 80.0
 offset_right = 920.0
 offset_bottom = 640.0
 color = Color(0.12, 0.14, 0.2, 1)
 
-[node name="Header" type="Label" parent="Screen/Body"]
+[node name="Header" type="Label" parent="Screen/Body" unique_id=1285952252]
+layout_mode = 0
 offset_left = 20.0
 offset_top = 14.0
 offset_right = 540.0
@@ -70,20 +77,21 @@ offset_bottom = 52.0
 theme_override_font_sizes/font_size = 24
 text = "📱 手机"
 
-[node name="AppList" type="VBoxContainer" parent="Screen/Body"]
+[node name="AppList" type="VBoxContainer" parent="Screen/Body" unique_id=477094554]
+layout_mode = 0
 offset_left = 24.0
 offset_top = 72.0
 offset_right = 200.0
 offset_bottom = 540.0
 theme_override_constants/separation = 16
 
-[node name="TaskBtn" type="Button" parent="Screen/Body/AppList"]
+[node name="TaskBtn" type="Button" parent="Screen/Body/AppList" unique_id=1675996223]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "📋 任务"
 
-[node name="Dot" type="Panel" parent="Screen/Body/AppList/TaskBtn"]
+[node name="Dot" type="Panel" parent="Screen/Body/AppList/TaskBtn" unique_id=2088476381]
 visible = false
 layout_mode = 1
 anchors_preset = 1
@@ -93,15 +101,16 @@ offset_left = -20.0
 offset_top = 6.0
 offset_right = -6.0
 offset_bottom = 20.0
+grow_horizontal = 0
 theme_override_styles/panel = SubResource("DotStyle")
 
-[node name="MowangBtn" type="Button" parent="Screen/Body/AppList"]
+[node name="MowangBtn" type="Button" parent="Screen/Body/AppList" unique_id=1847629951]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "💬 莫忘"
 
-[node name="Dot" type="Panel" parent="Screen/Body/AppList/MowangBtn"]
+[node name="Dot" type="Panel" parent="Screen/Body/AppList/MowangBtn" unique_id=316366966]
 visible = false
 layout_mode = 1
 anchors_preset = 1
@@ -111,22 +120,24 @@ offset_left = -20.0
 offset_top = 6.0
 offset_right = -6.0
 offset_bottom = 20.0
+grow_horizontal = 0
 theme_override_styles/panel = SubResource("DotStyle")
 
-[node name="CloseBtn" type="Button" parent="Screen/Body/AppList"]
+[node name="CloseBtn" type="Button" parent="Screen/Body/AppList" unique_id=110672203]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "✕ 关闭"
 
-[node name="DisplayBg" type="ColorRect" parent="Screen/Body"]
+[node name="DisplayBg" type="ColorRect" parent="Screen/Body" unique_id=2086512164]
+layout_mode = 0
 offset_left = 216.0
 offset_top = 72.0
 offset_right = 540.0
 offset_bottom = 540.0
 color = Color(0.06, 0.07, 0.1, 1)
 
-[node name="Scroll" type="ScrollContainer" parent="Screen/Body/DisplayBg"]
+[node name="Scroll" type="ScrollContainer" parent="Screen/Body/DisplayBg" unique_id=1860063903]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -135,16 +146,18 @@ offset_left = 12.0
 offset_top = 12.0
 offset_right = -12.0
 offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="Display" type="Label" parent="Screen/Body/DisplayBg/Scroll"]
+[node name="Display" type="Label" parent="Screen/Body/DisplayBg/Scroll" unique_id=1699749431]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "点左侧 app 查看。"
 autowrap_mode = 3
 
-[node name="Toast" type="Label" parent="."]
+[node name="Toast" type="Label" parent="." unique_id=1871221452]
 visible = false
 anchors_preset = 1
 anchor_left = 1.0

@@ -140,7 +140,6 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("4")
-color = Color(0.86, 0.88, 0.9, 0.95)
 
 [node name="Margin" type="MarginContainer" parent="ZhouBubble" unique_id=357766759]
 layout_mode = 1
@@ -195,7 +194,6 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("4")
-color = Color(0.86, 0.88, 0.9, 0.95)
 
 [node name="Margin" type="MarginContainer" parent="PlayerBubble" unique_id=1428714922]
 layout_mode = 1
@@ -222,9 +220,10 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -188.0
-offset_right = 140.0
-offset_bottom = -148.0
+offset_left = 4.0
+offset_top = -637.0
+offset_right = 144.0
+offset_bottom = -597.0
 grow_vertical = 0
 focus_mode = 0
 theme_override_font_sizes/font_size = 20
@@ -238,79 +237,84 @@ autostart = true
 
 [node name="Phone" parent="." unique_id=64375825 instance=ExtResource("5")]
 
-[node name="Evidence" type="Panel" parent="."]
-visible = true
+[node name="Evidence" type="Panel" parent="." unique_id=394265678]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 440.0
 offset_right = 200.0
 offset_bottom = 620.0
 
-[node name="VBox" type="VBoxContainer" parent="Evidence"]
+[node name="VBox" type="VBoxContainer" parent="Evidence" unique_id=1308070643]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="Card_photo" type="Button" parent="Evidence/VBox" unique_id=1749354288]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "合照"
+
+[node name="Card_death" type="Button" parent="Evidence/VBox" unique_id=153748086]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "死亡证明"
+
+[node name="Card_farewell" type="Button" parent="Evidence/VBox" unique_id=1140451879]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "安葬记录"
+
+[node name="Card_molog" type="Button" parent="Evidence/VBox" unique_id=1099060486]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "莫忘日志"
+
+[node name="DirectorHttp" type="HTTPRequest" parent="." unique_id=1093424529]
+
+[node name="FadeOverlay" type="ColorRect" parent="." unique_id=1791613675]
+visible = false
+z_index = 100
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 6
-offset_left = 8.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = -8.0
-
-[node name="Card_photo" type="Button" parent="Evidence/VBox"]
-visible = false
-layout_mode = 2
-toggle_mode = true
-text = "合照"
-
-[node name="Card_death" type="Button" parent="Evidence/VBox"]
-visible = false
-layout_mode = 2
-toggle_mode = true
-text = "死亡证明"
-
-[node name="Card_farewell" type="Button" parent="Evidence/VBox"]
-visible = false
-layout_mode = 2
-toggle_mode = true
-text = "安葬记录"
-
-[node name="Card_molog" type="Button" parent="Evidence/VBox"]
-visible = false
-layout_mode = 2
-toggle_mode = true
-text = "莫忘日志"
-
-[node name="DirectorHttp" type="HTTPRequest" parent="."]
-
-[node name="FadeOverlay" type="ColorRect" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
 mouse_filter = 2
-z_index = 100
 color = Color(0, 0, 0, 1)
 
-[node name="EndSlide" type="Control" parent="."]
+[node name="EndSlide" type="Control" parent="." unique_id=1612104669]
 visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
 z_index = 101
-
-[node name="Bg" type="ColorRect" parent="EndSlide"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="EndSlide" unique_id=397470937]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="VBox" type="VBoxContainer" parent="EndSlide"]
+[node name="VBox" type="VBoxContainer" parent="EndSlide" unique_id=673567379]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -326,7 +330,7 @@ grow_vertical = 2
 theme_override_constants/separation = 40
 alignment = 1
 
-[node name="Body" type="Label" parent="EndSlide/VBox"]
+[node name="Body" type="Label" parent="EndSlide/VBox" unique_id=722654771]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
 theme_override_constants/line_spacing = 10
@@ -334,31 +338,31 @@ theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Subtitle" type="Label" parent="EndSlide/VBox"]
+[node name="Subtitle" type="Label" parent="EndSlide/VBox" unique_id=937564263]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.78, 0.57, 0.92, 1)
 theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TitleLabel" type="Label" parent="EndSlide/VBox"]
+[node name="TitleLabel" type="Label" parent="EndSlide/VBox" unique_id=634148303]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1)
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="EndButtons" type="HBoxContainer" parent="EndSlide/VBox"]
+[node name="EndButtons" type="HBoxContainer" parent="EndSlide/VBox" unique_id=284435567]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 24
+alignment = 1
 
-[node name="BackToMenuBtn" type="Button" parent="EndSlide/VBox/EndButtons"]
+[node name="BackToMenuBtn" type="Button" parent="EndSlide/VBox/EndButtons" unique_id=1403394180]
 layout_mode = 2
 text = "返回主菜单"
 
-[node name="ViewAchieveBtn" type="Button" parent="EndSlide/VBox/EndButtons"]
+[node name="ViewAchieveBtn" type="Button" parent="EndSlide/VBox/EndButtons" unique_id=1411615584]
 layout_mode = 2
 text = "查看成就"
 
-[node name="TitleHttp" type="HTTPRequest" parent="."]
+[node name="TitleHttp" type="HTTPRequest" parent="." unique_id=1835774649]
