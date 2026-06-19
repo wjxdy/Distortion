@@ -33,7 +33,6 @@ static func key_fingerprint() -> String:
 	return "%s len=%d %s…" % [src, k.length(), head]
 
 const EMOTIONS := ["calm", "angry", "sinister", "sad"]
-const VALID_END := ["ready", "reveal", "comfort", "leave"]
 
 # 周明远人设（普通退休老人 / 莫忘=商业陪伴 App / 阿尔茨海默 / 选择相信）
 const SYSTEM_PROMPT := """你叫周明远，78 岁，一个普通的退休老人。
@@ -177,7 +176,7 @@ static func extract_content(data) -> String:
 		return ""
 	return str(msg.get("content", ""))
 
-# 解析模型回复 → {reply, emotion, hint, end}。与后端 llm.js parseReply 等价。
+# 解析模型回复 → {reply, emotion, hint}。结局不再由老头台词判定（改裁判调用）。
 static func parse_reply(content: String) -> Dictionary:
 	var text := str(content).strip_edges()
 
@@ -189,15 +188,6 @@ static func parse_reply(content: String) -> Dictionary:
 	if hm:
 		hint = hm.get_string(1)
 		text = (text.substr(0, hm.get_start()) + text.substr(hm.get_end())).strip_edges()
-
-	# 剥隐藏 end 标签 [[end:ID]]（仅合法值，否则当普通文本）
-	var end := ""
-	var end_re := RegEx.new()
-	end_re.compile("(?i)[\\[【]{1,2}\\s*end\\s*:\\s*([A-Za-z]+)\\s*[\\]】]{1,2}")
-	var em := end_re.search(text)
-	if em and (em.get_string(1).to_lower() in VALID_END):
-		end = em.get_string(1).to_lower()
-		text = (text.substr(0, em.get_start()) + text.substr(em.get_end())).strip_edges()
 
 	# 剥情绪标签（任意位置），第一个合法的作为 emotion；非法标签([happy])原样保留
 	var emotion := "calm"
@@ -212,4 +202,4 @@ static func parse_reply(content: String) -> Dictionary:
 			emotion = nm   # 倒序遍历，最后赋值的是最靠前的合法标签 → emotion=第一个
 	text = text.strip_edges()
 
-	return {"reply": text, "emotion": emotion, "hint": hint, "end": end}
+	return {"reply": text, "emotion": emotion, "hint": hint}

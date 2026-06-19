@@ -157,19 +157,28 @@ func _initialize() -> void:
 
 	# --- LLM.parse_reply（客户端直连版，移植自后端 llm.js parseReply） ---
 	var r1 = LLM.parse_reply("[sad] 她……只是出门买点菜。 ")
-	_check(r1["reply"] == "她……只是出门买点菜。" and r1["emotion"] == "sad" and r1["hint"] == "" and r1["end"] == "", "解析句首情绪+去空白")
+	_check(r1["reply"] == "她……只是出门买点菜。" and r1["emotion"] == "sad" and r1["hint"] == "", "解析句首情绪+去空白")
 	var r2 = LLM.parse_reply("[angry]是 AI 害死她的！[[hint:investigate_death]]")
 	_check(r2["reply"] == "是 AI 害死她的！" and r2["emotion"] == "angry" and r2["hint"] == "investigate_death", "剥 [[hint:ID]]")
+	# end 标签已不再解析（结局改裁判判定）：含 [[end:X]] 的内容当普通文本/忽略
 	var r3 = LLM.parse_reply("[sad]她就那么走了。[[end:reveal]]")
-	_check(r3["reply"] == "她就那么走了。" and r3["end"] == "reveal", "剥 [[end:reveal]]")
-	_check(LLM.parse_reply("[[end:boom]]你好")["end"] == "", "非法 end 不当标签")
+	_check(r3["reply"] == "她就那么走了。[[end:reveal]]" or (not r3.has("end") or r3.get("end","") == ""), "end 标签不再产出(当文本或丢弃)")
 	var r5 = LLM.parse_reply("[angry]是 AI 害的！[[hint:visit_community]][[end:ready]]")
-	_check(r5["reply"] == "是 AI 害的！" and r5["hint"] == "visit_community" and r5["end"] == "ready", "hint+end 共存且都剥")
+	_check(r5["reply"] != "" and r5["hint"] == "visit_community" and (not r5.has("end") or r5.get("end","") == ""), "hint 仍剥，end 不再产出")
 	var r6 = LLM.parse_reply("[angry]你们懂什么！\n\n[calm]好吧，我承认。")
 	_check(r6["reply"] == "你们懂什么！\n\n好吧，我承认。" and r6["emotion"] == "angry", "中段情绪标签也剥,取第一个")
 	_check(LLM.parse_reply("[happy]你好")["reply"] == "[happy]你好", "非法情绪标签原样保留")
 	var r8 = LLM.parse_reply("我就……记记日常。   [[hint:protecting_app]]")
 	_check(r8["reply"] == "我就……记记日常。" and r8["hint"] == "protecting_app", "尾部 hint 剥净不残留")
+	# parse_reply 不再产出 end 字段（结局改裁判判定，C2）
+	var pr := LLM.parse_reply("[sad]她出门了，一会儿就回来。[[hint:investigate_death]]")
+	_check(pr["emotion"] == "sad", "情绪仍解析")
+	_check(pr["hint"] == "investigate_death", "hint 仍解析")
+	_check(not pr.has("end") or str(pr.get("end","")) == "", "不再产出 end 字段")
+
+	# 终局 roleplay 提示词不含结局正文分隔符
+	_check(not ("===结局===" in LLM.FINALE_SYSTEM_PROMPT), "终局roleplay不含结局正文分隔符")
+
 	# build_messages：终局换 FINALE，系统提示在最前
 	var msgs = LLM.build_messages([{"role": "user", "content": "hi"}], false)
 	_check(msgs.size() == 2 and msgs[0]["role"] == "system" and "周明远" in msgs[0]["content"], "build_messages 非终局用人设提示")
