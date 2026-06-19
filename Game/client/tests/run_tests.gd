@@ -138,10 +138,11 @@ func _initialize() -> void:
 	_check(Content.ENDING_SLIDES.size() >= 3, "ENDING_SLIDES 三分支文案存在")
 	for b in ["reveal", "comfort", "leave"]:
 		_check(Content.ENDING_SLIDES.has(b) and str(Content.ENDING_SLIDES[b]) != "", "结局幻灯片有 " + b)
-	# 日志蒙太奇：那条无理由跳变的"是 AI 害死的" + 点破空白的旁白
+	# 日志蒙太奇：新滑坡("她走丢/在回来的路上")，不再有旧设定"误诊/AI害死"
 	var molog_blob := "\n".join(Content.MOWANG_LOG_LINES)
-	_check("是 AI 害死的" in molog_blob, "日志含突兀跳变的'是 AI 害死的'")
-	_check(("没有前一天" in molog_blob) or ("没有任何理由" in molog_blob), "日志含点破空白的旁白")
+	_check("走丢" in molog_blob or "回来的路上" in molog_blob, "莫忘日志=她走丢了/在回来的路上")
+	_check(not ("误诊" in molog_blob), "莫忘日志不再有'误诊'旧设定")
+	_check(Content.MOWANG_HINTS.has("ask_farewell"), "提醒含 ask_farewell")
 
 	# --- 莫忘"今天的对话"(道具栏看) + 提醒链:手机→道具栏→终端恢复历史 ---
 	_check(Content.MOWANG_TODAY_LINES.size() >= 2, "今天的对话有内容")
