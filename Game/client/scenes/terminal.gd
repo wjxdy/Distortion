@@ -95,7 +95,9 @@ func _close_terminal() -> void:
 	_update_prompt()
 
 func _refresh_terminal_actions() -> void:
-	submit_phone_btn.visible = Game.state.has_item("oldman_phone") and not Game.state.has_key("molog")
+	# 有老人手机就一直显示该按钮；翻完日志(molog)后仍可重看历史，不再一关就消失。
+	submit_phone_btn.visible = Game.state.has_item("oldman_phone")
+	submit_phone_btn.text = "📱 重看莫忘历史日志" if Game.state.has_key("molog") else "📱 接入手机·恢复历史日志"
 
 func _show(file_id: String) -> void:
 	var f = Content.TERMINAL_FILES.get(file_id)
