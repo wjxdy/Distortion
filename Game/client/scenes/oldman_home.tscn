@@ -83,6 +83,7 @@ scale = Vector2(0.044270806, 0.044270806)
 texture = ExtResource("5_dcvvl")
 
 [node name="Player" parent="." unique_id=2143951481 instance=ExtResource("2_player")]
+z_index = 10
 position = Vector2(282, 654)
 scale = Vector2(1.4, 1.4)
 
@@ -114,6 +115,7 @@ text = "周明远家     WASD / ↑↓←→ 移动     W/↑ 查看 / 离开"
 horizontal_alignment = 1
 
 [node name="Prompt" type="Label" parent="." unique_id=1866045933]
+z_index = 100
 layout_mode = 0
 offset_right = 240.0
 offset_bottom = 32.0
