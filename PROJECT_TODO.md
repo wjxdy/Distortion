@@ -5,8 +5,8 @@
   - [x] **Task A1**（8986a6a）：content.gd 终端/档案文案 + no_accident→farewell + 两层真相关键词（TDD 98/98）
   - [x] **Task A2**（1604d34）：莫忘滑坡日志改"她走丢了会回来" + 今日对话 + BOSS_TASK + MOWANG_HINTS + 邻居台词对齐失踪妻子剧情（TDD 99/99）
   - [x] **Task B1**（24469c0）：content.gd 新增 4 张证据手牌 EVIDENCE_CARDS + 结局兜底正文 ENDING_FALLBACK（TDD 105/105）
+  - [x] **Task B2+C0**（faa7b50）：game_state.gd 新增 presented/present_evidence/presented_proofs + 删 investigation_summary/PROGRESS_FACTS；interrogation.gd:182 最小替换；run_tests.gd 清旧断言+加新断言（TDD 105/105）
   - [ ] **Task B（剩余）**：上司任务 + hint 文案改版
-  - [ ] **Task C0**：删 investigation_summary/PROGRESS_FACTS，改 presented 证据旁白
   - [ ] **Task C1**：证据手牌面板节点（审讯室 .tscn）+ 发牌/出示逻辑
   - [ ] **Task D3**：hint_fallback 逻辑改失踪语境 + 老头/裁判双调用结局系统
   - **延后第二阶段(留接口)**：通话记录"打通了"恐怖反转+当场打电话结局+AI合成语音。
