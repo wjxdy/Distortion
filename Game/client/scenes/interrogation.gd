@@ -48,7 +48,6 @@ var _req_start := 0
 @onready var emo_timer: Timer = $EmoTimer
 @onready var http: HTTPRequest = $Http
 @onready var back_btn: Button = $BackBtn
-@onready var leave_btn: Button = $LeaveBtn
 @onready var fade_overlay: ColorRect = $FadeOverlay
 @onready var end_slide: Control = $EndSlide
 @onready var end_body: Label = $EndSlide/VBox/Body
@@ -77,11 +76,8 @@ func _ready() -> void:
 	http.request_completed.connect(_on_reply)
 	http.timeout = 25.0   # 超时→保底沉默(原后端 14s,直连放宽到 25s 容 Moonshot 偶发慢)
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
-	leave_btn.pressed.connect(_on_leave)
 	end_slide.visible = false
 	fade_overlay.visible = false
-	# 进入终局对峙(已拿莫忘日志) → 显示"起身离开"(C 分支)
-	leave_btn.visible = state.in_finale()
 	# 看手机时禁用盘问输入栏（查档案在手机里）
 	phone.opened.connect(func() -> void: _bar_enabled(false))
 	phone.closed.connect(func() -> void: _bar_enabled(not finished))
@@ -278,20 +274,14 @@ func _hint_fallback(reply: String) -> void:
 	if ("莫忘" in m) or ("手机" in m) or ("app" in m) or ("APP" in m) or ("为什么用" in m) or ("天天" in m):
 		_fire_hint("protecting_app")
 
-# 终局：后端用 FINALE_SYSTEM_PROMPT 时模型按玩家态度吐 [[end:reveal/comfort]] → 触发对应结局。
-# leave 由"起身离开"按钮走 _on_leave。(ready 已弃用;若模型偶吐别的值,这里不处理即忽略。)
+# 终局：模型按玩家态度吐 [[end:reveal/comfort]] → 触发对应结局。
+# (ready 已弃用;若模型偶吐别的值,这里不处理即忽略。leave 分支已移除。)
 func _handle_end(data) -> void:
 	if typeof(data) != TYPE_DICTIONARY:
 		return
 	var e := str(data.get("end", ""))
 	if e == "reveal" or e == "comfort":
 		_trigger_ending(e)
-
-func _on_leave() -> void:
-	if finished:
-		return
-	Sfx.play_click()
-	_trigger_ending("leave")
 
 # 渐黑 → 幻灯片(分支正文 + 统一字幕)。结局唯一入口；结束在此锁死。
 func _trigger_ending(branch: String) -> void:
@@ -300,7 +290,6 @@ func _trigger_ending(branch: String) -> void:
 	finished = true
 	input.editable = false
 	send_btn.disabled = true
-	leave_btn.visible = false
 	# 渐黑
 	fade_overlay.visible = true
 	fade_overlay.modulate.a = 0.0

@@ -238,23 +238,52 @@ autostart = true
 
 [node name="Phone" parent="." unique_id=64375825 instance=ExtResource("5")]
 
-[node name="LeaveBtn" type="Button" parent="."]
-visible = false
+[node name="Evidence" type="Panel" parent="."]
+visible = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 440.0
+offset_right = 200.0
+offset_bottom = 620.0
+
+[node name="VBox" type="VBoxContainer" parent="Evidence"]
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -320.0
-offset_top = -106.0
-offset_right = -20.0
-offset_bottom = -66.0
-grow_horizontal = 0
-grow_vertical = 0
-focus_mode = 0
-theme_override_font_sizes/font_size = 18
-text = "起身，什么都不说地离开"
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+
+[node name="Card_photo" type="Button" parent="Evidence/VBox"]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "合照"
+
+[node name="Card_death" type="Button" parent="Evidence/VBox"]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "死亡证明"
+
+[node name="Card_farewell" type="Button" parent="Evidence/VBox"]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "安葬记录"
+
+[node name="Card_molog" type="Button" parent="Evidence/VBox"]
+visible = false
+layout_mode = 2
+toggle_mode = true
+text = "莫忘日志"
+
+[node name="DirectorHttp" type="HTTPRequest" parent="."]
 
 [node name="FadeOverlay" type="ColorRect" parent="."]
 visible = false
