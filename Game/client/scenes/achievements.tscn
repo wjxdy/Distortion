@@ -1,0 +1,81 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/achievements.gd" id="1_script"]
+
+[node name="Achievements" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.1, 1)
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 40.0
+offset_right = 200.0
+offset_bottom = 90.0
+grow_horizontal = 2
+text = "称号收藏"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 36
+
+[node name="CountLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 100.0
+offset_right = 200.0
+offset_bottom = 132.0
+grow_horizontal = 2
+text = "已获得 0 个称号"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 148.0
+offset_right = 300.0
+offset_bottom = 500.0
+grow_horizontal = 2
+
+[node name="List" type="Label" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "暂无称号，去玩一局吧。"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="BackBtn" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_top = 520.0
+offset_right = 120.0
+offset_bottom = 560.0
+grow_horizontal = 2
+custom_minimum_size = Vector2(240, 40)
+text = "返回"
