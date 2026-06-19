@@ -29,7 +29,7 @@ func _update_prompt() -> void:
 		prompt.text = "↑ 进入  702 · 周明远家" if Game.state.has_item("home_key") else "702 · 门锁着（去档案室拿钥匙）"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 返回  电梯"
+		prompt.text = "← 返回  电梯"
 		prompt.visible = true
 	else:
 		prompt.visible = false
@@ -40,16 +40,17 @@ func _update_prompt() -> void:
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if not event.is_action_pressed("move_up"):
+	# 返回电梯在左边→←/A(容忍 W)
+	if (event.is_action_pressed("move_left") or event.is_action_pressed("move_up")) and _at(exit_area):
+		_go(ELEVATOR, "")
 		return
-	if _at(home_door):
+	# 老人家门在前方→↑/W
+	if event.is_action_pressed("move_up") and _at(home_door):
 		if Game.state.has_item("home_key"):
 			_go(HOME, "from_corridor")
 		else:
 			Sfx.play_click()
 			prompt.text = "门锁着——去警局档案室拿钥匙"
-	elif _at(exit_area):
-		_go(ELEVATOR, "")
 
 func _go(scene_path: String, entry: String) -> void:
 	Game.spawn_point = entry

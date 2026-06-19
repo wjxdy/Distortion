@@ -61,7 +61,7 @@ func _update_prompt() -> void:
 		prompt.text = "↑ 进入  警察局"
 		prompt.visible = true
 	elif _near(community_door):
-		prompt.text = "↑ 进入  晚晴小区"
+		prompt.text = "→ 进入  晚晴小区"
 		prompt.visible = true
 	else:
 		prompt.visible = false
@@ -69,15 +69,14 @@ func _update_prompt() -> void:
 		# 提示是世界空间 Control，跟随玩家头顶(随相机一起滚)
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 门按 W/↑ 进入(按下事件→进新场景时还按着键也不反跳)
+# 警察局是前方建筑→↑/W；晚晴小区在街道最右端→→/D(都容忍 W 兜底)。
 func _input(event: InputEvent) -> void:
 	if player.locked or intro_running:
 		return
-	if not event.is_action_pressed("move_up"):
-		return
-	if _near(police_door):
+	if event.is_action_pressed("move_up") and _near(police_door):
 		_enter_door(POLICE, "from_world")
-	elif _near(community_door):
+		return
+	if (event.is_action_pressed("move_right") or event.is_action_pressed("move_up")) and _near(community_door):
 		_enter_door(COMMUNITY, "from_world")
 
 func _enter_door(scene_path: String, entry: String = "") -> void:

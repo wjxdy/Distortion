@@ -53,23 +53,22 @@ func _update_prompt() -> void:
 		prompt.text = "↑ 进入  老人的楼"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 返回  街道"
+		prompt.text = "← 返回  街道"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 门按 W/↑ 进出
+# 老人楼在前方→↑/W；返回街道在左边→←/A(也容忍 W)。
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if not event.is_action_pressed("move_up"):
-		return
-	if _at(building_door):
-		_go(ELEVATOR, "")
-	elif _at(exit_area):
+	if (event.is_action_pressed("move_left") or event.is_action_pressed("move_up")) and _at(exit_area):
 		_go(WORLD, "community")
+		return
+	if event.is_action_pressed("move_up") and _at(building_door):
+		_go(ELEVATOR, "")
 
 func _go(scene_path: String, entry: String) -> void:
 	Game.spawn_point = entry

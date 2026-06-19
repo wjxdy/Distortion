@@ -37,18 +37,18 @@ func _update_prompt() -> void:
 		prompt.text = "空格  查看手机"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 离开"
+		prompt.text = "← 离开"
 		prompt.visible = true
 	else:
 		prompt.visible = false
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 门按 W/↑ 进出；物品(合照/手机)按空格查看
+# 离开出口在左边→←/A(容忍 W)；物品(合照/手机)按空格查看
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if event.is_action_pressed("move_up") and _at(exit_area):
+	if (event.is_action_pressed("move_left") or event.is_action_pressed("move_up")) and _at(exit_area):
 		_go(CORRIDOR, "from_home")
 	elif event.is_action_pressed("ui_select"):
 		if _at(photo_area):
