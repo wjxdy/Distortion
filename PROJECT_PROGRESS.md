@@ -33,6 +33,8 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-19: **【Task 2 完成】llm.gd 称号评定调用（提交 572f150，TDD 126/126）**：新增 `TITLE_PROMPT` 常量（称号评定官系统提示，硬性≤10字、只输出称号本身）；`build_title_messages(history, ending_kind) -> Array` 把全局对话记录+结局类型拼成 `[system, user]` 消息组；`title_request_body(...)` 用 temperature=0.7 构建请求体；`parse_title(content) -> String` 取首行、while循环剥首尾引号/标点/书名号、超10字截断、空白→""。TDD RED（parse error 函数不存在）→ GREEN 126/126，零回归。函数位于 director 系列正上方，`interrogation.gd` 接线留 Task 3。
+
 - 2026-06-19: **【Task 1 完成】Titles autoload 称号去重持久化（提交 cb7679e，TDD 120/120）**：新增 `game/titles.gd`（`extends Node`，`user://achievements.cfg` via ConfigFile）；接口 `add_title/all_titles/count/has`（对外）+ `_register/_save_to/_load_from`（内部，测试用）；去重基于 `strip_edges()` 后比较；`_ready()` 自动读档，`add_title` 写入成功才落盘。`project.godot [autoload]` 加 `Titles="*res://game/titles.gd"`（Game 之后）；`run_tests.gd` 新增 8 条断言含 round-trip 临时路径测试（`user://_test_ach.cfg`，用后自动删除）。TDD RED（parse error 文件不存在）→ GREEN 120/120，零回归。
 
 - 2026-06-19: **【整支实现完成·待用户F5+合并】feat/finale-emergent-ending 全 Phase(A–E) 收尾**：子agent驱动TDD逐任务(A1/A2/B1/B2+C0/C1/C2/C3/D1/D2/D3)落地，每任务 implementer+reviewer 两段式过审。**Phase E 实测调优**(`tune ff91e1b`)：真key跑老头/裁判双调用——S3全证据→`truth`、S4顺从→`comfort`、留白epilogue均正确；**S1只出死亡证明(无molog)模型会因老头崩溃误判`truth`** → 在 `_on_director` 加**确定性闸：truth 必须玩家真出示过 molog 才放行**(comfort不限)，保证"亮哪些牌→不同结局"、partial证据不达全真相结局；并修两处 `X 年前`→`三年前` 占位符。终态：单测 **113/113**、8 场景加载干净。**待**：用户F5实机(编辑器内需在 ESC 设置填自己的 Moonshot key，否则内置占位符 401)→ 合并回 main。**延后第二阶段(spec §十三留接口)**：通话记录"打通了"恐怖反转 + 当场打电话结局 + AI合成语音。
