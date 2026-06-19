@@ -323,6 +323,11 @@ func _on_director(_result: int, code: int, _h: PackedStringArray, body: PackedBy
 	var content := LLM.extract_content(data)
 	var verdict := LLM.parse_director(content)
 	if not verdict.get("end", false): return
+	# 确定性闸：truth 结局必须玩家真的出示过【莫忘日志】(揭穿"是app在骗他、他选择等"这层)。
+	# 没出示 molog 就只崩了"她死了"层、没碰最深的那层——不给 truth 收尾，继续僵持。
+	# comfort(顺从安慰)不需要证据，照常放行。模型有时会无视提示词里的硬性要求，这里用代码兜死。
+	if str(verdict.get("kind", "")) == "truth" and not state.presented.has("molog"):
+		return
 	_pending_end = verdict
 	_maybe_finish_after_typing()
 

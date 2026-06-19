@@ -173,7 +173,7 @@ const EVIDENCE_CARDS := [
 	{"id": "photo", "label": "合照", "key": "photo",
 	 "proof": "周明远与林秀兰的合照——她确实是他妻子。"},
 	{"id": "death", "label": "死亡证明", "key": "linxiulan",
-	 "proof": "林秀兰的死亡证明：X 年前因慢性肺病去世——她不是走丢了，是去世了。"},
+	 "proof": "林秀兰的死亡证明：三年前因慢性肺病去世——她不是走丢了，是去世了。"},
 	{"id": "farewell", "label": "安葬记录", "key": "farewell",
 	 "proof": "她的骨灰安放记录，经办人是周明远本人——是他亲手送的她。"},
 	{"id": "molog", "label": "莫忘日志", "key": "molog",
