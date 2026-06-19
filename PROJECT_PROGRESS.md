@@ -3,7 +3,7 @@
 ## 基本信息
 - 项目名称：《失真 Distortion》
 - 当前阶段：开发早期 / MVP 垂直切片
-- 最后更新：2026-06-18
+- 最后更新：2026-06-19
 
 ## 当前状态
 - 项目目标是做一个 5-8 分钟的赛博朋克像素叙事侦探 demo：开场世界观、自由审讯、探索取证、揭示第一块真相、结尾钩子。
@@ -33,6 +33,7 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-19: **【Task A2 完成】莫忘滑坡日志改"她走丢了会回来" + 任务/提醒/邻居台词对齐失踪妻子剧情**（提交 1604d34，TDD 99/99）：`MOWANG_LOG_LINES` 全改新滑坡（最初告知死亡→几天后"她出门了"→再后来"在找回家的路"→往后每天"还在回来的路上"）；`MOWANG_TODAY_LINES` 改"快了，她在回家的路上"；`BOSS_TASK` 改为每天来报案老人+三年前病逝妻子语境；`MOWANG_HINTS["investigate_death"]` + `ask_farewell` 改失踪语境；`EXPLORE_ACTIONS` molog text 改新滑坡摘录；`community.tscn` 邻居 NpcText 改"他老伴儿早走了好几年喽，他却天天念叨等她回家，还老对着手机打电话"。TDD：RED 1 失败（新日志断言）→ GREEN 99/99。
 - 2026-06-19: **【Task A1 完成】终端/档案文案改失踪妻子剧情 + no_accident→farewell + 两层真相关键词**（提交 8986a6a，TDD 98/98）：`content.gd` TRUTHS 关键词改失踪语境（"死了/去世/不会回来"等）；TERMINAL_FILES 改案件/林秀兰/安葬三条；`medical` grants_key `no_accident`→`farewell`；EXPLORE_ACTIONS medical 同步；MOWANG_HINTS `ask_no_accident`→`ask_farewell`；`terminal.gd` FILE_HINTS / `interrogation.gd` hint_fallback 仅改键名。`game_state.gd` PROGRESS_FACTS 的 `no_accident` 行保留（Task C0 删整段）。TDD：RED 3 失败（Triggers/Explore/Content 新断言）→ GREEN 98/98。
 
 - 2026-06-19: **【设计稿已定，待实现】终局重构 + 失踪妻子剧情改版**（分支 `feat/finale-emergent-ending`，spec=`docs/superpowers/specs/2026-06-19-finale-emergent-ending-design.md`，已提交 62db481）。三件事打包：① **剧情改版**——从"闹医院/AI误诊害死妻子"改为"**妻子失踪、他天天来警局报案，AI 莫忘骗他'她只是走丢了、会回来'，真相是她早已病逝**"；去加害者，反派回归"算法为留存而迎合+悲伤本身"；玩家=一次次接他报案的警察，今天主动留他谈一次。**全程复用现有场景，只改文案/content/提示词**，唯一新增结构=审讯室证据手牌面板节点。② **结局系统重构为"老头/裁判双调用"**——v1 想用单次调用让老头自己吐 `[[end]]`，**真 key 实测两版翻车**(收尾口气一来就误吐标签/证据全摆也说不动)，根因=同一次调用既演顽固老头又当公正裁判，两角色冲突；**改双调用**(老头纯演不判结局 + 独立 `DIRECTOR_PROMPT` 裁判判 `{end,kind,epilogue}`，AI 现写结局正文)，实测同样翻车的对话裁判 **5/5 判对**。③ **证据手牌**——4 张牌(合照/死亡证明/安葬记录/莫忘日志)，复用现有钥匙发放点；点牌挂 chip→"出示了才算数"(空口≠出示)→只把出示过的牌喂老头→亮哪张/瞒哪张驱动分叉。决策:`MIN_FINALE_TURNS=4`、presented 旁白替换 investigation_summary 整审讯生效、证据面板整审讯显示、黑暗结局留白暗示、删「起身离开」C 结局、修"老头话没说完就跳幻灯片"打断 bug。**延后第二阶段(本轮不做,spec §十三留接口)**:通话记录"几通打通了"恐怖反转(莫忘用亡妻声音接电话)+ 当场打电话诡异接通→专属结局 + AI 合成语音;通话记录本轮只做轻钩子(指向悲剧不揭谜底)。**邪教线确认不做**(保持干净内核)。**下一步=writing-plans 出实现计划**。
