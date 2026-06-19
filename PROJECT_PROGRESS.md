@@ -33,6 +33,8 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-19: **【Task D2 完成】interrogation.gd 证据手牌点亮/出示结算 + presented旁白整审讯注入**（提交 77b5f6b，TDD 115/115）：新增 `ev_panel`/`director_http` `@onready` + `_card_btns` 字典；`_ready()` 遍历 `EVIDENCE_CARDS` 按 `state.has_key` 点亮各牌；新增 `_refresh_cards()`（同步刷新各牌 visible + 若无解锁牌则整个面板隐藏，防空盒子）；`_send()` 全面重写：结算 armed 牌 → 空文本+有牌时自动生成"（你把X推到他面前。）" → 调 `state.present_evidence` 并复位按钮 → 整审讯（不分终局）注入 `presented_proofs()` 旁白；修复 `var prog: String` 类型推断问题（state 无类型变量 `:=` 会 parse error）。`test_interrogation_struct.gd` 补 `Card_photo`/`Card_farewell` 节点断言（全4张牌覆盖）。场景加载干净，115/115 零回归。
+
 - 2026-06-19: **【Task D1 完成】interrogation.tscn 加证据手牌面板 + DirectorHttp + 删 LeaveBtn**（提交 186bdce，TDD 115/115）：删除 `LeaveBtn` 节点（C 结局"起身离开"按钮）；新增 `Evidence` Panel（左下占位，用户后调）含 `VBox` 和 4 个 Button（`Card_photo`/`Card_death`/`Card_farewell`/`Card_molog`，各 `toggle_mode=true`、初始 `visible=false`，由 D2/D3 脚本按 game_state 解锁显示）；新增 `DirectorHttp`（HTTPRequest，供 D3 裁判调用接线）。`interrogation.gd` 同步删除所有 `leave_btn` 引用（`@onready`/`connect`/`visible` 赋值/`_on_leave()` 函数），保持场景加载干净；D2/D3 接线时不需再动 leave_btn。新建结构测试 `tests/test_interrogation_struct.gd` → 结构 OK，exit 0；场景无头加载无脚本错误；115/115 零回归。⚠️ 用户需在编辑器 Reload Saved Scene。
 
 - 2026-06-19: **【Task C3 完成】llm.gd 新增裁判三件套（提交 4ef995d，TDD 115/115）**：新增 `DIRECTOR_PROMPT` 常量（新剧情版：妻子病逝/莫忘骗"走丢"/老人选择等待）；`build_director_messages(history, presented_summary, turns)` 把对话记录+已出示证据摘要+轮数拼成 `[system, user]` 消息组；`director_request_body(...)` 用 temperature=0.3 构建请求体；`parse_director(content)` 从噪声中抠 JSON（`find("{")` + `rfind("}")`）、任何异常返回 `{end:false}`。`run_tests.gd` 新增4条断言（正常JSON解析/畸形→false/噪声抠JSON/messages带system提示）。TDD RED（parse error）→ GREEN 115/115。已有函数零改动；interrogation.gd 未接线（Task D3）。

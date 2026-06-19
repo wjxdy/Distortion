@@ -10,9 +10,9 @@
   - [x] **Task C2**（d8489bf）：parse_reply 移除旧 end 标签逻辑（删 VALID_END + end 剥离块 + end 字段）；run_tests.gd 加4条断言/更新3条（TDD 111/111）
   - [x] **Task C3**（4ef995d）：llm.gd 新增 DIRECTOR_PROMPT + build_director_messages + director_request_body + parse_director（JSON容错）；run_tests.gd 加4条断言（TDD 115/115）
   - [x] **Task D1**（186bdce）：interrogation.tscn 删 LeaveBtn + 加 Evidence 面板(4 toggle Button) + DirectorHttp；interrogation.gd 删 leave_btn 全部引用；新建 test_interrogation_struct.gd（TDD 115/115）
+  - [x] **Task D2**（77b5f6b）：interrogation.gd 证据手牌点亮/出示结算 + _send 重写 + presented旁白整审讯注入；_refresh_cards() 含空面板隐藏；test_interrogation_struct.gd 补全4张牌断言（TDD 115/115）
   - [ ] **Task B（剩余）**：上司任务 + hint 文案改版
-  - [ ] **Task D2**：interrogation.gd _send 逻辑 + 证据手牌 UI 连线（按 game_state 解锁显示各牌）
-  - [ ] **Task D3**：hint_fallback 逻辑改失踪语境 + 老头/裁判双调用结局系统（DirectorHttp 已在 tscn 中，接 @onready 引用）
+  - [ ] **Task D3**：hint_fallback 逻辑改失踪语境 + 老头/裁判双调用结局系统（DirectorHttp 已在 tscn 中，@onready 已在 D2 接好）
   - **延后第二阶段(留接口)**：通话记录"打通了"恐怖反转+当场打电话结局+AI合成语音。
 - [ ] **合并终局分支**：`feat/final-confrontation-ending`(10 提交，用户 F5 确认 OK) 合回 main。注意：合并前 main 工作区有用户并行在做的脚步声/BGM/music autoload 等未提交改动，别误带。
 - [x] ~~剧情去邪教版【客户端】全流程落地~~（已完成）：步骤A数据→手机中枢→phone复用→警局终端→小区支线→道具栏/钥匙→**终局对峙+三分支结局**(A戳破/B顺着他=模型 [[end:reveal/comfort]]/C沉默按钮，结束已解耦)。
