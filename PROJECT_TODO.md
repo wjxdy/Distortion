@@ -4,7 +4,8 @@
 - [ ] **【进行中·分支 feat/finale-emergent-ending】终局重构 + 失踪妻子剧情改版**：设计稿已定+提交(62db481)，实现计划已拆任务。范围见 spec `docs/superpowers/specs/2026-06-19-finale-emergent-ending-design.md`。
   - [x] **Task A1**（8986a6a）：content.gd 终端/档案文案 + no_accident→farewell + 两层真相关键词（TDD 98/98）
   - [x] **Task A2**（1604d34）：莫忘滑坡日志改"她走丢了会回来" + 今日对话 + BOSS_TASK + MOWANG_HINTS + 邻居台词对齐失踪妻子剧情（TDD 99/99）
-  - [ ] **Task B**：上司任务 + hint 文案改版
+  - [x] **Task B1**（24469c0）：content.gd 新增 4 张证据手牌 EVIDENCE_CARDS + 结局兜底正文 ENDING_FALLBACK（TDD 105/105）
+  - [ ] **Task B（剩余）**：上司任务 + hint 文案改版
   - [ ] **Task C0**：删 investigation_summary/PROGRESS_FACTS，改 presented 证据旁白
   - [ ] **Task C1**：证据手牌面板节点（审讯室 .tscn）+ 发牌/出示逻辑
   - [ ] **Task D3**：hint_fallback 逻辑改失踪语境 + 老头/裁判双调用结局系统
