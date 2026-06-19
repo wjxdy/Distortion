@@ -60,6 +60,10 @@ var _card_btns := {}   # id -> Button
 @onready var end_slide: Control = $EndSlide
 @onready var end_body: Label = $EndSlide/VBox/Body
 @onready var end_subtitle: Label = $EndSlide/VBox/Subtitle
+@onready var title_label: Label = $EndSlide/VBox/TitleLabel
+@onready var back_menu_btn: Button = $EndSlide/VBox/EndButtons/BackToMenuBtn
+@onready var view_achieve_btn: Button = $EndSlide/VBox/EndButtons/ViewAchieveBtn
+@onready var title_http: HTTPRequest = $TitleHttp
 
 func _ready() -> void:
 	Music.play_police_ambience()
@@ -85,6 +89,9 @@ func _ready() -> void:
 	http.timeout = 25.0   # 超时→保底沉默(原后端 14s,直连放宽到 25s 容 Moonshot 偶发慢)
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
 	director_http.request_completed.connect(_on_director)
+	title_http.request_completed.connect(_on_title)
+	back_menu_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
+	view_achieve_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/achievements.tscn"))
 	end_slide.visible = false
 	fade_overlay.visible = false
 	# 看手机时禁用盘问输入栏（查档案在手机里）
@@ -350,6 +357,10 @@ func _trigger_ending_emergent(epilogue: String) -> void:
 	finished = true
 	input.editable = false
 	send_btn.disabled = true
+	# 并行发称号请求（不阻塞渐黑/幻灯片流程）
+	var kind := str(_pending_end.get("kind", ""))
+	title_label.text = ""
+	title_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.title_request_body(state.history, kind))
 	fade_overlay.visible = true
 	fade_overlay.modulate.a = 0.0
 	var tw := create_tween()
@@ -439,6 +450,16 @@ func _back() -> void:
 # _exit_tree 在节点离树时必触发,兜住所有离场路径。
 func _exit_tree() -> void:
 	Sfx.stop_typing()
+
+func _on_title(_result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	var t := ""
+	if code == 200:
+		var data = JSON.parse_string(body.get_string_from_utf8())
+		t = LLM.parse_title(LLM.extract_content(data))
+	if t == "":
+		t = "过客"
+	var is_new := Titles.add_title(t)
+	title_label.text = "你获得称号：%s%s" % [t, "（新！）" if is_new else ""]
 
 func _input(event: InputEvent) -> void:
 	# ESC 现在专用于打开设置(Settings autoload)；返回走廊用屏幕上的「返回」按钮。
