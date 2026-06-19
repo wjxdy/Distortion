@@ -202,6 +202,11 @@ func _initialize() -> void:
 	_check(not sfx_t._typing_player.playing, "stop_typing(淡出后)→循环停下(离场不再残留)")
 	sfx_t.queue_free()
 
+	# --- 提示词新设定 ---
+	_check("走丢" in LLM.SYSTEM_PROMPT or "回来" in LLM.SYSTEM_PROMPT, "人设=她会回来/走丢")
+	_check(not ("误诊" in LLM.SYSTEM_PROMPT), "人设不再有AI误诊旧设定")
+	_check(not ("[[end" in LLM.FINALE_SYSTEM_PROMPT), "终局roleplay不再让老头吐end标签")
+
 	# --- 失败原因翻译(LLM.fail_reason)：调试日志据此告诉玩家是哪种失败 ---
 	var r_429 = LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 429, '{"error":{"type":"engine_overloaded_error"}}')
 	_check("429" in r_429 and ("过载" in r_429 or "限流" in r_429), "fail_reason: 429→过载/限流")
