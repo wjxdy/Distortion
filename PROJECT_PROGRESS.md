@@ -33,6 +33,8 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-19: **【Task D1 完成】interrogation.tscn 加证据手牌面板 + DirectorHttp + 删 LeaveBtn**（提交 186bdce，TDD 115/115）：删除 `LeaveBtn` 节点（C 结局"起身离开"按钮）；新增 `Evidence` Panel（左下占位，用户后调）含 `VBox` 和 4 个 Button（`Card_photo`/`Card_death`/`Card_farewell`/`Card_molog`，各 `toggle_mode=true`、初始 `visible=false`，由 D2/D3 脚本按 game_state 解锁显示）；新增 `DirectorHttp`（HTTPRequest，供 D3 裁判调用接线）。`interrogation.gd` 同步删除所有 `leave_btn` 引用（`@onready`/`connect`/`visible` 赋值/`_on_leave()` 函数），保持场景加载干净；D2/D3 接线时不需再动 leave_btn。新建结构测试 `tests/test_interrogation_struct.gd` → 结构 OK，exit 0；场景无头加载无脚本错误；115/115 零回归。⚠️ 用户需在编辑器 Reload Saved Scene。
+
 - 2026-06-19: **【Task C3 完成】llm.gd 新增裁判三件套（提交 4ef995d，TDD 115/115）**：新增 `DIRECTOR_PROMPT` 常量（新剧情版：妻子病逝/莫忘骗"走丢"/老人选择等待）；`build_director_messages(history, presented_summary, turns)` 把对话记录+已出示证据摘要+轮数拼成 `[system, user]` 消息组；`director_request_body(...)` 用 temperature=0.3 构建请求体；`parse_director(content)` 从噪声中抠 JSON（`find("{")` + `rfind("}")`）、任何异常返回 `{end:false}`。`run_tests.gd` 新增4条断言（正常JSON解析/畸形→false/噪声抠JSON/messages带system提示）。TDD RED（parse error）→ GREEN 115/115。已有函数零改动；interrogation.gd 未接线（Task D3）。
 
 - 2026-06-19: **【Task C2 完成】parse_reply 移除旧 end 标签逻辑（提交 d8489bf，TDD 111/111）**：删除 `VALID_END` 常量；删除 `parse_reply` 中剥 `[[end:ID]]` 的整段（`end_re`/`em`/`end` 变量）；返回字典从 `{reply,emotion,hint,end}` 改为 `{reply,emotion,hint}`。hint/emotion 解析逻辑不变。`run_tests.gd` 新增4条断言（情绪仍解析/hint仍解析/不再产出end字段/终局roleplay不含结局正文分隔符），更新3条旧断言（不再检查 `r["end"]`）。`VALID_END` grep 确认 `game/` 和 `scenes/` 零残留。TDD RED→GREEN 108→111/111。
