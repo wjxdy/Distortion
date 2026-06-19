@@ -77,11 +77,11 @@ func _input(event: InputEvent) -> void:
 		_enter_door(POLICE, "from_world")
 		return
 	if (event.is_action_pressed("move_right") or event.is_action_pressed("move_up")) and _near(community_door):
-		_enter_door(COMMUNITY, "from_world")
+		_enter_door(COMMUNITY, "from_world", "right")
 
-func _enter_door(scene_path: String, entry: String = "") -> void:
+func _enter_door(scene_path: String, entry: String = "", dir: String = "up") -> void:
 	Game.spawn_point = entry   # 告诉目标场景：玩家该落在哪个入口锚点
-	player.enter_door()
+	player.enter_door(dir)
 	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout
 	get_tree().change_scene_to_file(scene_path)

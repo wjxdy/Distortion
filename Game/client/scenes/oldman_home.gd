@@ -49,16 +49,16 @@ func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
 	if event.is_action_pressed("move_left") and _at(exit_area):
-		_go(CORRIDOR, "from_home")
+		_go(CORRIDOR, "from_home", "left")
 	elif event.is_action_pressed("ui_select"):
 		if _at(photo_area):
 			_examine("photo")
 		elif _at(phone_area):
 			_take_phone()
 
-func _go(scene_path: String, entry: String) -> void:
+func _go(scene_path: String, entry: String, dir: String = "up") -> void:
 	Game.spawn_point = entry
-	player.enter_door()
+	player.enter_door(dir)
 	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout
 	get_tree().change_scene_to_file(scene_path)
