@@ -33,6 +33,8 @@
 - 当前后端实现接入月之暗面 Kimi（`KIMI_API_KEY` / `KIMI_MODEL`），而设计文档早期写的是腾讯云大模型/SCF；这是需要后续确认或统一的差异。
 
 ## 最近一次进展
+- 2026-06-19: **【Task C3 完成】llm.gd 新增裁判三件套（提交 4ef995d，TDD 115/115）**：新增 `DIRECTOR_PROMPT` 常量（新剧情版：妻子病逝/莫忘骗"走丢"/老人选择等待）；`build_director_messages(history, presented_summary, turns)` 把对话记录+已出示证据摘要+轮数拼成 `[system, user]` 消息组；`director_request_body(...)` 用 temperature=0.3 构建请求体；`parse_director(content)` 从噪声中抠 JSON（`find("{")` + `rfind("}")`）、任何异常返回 `{end:false}`。`run_tests.gd` 新增4条断言（正常JSON解析/畸形→false/噪声抠JSON/messages带system提示）。TDD RED（parse error）→ GREEN 115/115。已有函数零改动；interrogation.gd 未接线（Task D3）。
+
 - 2026-06-19: **【Task C2 完成】parse_reply 移除旧 end 标签逻辑（提交 d8489bf，TDD 111/111）**：删除 `VALID_END` 常量；删除 `parse_reply` 中剥 `[[end:ID]]` 的整段（`end_re`/`em`/`end` 变量）；返回字典从 `{reply,emotion,hint,end}` 改为 `{reply,emotion,hint}`。hint/emotion 解析逻辑不变。`run_tests.gd` 新增4条断言（情绪仍解析/hint仍解析/不再产出end字段/终局roleplay不含结局正文分隔符），更新3条旧断言（不再检查 `r["end"]`）。`VALID_END` grep 确认 `game/` 和 `scenes/` 零残留。TDD RED→GREEN 108→111/111。
 
 - 2026-06-19: **【Task C1 完成】llm.gd 两段提示词改失踪妻子新剧情**（提交 a6678c9，TDD 108/108）：`SYSTEM_PROMPT` 核心信念改为"妻子三年前病逝、被莫忘骗成'走丢了/会回来'、天天报案等她"；删旧"AI误诊害死"；保留情绪标签 + hint 机制，hint ID 语义改新剧情（`investigate_death`=坚持走丢会回来、`visit_community`=被亮证据仍死撑、`protecting_app`=回避手机App）。`FINALE_SYSTEM_PROMPT` 全改 roleplay 版：老头只演不判结局、绝不吐任何 `[[end...]]` 标签（收尾交独立裁判调用）；新增"你只知道摆到眼前的证据"机制 + 逐层卸防节奏（合照→松口有妻子/死亡证明→撑不住会回来/莫忘日志→承认被App骗着等）。`run_tests.gd` 新增三条断言（走丢/回来在SYSTEM_PROMPT + 无误诊 + FINALE不含[[end）TDD RED→GREEN 108/108。
