@@ -90,6 +90,7 @@ func _ready() -> void:
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
 	director_http.request_completed.connect(_on_director)
 	title_http.request_completed.connect(_on_title)
+	title_http.timeout = 25.0   # 超时保证：请求挂起也能落到"过客"兜底
 	back_menu_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
 	view_achieve_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/achievements.tscn"))
 	end_slide.visible = false
