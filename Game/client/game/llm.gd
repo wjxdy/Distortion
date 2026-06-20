@@ -305,3 +305,15 @@ static func terminal_local_match(query: String) -> String:
 					best_match_length = kw_len
 					best_match_fid = str(fid)
 	return best_match_fid
+
+# 从模型输出里抠出合法档案 id（必须在 TERMINAL_FILES 里）；抠不到/NONE/乱答→""。
+static func parse_terminal_result(content: String) -> String:
+	var files = preload("res://game/content.gd").TERMINAL_FILES
+	var text := str(content)
+	var re := RegEx.new()
+	re.compile("[A-Za-z_]+")
+	for m in re.search_all(text):
+		var w := m.get_string(0).to_lower()
+		if files.has(w):
+			return w
+	return ""

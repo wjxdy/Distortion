@@ -239,6 +239,16 @@ func _initialize() -> void:
 	_check(LLM.terminal_local_match("今天天气怎么样") == "", "本地匹配: 无关问题→空")
 	_check(LLM.terminal_local_match("") == "", "本地匹配: 空输入→空")
 
+	# --- 终端查询：从模型输出抠合法 id LLM.parse_terminal_result ---
+	_check(LLM.parse_terminal_result("zhou") == "zhou", "解析: 裸 id")
+	_check(LLM.parse_terminal_result("[wife]") == "wife", "解析: 方括号 id")
+	_check(LLM.parse_terminal_result("id: address") == "address", "解析: 带前缀 id")
+	_check(LLM.parse_terminal_result("应该是 medical 这条") == "medical", "解析: 句中 id")
+	_check(LLM.parse_terminal_result("NONE") == "", "解析: NONE→空")
+	_check(LLM.parse_terminal_result("没有匹配的记录") == "", "解析: 自然语言无→空")
+	_check(LLM.parse_terminal_result("xyz") == "", "解析: 非法 id→空")
+	_check(LLM.parse_terminal_result("") == "", "解析: 空→空")
+
 	# --- 调试日志行格式(Dbg.format_line) ---
 	var ln_fail = Dbg.format_line(2, false, 429, "过载", 0.3)
 	_check("第2次" in ln_fail and "FAIL" in ln_fail and "code=429" in ln_fail, "format_line: 失败行含 第2次/FAIL/code")
