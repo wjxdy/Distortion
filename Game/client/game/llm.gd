@@ -373,9 +373,23 @@ static func asks_why_calls(msg: String) -> bool:
 			return true
 	return false
 
-# 第二步·追问怎么打通的 → (已解锁时)触发电话结局。
+# 第二步·追问怎么打通的、或挑战他当场打给她看 → (已解锁时)触发电话结局。
+# 老头的收尾台词正是"你不信？……我拨给你看"，所以"打给她看/给我看他打电话/当面打"这类
+# 演示挑战也要算触发，不能只认"怎么打通"。
 static func asks_how_connected(msg: String) -> bool:
+	# (a) 直接问"怎么打通 / 接通"
 	for kw in ["打通", "接通", "怎么打的通", "怎么打通", "通了吗", "能打通"]:
+		if msg.find(kw) >= 0:
+			return true
+	# (b) 挑战他当场打给她看 / 证明给我看：提到"打/拨电话给她" + 演示·质问词
+	var mentions_call := false
+	for kw in ["打电话", "打给", "拨给", "拨号", "打个电话", "打通她", "给她打", "给妻子打", "给老伴打"]:
+		if msg.find(kw) >= 0:
+			mentions_call = true
+			break
+	if not mentions_call:
+		return false
+	for kw in ["给我看", "让我看", "看看", "我看", "看你", "当面", "现在", "马上", "打打看", "试试", "证明", "拨给我", "打给我"]:
 		if msg.find(kw) >= 0:
 			return true
 	return false
