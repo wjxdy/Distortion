@@ -81,6 +81,7 @@ func _examine(id: String) -> void:
 	var k := str(e.get("grants_key", ""))
 	if k != "":
 		Game.state.add_key(k)
+		Evidence.note(k)
 
 # 查老人手机 → 只拿到手机道具 + 莫忘提醒去警局终端解锁日志(日志在终端看)
 func _take_phone() -> void:

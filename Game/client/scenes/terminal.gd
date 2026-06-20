@@ -128,6 +128,7 @@ func _log_next() -> void:
 
 func _finish_log() -> void:
 	Game.state.add_key("molog")   # 第二层真相钥匙
+	Evidence.note("molog")
 	_refresh_terminal_actions()
 	if Game.state.fire_hint("go_confront", str(Content.MOWANG_HINTS["go_confront"])):
 		phone.notify_hint()
@@ -189,6 +190,7 @@ func _grant_and_hint(id: String) -> void:
 	var k := str(f.get("grants_key", ""))
 	if k != "":
 		Game.state.add_key(k)
+		Evidence.note(k)
 	if FILE_HINTS.has(id):
 		var hid: String = FILE_HINTS[id]
 		if Content.MOWANG_HINTS.has(hid) and Game.state.fire_hint(hid, str(Content.MOWANG_HINTS[hid])):

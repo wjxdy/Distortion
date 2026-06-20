@@ -27,6 +27,7 @@ func _ready() -> void:
 	intro_fade.visible = intro_from_opening
 	intro_fade.color.a = 1.0 if intro_from_opening else 0.0
 	Inv.visible = not intro_from_opening
+	Evidence.visible = not intro_from_opening
 	if intro_from_opening:
 		intro_running = true
 		player.locked = true
@@ -107,5 +108,6 @@ func _run_opening_arrival() -> void:
 	intro_running = false
 	player.locked = false
 	Inv.visible = true
+	Evidence.visible = true
 	if Game.state.task_unread:
 		_show_toast("【周队】新任务已送达")
