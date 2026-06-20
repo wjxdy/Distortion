@@ -73,6 +73,13 @@ func _initialize() -> void:
 	for fid in Content.TERMINAL_FILES:
 		_check(Content.TERMINAL_FILES[fid]["text"] != "", "终端案卷有内容: " + str(fid))
 
+	# --- 终端查询：每条案卷都有检索关键词（新查询机用） ---
+	for fid in Content.TERMINAL_FILES:
+		_check(Content.TERMINAL_FILES[fid].has("keywords") and (Content.TERMINAL_FILES[fid]["keywords"] is Array) and not Content.TERMINAL_FILES[fid]["keywords"].is_empty(), "终端案卷有检索关键词: " + str(fid))
+	_check("住哪" in Content.TERMINAL_FILES["address"]["keywords"], "住址案卷含'住哪'关键词")
+	_check("老婆" in Content.TERMINAL_FILES["wife"]["keywords"], "林秀兰案卷含'老婆'关键词")
+	_check("安葬" in Content.TERMINAL_FILES["medical"]["keywords"], "安葬案卷含'安葬'关键词")
+
 	# --- 全局状态单例（跨场景保留线索：手机在 world 拿的钥匙，审讯室要还在） ---
 	var GG = load("res://game/game_global.gd")
 	_check(GG != null, "game_global.gd 存在(全局状态单例)")
