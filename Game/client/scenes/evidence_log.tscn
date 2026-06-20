@@ -1,0 +1,103 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/evidence_log.gd" id="1_ev"]
+
+[node name="Evidence" type="CanvasLayer"]
+layer = 4
+script = ExtResource("1_ev")
+
+[node name="ToggleBtn" type="Button" parent="."]
+offset_left = 988.0
+offset_top = 12.0
+offset_right = 1120.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 18
+text = "📁 证据"
+
+[node name="Dot" type="ColorRect" parent="ToggleBtn"]
+visible = false
+offset_left = 118.0
+offset_top = -4.0
+offset_right = 130.0
+offset_bottom = 8.0
+color = Color(0.9, 0.2, 0.2, 1)
+
+[node name="Panel" type="ColorRect" parent="."]
+visible = false
+offset_left = 900.0
+offset_top = 58.0
+offset_right = 1268.0
+offset_bottom = 430.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Title" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 320.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.95, 0.9, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "证据"
+
+[node name="List" type="VBoxContainer" parent="Panel"]
+offset_left = 14.0
+offset_top = 48.0
+offset_right = 354.0
+offset_bottom = 230.0
+theme_override_constants/separation = 8
+
+[node name="Entry0" type="Button" parent="Panel/List"]
+custom_minimum_size = Vector2(340, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "·"
+
+[node name="Entry1" type="Button" parent="Panel/List"]
+custom_minimum_size = Vector2(340, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "·"
+
+[node name="Entry2" type="Button" parent="Panel/List"]
+custom_minimum_size = Vector2(340, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "·"
+
+[node name="Entry3" type="Button" parent="Panel/List"]
+custom_minimum_size = Vector2(340, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "·"
+
+[node name="Empty" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 352.0
+offset_bottom = 96.0
+theme_override_colors/font_color = Color(0.8, 0.85, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "还没有收集到证据。"
+
+[node name="Detail" type="Label" parent="Panel"]
+visible = false
+offset_left = 16.0
+offset_top = 238.0
+offset_right = 352.0
+offset_bottom = 360.0
+theme_override_colors/font_color = Color(0.92, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+
+[node name="Toast" type="Label" parent="."]
+visible = false
+offset_left = 440.0
+offset_top = 72.0
+offset_right = 840.0
+offset_bottom = 112.0
+theme_override_colors/font_color = Color(0.95, 0.9, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+vertical_alignment = 1
