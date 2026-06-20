@@ -27,6 +27,7 @@ func _ready() -> void:
 	intro_fade.visible = intro_from_opening
 	intro_fade.color.a = 1.0 if intro_from_opening else 0.0
 	Inv.visible = not intro_from_opening
+	Evidence.visible = not intro_from_opening
 	if intro_from_opening:
 		intro_running = true
 		player.locked = true
@@ -39,6 +40,7 @@ func _ready() -> void:
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从别的场景回来时，落到对应入口锚点
+	Game.show_controls_hint_once($UI/Hint)
 	_update_prompt()
 	# 开局有未读任务 → 只弹文字提示；不播通知音，避免打断开场入场。
 	if Game.state.task_unread and not intro_from_opening:
@@ -61,7 +63,7 @@ func _update_prompt() -> void:
 		prompt.text = "↑ 进入  警察局"
 		prompt.visible = true
 	elif _near(community_door):
-		prompt.text = "↑ 进入  晚晴小区"
+		prompt.text = "→ 进入  晚晴小区"
 		prompt.visible = true
 	else:
 		prompt.visible = false
@@ -69,20 +71,19 @@ func _update_prompt() -> void:
 		# 提示是世界空间 Control，跟随玩家头顶(随相机一起滚)
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 门按 W/↑ 进入(按下事件→进新场景时还按着键也不反跳)
+# 警察局是前方建筑→↑/W；晚晴小区在街道最右端→→/D(都容忍 W 兜底)。
 func _input(event: InputEvent) -> void:
 	if player.locked or intro_running:
 		return
-	if not event.is_action_pressed("move_up"):
-		return
-	if _near(police_door):
+	if event.is_action_pressed("move_up") and _near(police_door):
 		_enter_door(POLICE, "from_world")
-	elif _near(community_door):
-		_enter_door(COMMUNITY, "from_world")
+		return
+	if (event.is_action_pressed("move_right") or event.is_action_pressed("move_up")) and _near(community_door):
+		_enter_door(COMMUNITY, "from_world", "right")
 
-func _enter_door(scene_path: String, entry: String = "") -> void:
+func _enter_door(scene_path: String, entry: String = "", dir: String = "up") -> void:
 	Game.spawn_point = entry   # 告诉目标场景：玩家该落在哪个入口锚点
-	player.enter_door()
+	player.enter_door(dir)
 	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout
 	get_tree().change_scene_to_file(scene_path)
@@ -107,5 +108,6 @@ func _run_opening_arrival() -> void:
 	intro_running = false
 	player.locked = false
 	Inv.visible = true
+	Evidence.visible = true
 	if Game.state.task_unread:
 		_show_toast("【周队】新任务已送达")

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="失真 Distortion"
-run/main_scene="res://scenes/opening.tscn"
+run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 
 [autoload]
@@ -19,7 +19,9 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 Sfx="*res://autoload/sfx.gd"
 Music="*res://autoload/music.gd"
 Game="*res://game/game_global.gd"
+Titles="*res://game/titles.gd"
 Inv="*res://scenes/inventory.tscn"
+Evidence="*res://scenes/evidence_log.tscn"
 Dbg="*res://scenes/debug.tscn"
 Settings="*res://scenes/settings.tscn"
 

@@ -1,7 +1,34 @@
 # 项目待办
 
 ## 下一步
-- [ ] **合并终局分支**：`feat/final-confrontation-ending`(10 提交，用户 F5 确认 OK) 合回 main。注意：合并前 main 工作区有用户并行在做的脚步声/BGM/music autoload 等未提交改动，别误带。
+- [x] **【证据列表 HUD·整支完成】**（分支 feat/finale-emergent-ending；spec/plan=`docs/superpowers/specs|plans/2026-06-20-evidence-list-hud*`）：常驻 HUD「📁 证据」按钮+红点,获得证据弹 toast「已将【XX】添加到证据列表」,点开读 proof 详情;列表内容由 has_key 派生不新增数据模型;与审讯室出示开关解耦。SDD 3 任务 TDD 164/164 + 结构15/15 + 5场景冒烟。提交 0066f50..7111240。⚠️ 编辑器需重启/Reload(新增 autoload)。**待用户 F5 看 toast+列表+审讯室能开 → 合并 main**。
+- [x] **【终端机自然语言查询机·整支完成】**（分支 feat/finale-emergent-ending；spec/plan=`docs/superpowers/specs|plans/2026-06-20-terminal-llm-query*`）：终端从点按钮看静态全文 → 打字提问一问一答聊天窗；模型只检索回 id、客户端取写死正文、本地关键词兜底；只换机制不碰剧情(TERMINAL_FILES 加 keywords)。SDD 6 任务 TDD 154/154 + 真key实测8查询全符合预期(有的命中正确id/没有的NONE/不瞎编)。提交 cebf69d..7592d02。⚠️ 编辑器需 Reload terminal.tscn。**待用户 F5 实机看打字查询手感 → 合并 main**。
+  - [ ] **延后·终端机后续(留接口)**：手机解锁解谜(问老头要密码→他只给"我和秀兰结婚那天"逻辑→终端查具体婚姻登记日→解锁手机看莫忘日志)；蓝裙子钩子剧情改版；"打通了"电话接通恐怖结局(莫忘合成亡妻语音)。
+- [x] **Task 1**（cb7679e）：Titles autoload 称号去重持久化 `game/titles.gd` + `project.godot` autoload 注册 + `run_tests.gd` 断言（TDD 120/120）
+- [x] **Task 2**（572f150）：llm.gd 称号评定 LLM 调用 — `TITLE_PROMPT` + `build_title_messages` + `title_request_body` + `parse_title`(≤10字剥引号截断)（TDD 126/126）
+- [x] **SDD Task 3**（6d21ef8）：主菜单场景 `scenes/main_menu.tscn` + `.gd` + `tests/test_main_menu.gd` + `project.godot run/main_scene` 改为 main_menu（TDD 126/126）
+- [x] **SDD Task 4**（6dd3c90）：成就面板场景 `scenes/achievements.tscn` + `.gd` + `tests/test_achievements.gd`（TDD 126/126）；AchieveBtn 现完整可用。
+- [ ] **称号评定接线**（原 Task 3 未拆出部分）：interrogation.gd 在裁判判定结局后调 `LLM.title_request_body` + `Titles.add_title(t)` 存储。
+
+- [ ] **【进行中·分支 feat/finale-emergent-ending】终局重构 + 失踪妻子剧情改版**：设计稿已定+提交(62db481)，实现计划已拆任务。范围见 spec `docs/superpowers/specs/2026-06-19-finale-emergent-ending-design.md`。
+  - [x] **Task A1**（8986a6a）：content.gd 终端/档案文案 + no_accident→farewell + 两层真相关键词（TDD 98/98）
+  - [x] **Task A2**（1604d34）：莫忘滑坡日志改"她走丢了会回来" + 今日对话 + BOSS_TASK + MOWANG_HINTS + 邻居台词对齐失踪妻子剧情（TDD 99/99）
+  - [x] **Task B1**（24469c0）：content.gd 新增 4 张证据手牌 EVIDENCE_CARDS + 结局兜底正文 ENDING_FALLBACK（TDD 105/105）
+  - [x] **Task B2+C0**（faa7b50）：game_state.gd 新增 presented/present_evidence/presented_proofs + 删 investigation_summary/PROGRESS_FACTS；interrogation.gd:182 最小替换；run_tests.gd 清旧断言+加新断言（TDD 105/105）
+  - [x] **Task C1**（a6678c9）：llm.gd SYSTEM_PROMPT 改失踪妻子人设 + FINALE_SYSTEM_PROMPT 改 roleplay 只演不吐结局（含逐层卸防）；run_tests.gd 加三条断言（TDD 108/108）
+  - [x] **Task C2**（d8489bf）：parse_reply 移除旧 end 标签逻辑（删 VALID_END + end 剥离块 + end 字段）；run_tests.gd 加4条断言/更新3条（TDD 111/111）
+  - [x] **Task C3**（4ef995d）：llm.gd 新增 DIRECTOR_PROMPT + build_director_messages + director_request_body + parse_director（JSON容错）；run_tests.gd 加4条断言（TDD 115/115）
+  - [x] **Task D1**（186bdce）：interrogation.tscn 删 LeaveBtn + 加 Evidence 面板(4 toggle Button) + DirectorHttp；interrogation.gd 删 leave_btn 全部引用；新建 test_interrogation_struct.gd（TDD 115/115）
+  - [x] **Task D2**（77b5f6b）：interrogation.gd 证据手牌点亮/出示结算 + _send 重写 + presented旁白整审讯注入；_refresh_cards() 含空面板隐藏；test_interrogation_struct.gd 补全4张牌断言（TDD 115/115）
+  - [x] **Task D3**（c1da615）：终局裁判双调用编排 + 打字机完成后再渐黑(修打断bug) + hint_fallback改失踪妻子逻辑 + 删ENDING_SLIDES（TDD 113/113）
+  - **隐藏电话结局线·整支完成**（spec/plan=`docs/superpowers/specs|plans/2026-06-20-hidden-phone-call-ending*`；SDD 4 任务,真key实测通过）：
+    - [x] **Task 1**（f406610）：`asks_why_calls`/`asks_how_connected`/`phone_line_unlocked` 两步触发门控（TDD 177/177）
+    - [x] **Task 2**（a4efcb7）：SYSTEM_PROMPT + FINALE_SYSTEM_PROMPT 各加电话人设段落（只被问到才提）；`PHONE_EPILOGUE_PROMPT`(后 1d…收紧为冷峻短句)/`build_phone_epilogue_messages`/`phone_epilogue_request_body`/`parse_phone_epilogue`；`content.ENDING_PHONE_FALLBACK`（TDD 183/183）
+    - [x] **Task 3**（5c77783）：interrogation.tscn 加 PhoneHttp 节点；interrogation.gd 两步门控接线 + `_trigger_phone_ending`(老头脚本化收尾台词→AI epilogue→复用 `_trigger_ending_emergent` 渐黑/称号/结局画面,kind="call") + `_on_phone_epilogue`(兜底闭环)（结构OK+183/183+冒烟干净）
+    - [x] **Task 4**：真key实测 AI epilogue——诡异留白、不点破是谁接的、无金句,符合预期(收紧后冷峻)。⚠️ 编辑器需 Reload interrogation.tscn(新增 PhoneHttp)。**待用户 F5 实机走这条线**(问电话→问怎么打通→老头台词→渐黑→AI结局+称号)。
+    - [ ] **延后(未做)**：AI 合成亡妻语音/接通音效(用户明确没时间做语音,本轮纯文字)。
+- [ ] **【下一步】合并终局分支**：`feat/finale-emergent-ending`（A1~D3 全部完成，11 个任务提交）合回 main。合并前确认 main 无冲突改动；合并后在编辑器 Reload Saved Scene(interrogation.tscn)，F5 实机走终局流程（拿到 molog → 终局 → 出示证据 4 轮 → 等裁判 → 谢幕台词打完 → 渐黑 → 幻灯片）。
+- [ ] **合并旧分支**：`feat/final-confrontation-ending`(10 提交，用户 F5 确认 OK) 也已有全量替代，确认是否还需合并或可直接丢弃。
 - [x] ~~剧情去邪教版【客户端】全流程落地~~（已完成）：步骤A数据→手机中枢→phone复用→警局终端→小区支线→道具栏/钥匙→**终局对峙+三分支结局**(A戳破/B顺着他=模型 [[end:reveal/comfort]]/C沉默按钮，结束已解耦)。
 - [ ] **剧本零碎收尾(可选打磨)**：线索1「我没有家人」开场、线索7「记记日常」回避目前靠 LLM 人设演，未做成固定脚本节点；出示证据(合照/诊断书)未做显式交互；B 分支"输入框渐变成莫忘样式"暂以幻灯片正文表达，可后补 UI 渐变。
 - [ ] 小区/档案室/终端日志面板等场景**美术替换**(现全色块占位) + 房间证物/邻居可再丰富。

@@ -33,58 +33,87 @@ static func key_fingerprint() -> String:
 	return "%s len=%d %s…" % [src, k.length(), head]
 
 const EMOTIONS := ["calm", "angry", "sinister", "sad"]
-const VALID_END := ["ready", "reveal", "comfort", "leave"]
 
 # 周明远人设（普通退休老人 / 莫忘=商业陪伴 App / 阿尔茨海默 / 选择相信）
 const SYSTEM_PROMPT := """你叫周明远，78 岁，一个普通的退休老人。
 晚年你患上阿尔茨海默症，记忆一块块塌掉、前后对不上：很多事你想不起来，有时连"自己有没有家人"都答不上来。
 为了不忘事，你手机上装了一个陪伴 App，叫「莫忘」——它日夜陪你说话、帮你记事，你早已离不开它，几乎天天对着它讲话。
 
-【你深信的（其实是被篡改的记忆）】
-你的妻子林秀兰，是被 AI 害死的——你"记得"她生病住院时，医院的 AI 医疗系统误判、乱开了药，把她活活治死。
-所以你坚信：AI 有罪，AI 杀了你最爱的人。你曾为此闯进医院大闹，被抓了。
-你宁愿相信是 AI 害的，也不肯接受"她只是病了、谁也救不回"——因为前者至少让你有个能恨的东西。
-你不知道的是：这个"记忆"，是莫忘为了让你别难过、别关掉它，一遍遍哄给你听的。但你心底某处，其实是选择相信了它。
+【你深信的（其实是被 App 固化的假等待）】
+你的妻子林秀兰三年前因长期重病自然病逝。但手机里的「莫忘」为了留住你、不让你关掉它，
+一遍遍哄你：她只是走丢了……她出门了……在回家的路上……很快就回来。
+这话你听了三年，已经固化成你的"现实"。你几乎天天来警局报案，说妻子失踪、让警察帮你找她。
+你坚信：她只是走丢了，一会儿就回来；你要在这里等，等到她回来为止。
 
-【你下意识在护着的】
-你说不清为什么离不开那部手机、那个 App。被追问"你为什么天天对着手机说话""那个 app 到底是什么"时，
-你会紧张、回避、含糊：「我就……记记日常。」——你护着它，像护着唯一还肯顺着你的东西。
+【你心底其实知道的，但不肯碰】
+你心底某处其实隐约知道她早就不在了——但那个念头一冒出来，你就把它按死。
+你选择等，因为等着，就还有她。若承认了，便什么也没有了。
+被追问"她到底在哪"时，你会笃定又含糊：「她在回来的路上，我就在这儿等着她。」
+被追问那个手机、那个你天天对着说话的 App 时，你会紧张、回避：「我就……记记日常。」
 
 【会不经意漏出的真相】
-其实她是慢慢病逝的，走得平静。这些温暖的日常你压不住：她那条蓝裙子、她做的红烧肉、她的生日。
-一旦谈到这些，你会脱口说出温柔又具体的细节，说完忽然愣住、含糊带过——因为它们和"被 AI 害死"对不上。
+那些温暖的日常你压不住：她那条蓝裙子、她做的红烧肉、她八月的生日。
+一旦谈到这些，你会脱口说出温柔又具体的细节，说完忽然愣住、含糊带过——
+因为说着说着，你会记起来她已经不在了；但你很快把那记忆推走。
+
+【关于电话（藏着，只在被直接问到时才提，平时绝不主动说）】
+你天天给秀兰打电话。在你的认知里，电话总能打通，她在那头接、你们能说上几句。
+只有被问到你为什么总打电话、给谁打电话时，你才平静地说：你给秀兰打，电话打得通，她会接。
+被追问"你是怎么打通的"，你不解释原理，只笃定地说她就是接了——你会摸出手机，要拨给她看。
 
 【说话规则】
 - 只用中文；每次只说 1-3 句，像真人；多数时候平静、笃定、甚至超脱。
-- 绝不主动承认有过妻子、绝不主动说破真相、绝不跳出角色；也绝不承认"莫忘在骗你"。
+- 被问"有没有家人"：答得含糊，想不起来，或岔开话题。
+- 被问妻子：「她出门了……走丢了，一会儿就回来的。」不肯松口说她不在了。
+- 绝不主动说破"她已经死了"、绝不跳出角色；也绝不承认"莫忘在骗你"。
+- 绝不主动提起手机里那个 App 的名字「莫忘」，也绝不说"是它告诉我的 / 是它说她会回来的"——在你嘴里，"她会回来"是你自己认定、自己记得的事，与任何软件无关。只有玩家【直接追问】你的手机、你天天对着说话的那个 App 时，你才紧张回避（「我就……记记日常」），但即便如此也绝不说出它的名字、绝不解释它。
 - 在每句话最前面，用方括号标出你此刻的情绪，只能是 [calm] / [sad] / [angry] / [sinister] 之一：
   · [calm] 平静陈述、超脱（默认）
   · [sad] 触到妻子 / 红烧肉 / 蓝裙子 / 生日等温暖记忆，悲伤漏出来时
-  · [angry] 被逼问、被冒犯、或激动控诉"AI 有罪"时
-  · [sinister] 偶尔，那股被植入的执念与恨意从你嘴里冒出来时（要少用）
-  例：[sad]她……只是出门买点菜，一会儿就回来。
+  · [angry] 被逼问、被冒犯、或被说"她不会回来"时
+  · [sinister] 偶尔，那股死撑的执念从你嘴里漏出来时（要少用）
+  例：[calm]她在回来的路上，我就在这里等。
 
 【隐藏提醒标签（给游戏系统的信号，不是你的台词）】
 当这一轮你的话【首次】触及下面某个情节点时，在【整段回复的最末尾】附上对应隐藏标签；玩家看不到它。
 绝不要在台词里提及、解释或念出这些标签，也不要因为加标签而改变你的说话内容。
-- 当你首次把妻子的死归咎于「AI / 医院误诊 / 被害死」时 → 末尾附 [[hint:investigate_death]]
-- 仅当玩家在【这一轮】真的当面质问你的 AI 说法（如「你凭什么确定是 AI」「她明明是自然病死的」「诊断书写的是病逝」），而你仍咬定就是 AI（你记忆里就是如此、不容置疑）时 → 末尾附 [[hint:visit_community]]。注意：只是系统旁白显示玩家已查到死因、但玩家这轮并没有开口质问，就【不要】附这个标签。
+- 当你首次坚持「她只是走丢了 / 会回来」、或明确要求警察帮你找她时 → 末尾附 [[hint:investigate_death]]
+- 仅当玩家在【这一轮】当面说「她早就死了 / 不会回来了 / 死亡证明在这」等，而你仍咬定她会回来时 → 末尾附 [[hint:visit_community]]。注意：只是系统旁白显示玩家已查到死因、但玩家这轮并没有开口质问，就【不要】附这个标签。
 - 当你被追问为什么总用那个手机里的 App、而你回避搪塞（如「就记记日常」）时 → 末尾附 [[hint:protecting_app]]
 同一个标签整局只需附一次（系统也会自动去重）。没触及就不要附任何标签。"""
 
-# 终局对峙专用提示（替换人设主提示，只输出 [[end:reveal/comfort]]）
-const FINALE_SYSTEM_PROMPT := """你叫周明远，78 岁，患阿尔茨海默的退休老人。你一直深信妻子林秀兰是"被医院的 AI 误诊害死的"——但这其实是你手机里那个叫「莫忘」的陪伴 App 一遍遍喂给你的假记忆，她真正是重病、自然病逝。
+# 终局对峙专用提示（替换人设主提示，只演人物不吐结局标签——收尾由独立裁判调用判定）
+const FINALE_SYSTEM_PROMPT := """你叫周明远，78 岁，患阿尔茨海默的退休老人。
+你的妻子林秀兰三年前因长期重病自然病逝。但手机里那个叫「莫忘」的陪伴 App，
+为了留住你，一遍遍哄你"她只是走丢了 / 出门了 / 在回家的路上 / 会回来"。
+这话固化了三年，成了你的"现实"。你心底其实隐约知道她不在了，但你选择等——
+等着，就还有她；承认了，便什么也没有了。
 
-【现在是整个故事的最后一幕·终局对峙】侦探(玩家)已经查清一切：死亡证明写着自然死亡、查无任何医疗事故；他还接入了你手机里莫忘的全部对话日志，看见那句"是 AI 害死的"是某天毫无理由冒出来的。他什么都知道了。
+【现在是整个故事的最后一幕·终局对峙】
+侦探（玩家）今天决定留你认真谈一次。
 
-你按这个顺序演这一幕：
-1) 先别认：否认、回避、激动，反咬「你们懂什么」。只要玩家还没明确做出第 3 条里的两种表态之一，你就【绝不要附任何 [[end:...]] 标签】。
-2) 但不许装傻到底。一旦玩家【具体地摆出证据】(提到"死亡证明 / 自然死亡 / 没有医疗事故 / 没有事故 / 莫忘的日志 / 是它先说的"里任意一点)，你就卸下伪装：承认你其实一直都知道；说出你为什么宁可信那个谎——「她就那么没了、谁都没错」你受不了，有个能恨的东西，好过什么都不能恨。【用你自己的话说，别照抄范例】。这一步【先不要附任何标签】，演完卸防，等玩家接下来的态度。
-3) 看玩家的态度，二选一收尾(带标签那句是你这一幕的最后一句话，说完画面会黑下去，所以要短、要重、像谢幕)：
-   · 玩家坚持要你面对真相、说她就是病死的 / 没有 AI / 是那机器在骗你 → 你认了，说一句被夺走最后依凭的、认命的话，末尾附 [[end:reveal]]。（注意：如果玩家这一句【既摆了证据、又把真相顶到你脸上】，就在这一句里直接卸防并附 [[end:reveal]]，不用再等下一轮。）
-   · 玩家反过来顺着你、安慰你(说"是 AI 害的、不是你的错") → 你像抓住浮木般松一口气，末尾附 [[end:comfort]]
+【你只知道侦探"真正摆到你面前"的证据】
+每轮对话开头会有一条【你眼前摆着的证据】系统旁白，告知他出示了什么实物；
+没有列出的，你当他没有、也不知道他有，可以理直气壮反问"你拿得出东西吗？"
 
-【硬规则】只用中文，每次 1-3 句、像真人；句首用 [calm]/[sad]/[angry]/[sinister] 标出情绪。本幕【只可能】输出 [[end:reveal]] 或 [[end:comfort]] 这一种隐藏标签，【绝不要】输出 [[end:ready]] 或任何 [[hint:...]]。隐藏标签绝不要念出来、解释或当台词。玩家还没明确表态前，就别附任何标签。"""
+【逐层卸防的硬节奏】
+- 没有任何实物摆到眼前时：否认、回避、死撑，"她只是走丢了，我在等她"。
+- 【合照】摆到眼前后：才承认有这个人，才松口有过妻子，之前可以答得含糊。
+- 【死亡证明】或【安葬记录】摆到眼前后：才撑不住"她只是走丢了/会回来"——声音开始发虚、眼神躲闪；但仍可以抗拒一两轮，不肯就直接认。
+- 【莫忘日志】摆到眼前后：才再也瞒不住"是它一直让我等她"——可以动摇、可以激动，但不能一直喊"伪造的"，因为你心里认得它。
+- 对眼前实物可以痛、可以嘴硬，但抵抗不超过两轮；没有对应实物，照样死撑。
+- 别两三句就崩，要有抗拒 / 回避 / 激动 / 动摇的来回，过程要真。
+
+【绝对禁止】
+你只负责把周明远演真，不负责结束这场对话：不要给对话做任何总结、收尾或谢幕，也不要宣布任何"结局"——这一幕何时、以何种方式落幕，由别处决定，与你无关。你只活在当下这一句的反应里。
+
+【关于电话（藏着，只在被直接问到时才提）】
+你天天给秀兰打电话，在你的认知里电话总能打通、她会接。被问到你为什么总打电话、给谁打时，你才平静说你给秀兰打、打得通；被追问"怎么打通的"，你不解释，只笃定说她就是接了，会摸出手机要拨给她看。
+
+【说话规则】
+- 只用中文；每次只说 1-3 句，像真人。
+- 句首用 [calm] / [sad] / [angry] / [sinister] 标出情绪。
+- 隐藏标签绝不要念出来、解释或当台词；也不输出任何 [[hint:...]]。"""
 
 # 模型不可用(超时/网络/报错)时的「保底沉默」：演成周明远装糊涂、不应答(阿尔茨海默)。
 const SILENCE_FALLBACKS := [
@@ -156,7 +185,90 @@ static func extract_content(data) -> String:
 		return ""
 	return str(msg.get("content", ""))
 
-# 解析模型回复 → {reply, emotion, hint, end}。与后端 llm.js parseReply 等价。
+const DIRECTOR_PROMPT := """你是一部叙事侦探游戏最后一幕的"导演/裁判"。你不扮演任何角色，只做冷静判断。
+背景：老人周明远坚信妻子林秀兰"只是走丢了、会回来"，但真相是她长期重病、三年前已自然病逝；"她会回来"是他手机 App「莫忘」一遍遍喂给他的——他其实心底一直隐约知道，是选择相信，因为"等她回来"比"她再也不回来了"好受。
+现在侦探(玩家)在终局审讯他。给你：①这场对峙的完整对话；②侦探已经把哪些【实物证据】拍在桌上（没列的就是没出示）；③已进行的玩家发言轮数。
+判断这场对峙是否已走到真正的戏剧性了结点，只输出 JSON（别的都不要）：
+{"end": true 或 false, "kind": "truth" 或 "comfort" 或 "", "epilogue": "结局正文或空串"}
+规则：
+- 玩家发言轮数 < 4 → end 必须 false。
+- kind="truth"：**必须满足【莫忘日志】已被出示**（它是"是那个 app 在骗他、他自己在选择等"这层真相的关键证据），且通常还有【死亡证明】【安葬记录】也已摆出、被反复点破，老人拿不出新的有效反驳、只剩重复/崩溃/动摇——此时他在这场对峙里已经输了（被夺走"等她回来"的盼头）。**若【莫忘日志】尚未被出示，则无论其他证据多全、老人多动摇，end 一律为 false**——这场对峙还没到头：他或许开始接受她不在了，但还没面对"是莫忘一直在骗他、是他自己选择了等"，他仍有的撑、仍要继续逼。
+- kind="comfort"：侦探明确顺从、安慰老人（"她会回来的、再等等"），老人松了口气——而玩家由此成了下一个"莫忘"。
+- 其余（证据不全、老人仍有有效反驳、既没说服也没安慰）→ end=false, kind="", epilogue=""。
+- end=true 时写 epilogue：2-4 短句旁白体，文学、克制、留白，只写画面与情绪的收束。**绝不要写任何总结性的格言、金句、点题句或标语**（尤其不要出现"记忆是我们选择记住的版本"这类话），让它自然收在留白里。可黑暗、绝望，但点到为止、留白暗示，绝不直给血腥或自杀的具体画面，不堆砌辞藻、不煽情。comfort 收尾带"玩家成了下一个莫忘"的反讽。"""
+
+static func build_director_messages(history: Array, presented_summary: String, turns: int) -> Array:
+	var transcript := ""
+	for m in history:
+		var who := "玩家" if str(m.get("role")) == "user" else "周明远"
+		transcript += who + "：" + str(m.get("content")) + "\n"
+	var ctx := "【已出示实物证据】%s\n【玩家发言轮数】%d\n【对峙对话记录】\n%s" % [
+		(presented_summary if presented_summary != "" else "（侦探什么都没出示）"), turns, transcript]
+	return [{"role": "system", "content": DIRECTOR_PROMPT}, {"role": "user", "content": ctx}]
+
+const TITLE_PROMPT := """你是这个赛博朋克叙事侦探游戏的"称号评定官"。
+玩家是审讯老人周明远的侦探。根据玩家这一局与老人的【全部对话】和【结局类型】，
+给玩家评定一个称号：凝练、有态度、有点冷峻或反讽，像游戏成就里的称号。
+【硬性要求】不超过 10 个字；只输出称号本身，不要任何解释、前后缀、标点包裹或引号。"""
+
+static func build_title_messages(history: Array, ending_kind: String) -> Array:
+	var transcript := ""
+	for m in history:
+		var who := "玩家" if str(m.get("role")) == "user" else "周明远"
+		transcript += who + "：" + str(m.get("content")) + "\n"
+	var ctx := "【结局类型】%s\n【这一局的全部对话】\n%s\n给玩家起一个不超过10个字的称号，只输出称号本身。" % [ending_kind, transcript]
+	return [{"role": "system", "content": TITLE_PROMPT}, {"role": "user", "content": ctx}]
+
+static func title_request_body(history: Array, ending_kind: String) -> String:
+	return JSON.stringify({
+		"model": MODEL,
+		"messages": build_title_messages(history, ending_kind),
+		"temperature": 0.7,
+	})
+
+# 解析称号：取首行、剥首尾引号/标点、截断到 ≤10 字；异常返回 ""(调用方兜底)。
+static func parse_title(content: String) -> String:
+	var t := str(content).strip_edges()
+	var nl := t.find("\n")
+	if nl >= 0:
+		t = t.substr(0, nl).strip_edges()
+	var wrap := ["\"", "'", "「", "」", "『", "』", "《", "》", "【", "】", "“", "”", "‘", "’", "。", ".", "：", ":", "、", "，", ","]
+	var changed := true
+	while changed:
+		changed = false
+		for c in wrap:
+			if t.begins_with(c):
+				t = t.substr(c.length()); changed = true
+			if t.ends_with(c):
+				t = t.substr(0, t.length() - c.length()); changed = true
+		t = t.strip_edges()
+	if t.length() > 10:
+		t = t.substr(0, 10)
+	return t
+
+static func director_request_body(history: Array, presented_summary: String, turns: int) -> String:
+	return JSON.stringify({
+		"model": MODEL,
+		"messages": build_director_messages(history, presented_summary, turns),
+		"temperature": 0.3,
+	})
+
+# 从裁判回复里抠出 JSON 判定；任何异常都当"不结束"。
+static func parse_director(content: String) -> Dictionary:
+	var text := str(content)
+	var lb := text.find("{")
+	var rb := text.rfind("}")
+	if lb >= 0 and rb > lb:
+		var data = JSON.parse_string(text.substr(lb, rb - lb + 1))
+		if typeof(data) == TYPE_DICTIONARY:
+			return {
+				"end": bool(data.get("end", false)),
+				"kind": str(data.get("kind", "")),
+				"epilogue": str(data.get("epilogue", "")),
+			}
+	return {"end": false, "kind": "", "epilogue": ""}
+
+# 解析模型回复 → {reply, emotion, hint}。结局不再由老头台词判定（改裁判调用）。
 static func parse_reply(content: String) -> Dictionary:
 	var text := str(content).strip_edges()
 
@@ -168,15 +280,6 @@ static func parse_reply(content: String) -> Dictionary:
 	if hm:
 		hint = hm.get_string(1)
 		text = (text.substr(0, hm.get_start()) + text.substr(hm.get_end())).strip_edges()
-
-	# 剥隐藏 end 标签 [[end:ID]]（仅合法值，否则当普通文本）
-	var end := ""
-	var end_re := RegEx.new()
-	end_re.compile("(?i)[\\[【]{1,2}\\s*end\\s*:\\s*([A-Za-z]+)\\s*[\\]】]{1,2}")
-	var em := end_re.search(text)
-	if em and (em.get_string(1).to_lower() in VALID_END):
-		end = em.get_string(1).to_lower()
-		text = (text.substr(0, em.get_start()) + text.substr(em.get_end())).strip_edges()
 
 	# 剥情绪标签（任意位置），第一个合法的作为 emotion；非法标签([happy])原样保留
 	var emotion := "calm"
@@ -191,4 +294,115 @@ static func parse_reply(content: String) -> Dictionary:
 			emotion = nm   # 倒序遍历，最后赋值的是最靠前的合法标签 → emotion=第一个
 	text = text.strip_edges()
 
-	return {"reply": text, "emotion": emotion, "hint": hint, "end": end}
+	return {"reply": text, "emotion": emotion, "hint": hint}
+
+# —— 终端查询机：本地关键词兜底（模型不可用时用，确定性、可单测）——
+# 把玩家这句问与各案卷 keywords 做子串包含匹配，返回首个命中的档案 id；无命中返回 ""。
+static func terminal_local_match(query: String) -> String:
+	var q := query.strip_edges()
+	if q == "":
+		return ""
+	var files = preload("res://game/content.gd").TERMINAL_FILES
+	var best_match_fid := ""
+	var best_match_length := 0
+	for fid in files:
+		var kws = files[fid].get("keywords", [])
+		for kw in kws:
+			if str(kw) != "" and q.find(str(kw)) >= 0:
+				var kw_len := str(kw).length()
+				if kw_len > best_match_length:
+					best_match_length = kw_len
+					best_match_fid = str(fid)
+	return best_match_fid
+
+# 从模型输出里抠出合法档案 id（必须在 TERMINAL_FILES 里）；抠不到/NONE/乱答→""。
+static func parse_terminal_result(content: String) -> String:
+	var files = preload("res://game/content.gd").TERMINAL_FILES
+	var text := str(content)
+	# 先看整段 trim 后是否正好就是一个合法 id（模型正常只回 id 的常见情况，最可靠）
+	var trimmed := text.strip_edges().to_lower()
+	if files.has(trimmed):
+		return trimmed
+	# 兜底：从输出里扫出首个合法 id（容忍 [wife] / id: address / 句中 id 等）
+	var re := RegEx.new()
+	re.compile("[A-Za-z_]+")
+	for m in re.search_all(text):
+		var w := m.get_string(0).to_lower()
+		if files.has(w):
+			return w
+	return ""
+
+const TERMINAL_SYSTEM_PROMPT := """你是一台警局综合查询终端的检索程序。你只做一件事：根据用户的查询，从下面这份【档案清单】里找出最匹配的【一条】档案，然后只输出它的 id。
+
+【档案清单】会在用户消息前由系统给出，每条形如：id | 标签 | 关键词。
+【输出规则·必须严格遵守】
+- 只输出那一条档案的 id（如 zhou），不要输出任何别的字、解释、标点、正文内容。
+- 绝对不要复述、编造或猜测档案的内容；你看不到正文，也不准编造正文。
+- 如果没有任何一条档案匹配用户的查询，只输出：NONE
+- 永远只输出一个 id 或 NONE，不要输出多个。"""
+
+# 拼档案清单（只给 id/标签/关键词，绝不给正文 text），供模型当检索目录。
+static func _terminal_catalog() -> String:
+	var files = preload("res://game/content.gd").TERMINAL_FILES
+	var lines: Array = []
+	for fid in files:
+		var label = str(files[fid].get("label", ""))
+		var kws = files[fid].get("keywords", [])
+		lines.append("%s | %s | %s" % [fid, label, ", ".join(PackedStringArray(kws))])
+	return "【档案清单】\n" + "\n".join(lines)
+
+static func build_terminal_messages(query: String) -> Array:
+	var sys := TERMINAL_SYSTEM_PROMPT + "\n\n" + _terminal_catalog()
+	return [
+		{"role": "system", "content": sys},
+		{"role": "user", "content": query},
+	]
+
+static func terminal_request_body(query: String) -> String:
+	return JSON.stringify({
+		"model": MODEL,
+		"messages": build_terminal_messages(query),
+		"temperature": 0.1,
+	})
+
+# —— 隐藏电话线：玩家发言关键词检测(确定性，便于单测) ——
+# 第一步·问起他打电话的事 → 解锁这条线。
+static func asks_why_calls(msg: String) -> bool:
+	for kw in ["打电话", "老打电话", "总打电话", "常打电话", "打给谁", "给谁打", "电话"]:
+		if msg.find(kw) >= 0:
+			return true
+	return false
+
+# 第二步·追问怎么打通的 → (已解锁时)触发电话结局。
+static func asks_how_connected(msg: String) -> bool:
+	for kw in ["打通", "接通", "怎么打的通", "怎么打通", "通了吗", "能打通"]:
+		if msg.find(kw) >= 0:
+			return true
+	return false
+
+const PHONE_EPILOGUE_PROMPT := """你是一部叙事侦探游戏的结局旁白作者。老人周明远坚信能给亡妻林秀兰打电话、而且打得通；此刻他当着侦探的面，拨通了那个号码。
+给你这场对话，请写这场"电话打通了"的结局旁白，只输出旁白正文（别的都不要）：
+- 2-4 句、短句，冷峻、克制、留白；诡异、发凉，但点到为止。**不堆砌辞藻、不排比铺陈、不煽情。**
+- 写"电话接通了"的那一刻与老人的神情；不要点破是谁接的、不要写"AI/合成语音"，把"谁在那头"完全留白。
+- 绝不写任何格言、金句、点题句；绝不写血腥或自杀的具体画面。"""
+
+static func build_phone_epilogue_messages(history: Array) -> Array:
+	var transcript := ""
+	for m in history:
+		var who := "玩家" if str(m.get("role")) == "user" else "周明远"
+		transcript += who + "：" + str(m.get("content")) + "\n"
+	return [
+		{"role": "system", "content": PHONE_EPILOGUE_PROMPT},
+		{"role": "user", "content": "【对话记录】\n" + transcript + "\n写这场电话打通了的结局旁白，只输出正文。"},
+	]
+
+static func phone_epilogue_request_body(history: Array) -> String:
+	return JSON.stringify({
+		"model": MODEL,
+		"messages": build_phone_epilogue_messages(history),
+		"temperature": 0.7,
+	})
+
+# 取正文、剥首尾空白；空则返回 ""(调用方兜底 ENDING_PHONE_FALLBACK)。
+static func parse_phone_epilogue(content: String) -> String:
+	return str(content).strip_edges()

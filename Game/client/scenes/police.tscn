@@ -134,6 +134,7 @@ position = Vector2(921.99994, 849)
 scale = Vector2(1.4, 1.4)
 
 [node name="Hint" type="Label" parent="." unique_id=1750110365]
+visible = false
 layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0

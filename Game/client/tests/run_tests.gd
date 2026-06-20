@@ -34,28 +34,28 @@ func _initialize() -> void:
 
 	# --- Triggers（去邪教版：两层真相，确定性 钥匙 + 关键词） ---
 	var s2 = GameState.new()
-	_check(Triggers.evaluate(s2, "是 AI 害死她的吗").is_empty(), "没钥匙不触发第一层")
+	_check(Triggers.evaluate(s2, "她早就去世了").is_empty(), "没钥匙不触发第一层")
 	s2.add_key("linxiulan")
 	_check(Triggers.evaluate(s2, "今天天气如何").is_empty(), "有钥匙无关键词不触发")
-	_check(Triggers.evaluate(s2, "是 AI 害死她的吗") == ["fact"], "持档案+追问AI/害死 触发第一层真相(事实=病逝)")
+	_check(Triggers.evaluate(s2, "她早就去世了，不会回来了") == ["fact"], "持死亡证明+说她去世 触发第一层(她病逝非走丢)")
 	s2.reveal("fact")
-	_check(Triggers.evaluate(s2, "是 AI 害死的").is_empty(), "第一层已揭示不再触发")
+	_check(Triggers.evaluate(s2, "她去世了").is_empty(), "第一层已揭示不再触发")
 	# 第二层真相：需莫忘日志钥匙
-	_check(Triggers.evaluate(s2, "是莫忘在骗你").is_empty(), "没莫忘日志钥匙不触发第二层")
+	_check(Triggers.evaluate(s2, "是莫忘在骗你").is_empty(), "没莫忘日志不触发第二层")
 	s2.add_key("molog")
-	_check(Triggers.evaluate(s2, "是莫忘在骗你") == ["complicity"], "持莫忘日志+追问莫忘 触发第二层真相(同谋)")
+	_check(Triggers.evaluate(s2, "是莫忘一直说她会回来") == ["complicity"], "持莫忘日志+说莫忘骗他 触发第二层")
 
 	# --- Explore（去邪教版终端线索 -> 钥匙） ---
 	var s3 = GameState.new()
 	_check(Explore.perform(s3, "archive").get("key") == "linxiulan", "查档案授予 linxiulan")
-	_check(Explore.perform(s3, "medical").get("key") == "no_accident", "查医疗记录授予 no_accident")
+	_check(Explore.perform(s3, "medical").get("key") == "farewell", "查安葬记录授予 farewell")
 	_check(Explore.perform(s3, "molog").get("key") == "molog", "翻莫忘日志授予 molog")
 	_check(Explore.perform(s3, "不存在").is_empty(), "未知探索返回空")
 
 	# --- Content（去邪教版设定校验） ---
 	_check(Content.TRUTHS.size() == 2, "两层真相")
 	var frag_fact := Triggers.fragment_of("fact")
-	_check(("查无" in frag_fact) or ("不是" in frag_fact) or ("病逝" in frag_fact), "第一层真相=查无事故/病逝/不是AI")
+	_check(("去世" in frag_fact) or ("病逝" in frag_fact) or ("不会回来" in frag_fact), "第一层真相=她病逝/不会回来")
 	var molog_text := ""
 	for a in Content.EXPLORE_ACTIONS:
 		if a["id"] == "molog":
@@ -68,10 +68,17 @@ func _initialize() -> void:
 
 	# --- 终端案卷（警局电脑终端查询项） ---
 	_check(Content.TERMINAL_FILES.has("wife") and Content.TERMINAL_FILES["wife"]["grants_key"] == "linxiulan", "终端·林秀兰记录授予 linxiulan")
-	_check(Content.TERMINAL_FILES.has("medical") and Content.TERMINAL_FILES["medical"]["grants_key"] == "no_accident", "终端·医疗事故授予 no_accident")
+	_check(Content.TERMINAL_FILES.has("medical") and Content.TERMINAL_FILES["medical"]["grants_key"] == "farewell", "终端·安葬记录授予 farewell")
 	_check(("自然死亡" in Content.TERMINAL_FILES["wife"]["text"]), "终端·林秀兰记录=自然死亡")
 	for fid in Content.TERMINAL_FILES:
 		_check(Content.TERMINAL_FILES[fid]["text"] != "", "终端案卷有内容: " + str(fid))
+
+	# --- 终端查询：每条案卷都有检索关键词（新查询机用） ---
+	for fid in Content.TERMINAL_FILES:
+		_check(Content.TERMINAL_FILES[fid].has("keywords") and (Content.TERMINAL_FILES[fid]["keywords"] is Array) and not Content.TERMINAL_FILES[fid]["keywords"].is_empty(), "终端案卷有检索关键词: " + str(fid))
+	_check("住哪" in Content.TERMINAL_FILES["address"]["keywords"], "住址案卷含'住哪'关键词")
+	_check("老婆" in Content.TERMINAL_FILES["wife"]["keywords"], "林秀兰案卷含'老婆'关键词")
+	_check("安葬" in Content.TERMINAL_FILES["medical"]["keywords"], "安葬案卷含'安葬'关键词")
 
 	# --- 全局状态单例（跨场景保留线索：手机在 world 拿的钥匙，审讯室要还在） ---
 	var GG = load("res://game/game_global.gd")
@@ -97,16 +104,19 @@ func _initialize() -> void:
 		s4.read_mowang()
 		_check(not s4.mowang_unread, "读过莫忘后转已读")
 
-	# --- 调查进展摘要（喂给模型，让老头知道玩家查到了什么） ---
-	var s5 = GameState.new()
-	_check(s5.has_method("investigation_summary"), "GameState 有 investigation_summary")
-	if s5.has_method("investigation_summary"):
-		_check(s5.investigation_summary() == "", "无线索时进展摘要为空")
-		s5.add_key("linxiulan")
-		s5.add_key("no_accident")
-		var summ = s5.investigation_summary()
-		_check(("林秀兰" in summ) or ("自然" in summ), "摘要含林秀兰死因")
-		_check(("查无" in summ) or ("事故" in summ), "摘要含医疗事故查无")
+	# --- 已出示证据 ---
+	var s5b = GameState.new()
+	_check(s5b.presented_proofs() == "", "未出示时旁白为空")
+	s5b.present_evidence("death")
+	var p6 := s5b.presented_proofs()
+	_check("死亡证明" in p6, "出示死亡证明后旁白含其 proof")
+	_check(not ("骨灰" in p6), "未出示安葬记录则旁白不含它")
+	s5b.present_evidence("death")  # 去重
+	var cnt := 0
+	for c in Content.EVIDENCE_CARDS:
+		if c["id"] in s5b.presented:
+			cnt += 1
+	_check(cnt == 1, "重复出示同一张只记一次")
 
 	# --- 开局任务红点（上司任务默认未读，看过转已读） ---
 	var s6 = GameState.new()
@@ -131,17 +141,18 @@ func _initialize() -> void:
 	s8.add_key("molog")
 	_check(s8.in_finale(), "拿到 molog → 进入终局")
 
-	# --- 终局：日志蒙太奇 + 新提醒 + 三分支结局文案 ---
+	# --- 终局：日志蒙太奇 + 新提醒 + 涌现结局 ---
 	_check(Content.MOWANG_HINTS.has("unlock_log"), "新增提醒 unlock_log(拿到手机→去终端解锁)")
 	_check(Content.MOWANG_HINTS.has("go_confront"), "新增提醒 go_confront(解锁日志→回审讯对峙)")
 	_check(not Content.MOWANG_HINTS.has("confront_molog"), "废弃提醒 confront_molog 已移除")
-	_check(Content.ENDING_SLIDES.size() >= 3, "ENDING_SLIDES 三分支文案存在")
-	for b in ["reveal", "comfort", "leave"]:
-		_check(Content.ENDING_SLIDES.has(b) and str(Content.ENDING_SLIDES[b]) != "", "结局幻灯片有 " + b)
-	# 日志蒙太奇：那条无理由跳变的"是 AI 害死的" + 点破空白的旁白
+	# ENDING_SLIDES 已由 AI 涌现结局(裁判 epilogue + ENDING_FALLBACK)取代，不再校验
+	_check(str(Content.ENDING_FALLBACK).length() > 0, "结局兜底正文 ENDING_FALLBACK 存在")
+	# 固定点题字幕 ENDING 已删除（任何残留 Content.ENDING 引用都会 parse error，编译即校验）
+	# 日志蒙太奇：新滑坡("她走丢/在回来的路上")，不再有旧设定"误诊/AI害死"
 	var molog_blob := "\n".join(Content.MOWANG_LOG_LINES)
-	_check("是 AI 害死的" in molog_blob, "日志含突兀跳变的'是 AI 害死的'")
-	_check(("没有前一天" in molog_blob) or ("没有任何理由" in molog_blob), "日志含点破空白的旁白")
+	_check("走丢" in molog_blob or "回来的路上" in molog_blob, "莫忘日志=她走丢了/在回来的路上")
+	_check(not ("误诊" in molog_blob), "莫忘日志不再有'误诊'旧设定")
+	_check(Content.MOWANG_HINTS.has("ask_farewell"), "提醒含 ask_farewell")
 
 	# --- 莫忘"今天的对话"(道具栏看) + 提醒链:手机→道具栏→终端恢复历史 ---
 	_check(Content.MOWANG_TODAY_LINES.size() >= 2, "今天的对话有内容")
@@ -153,19 +164,28 @@ func _initialize() -> void:
 
 	# --- LLM.parse_reply（客户端直连版，移植自后端 llm.js parseReply） ---
 	var r1 = LLM.parse_reply("[sad] 她……只是出门买点菜。 ")
-	_check(r1["reply"] == "她……只是出门买点菜。" and r1["emotion"] == "sad" and r1["hint"] == "" and r1["end"] == "", "解析句首情绪+去空白")
+	_check(r1["reply"] == "她……只是出门买点菜。" and r1["emotion"] == "sad" and r1["hint"] == "", "解析句首情绪+去空白")
 	var r2 = LLM.parse_reply("[angry]是 AI 害死她的！[[hint:investigate_death]]")
 	_check(r2["reply"] == "是 AI 害死她的！" and r2["emotion"] == "angry" and r2["hint"] == "investigate_death", "剥 [[hint:ID]]")
+	# end 标签已不再解析（结局改裁判判定）：含 [[end:X]] 的内容当普通文本/忽略
 	var r3 = LLM.parse_reply("[sad]她就那么走了。[[end:reveal]]")
-	_check(r3["reply"] == "她就那么走了。" and r3["end"] == "reveal", "剥 [[end:reveal]]")
-	_check(LLM.parse_reply("[[end:boom]]你好")["end"] == "", "非法 end 不当标签")
+	_check(r3["reply"] == "她就那么走了。[[end:reveal]]" or (not r3.has("end") or r3.get("end","") == ""), "end 标签不再产出(当文本或丢弃)")
 	var r5 = LLM.parse_reply("[angry]是 AI 害的！[[hint:visit_community]][[end:ready]]")
-	_check(r5["reply"] == "是 AI 害的！" and r5["hint"] == "visit_community" and r5["end"] == "ready", "hint+end 共存且都剥")
+	_check(r5["reply"] != "" and r5["hint"] == "visit_community" and (not r5.has("end") or r5.get("end","") == ""), "hint 仍剥，end 不再产出")
 	var r6 = LLM.parse_reply("[angry]你们懂什么！\n\n[calm]好吧，我承认。")
 	_check(r6["reply"] == "你们懂什么！\n\n好吧，我承认。" and r6["emotion"] == "angry", "中段情绪标签也剥,取第一个")
 	_check(LLM.parse_reply("[happy]你好")["reply"] == "[happy]你好", "非法情绪标签原样保留")
 	var r8 = LLM.parse_reply("我就……记记日常。   [[hint:protecting_app]]")
 	_check(r8["reply"] == "我就……记记日常。" and r8["hint"] == "protecting_app", "尾部 hint 剥净不残留")
+	# parse_reply 不再产出 end 字段（结局改裁判判定，C2）
+	var pr := LLM.parse_reply("[sad]她出门了，一会儿就回来。[[hint:investigate_death]]")
+	_check(pr["emotion"] == "sad", "情绪仍解析")
+	_check(pr["hint"] == "investigate_death", "hint 仍解析")
+	_check(not pr.has("end") or str(pr.get("end","")) == "", "不再产出 end 字段")
+
+	# 终局 roleplay 提示词不含结局正文分隔符
+	_check(not ("===结局===" in LLM.FINALE_SYSTEM_PROMPT), "终局roleplay不含结局正文分隔符")
+
 	# build_messages：终局换 FINALE，系统提示在最前
 	var msgs = LLM.build_messages([{"role": "user", "content": "hi"}], false)
 	_check(msgs.size() == 2 and msgs[0]["role"] == "system" and "周明远" in msgs[0]["content"], "build_messages 非终局用人设提示")
@@ -198,6 +218,12 @@ func _initialize() -> void:
 	_check(not sfx_t._typing_player.playing, "stop_typing(淡出后)→循环停下(离场不再残留)")
 	sfx_t.queue_free()
 
+	# --- 提示词新设定 ---
+	_check("走丢" in LLM.SYSTEM_PROMPT or "回来" in LLM.SYSTEM_PROMPT, "人设=她会回来/走丢")
+	_check(not ("误诊" in LLM.SYSTEM_PROMPT), "人设不再有AI误诊旧设定")
+	_check(not ("莫忘说" in LLM.SYSTEM_PROMPT), "人设不再让老头嘴里说'莫忘说…'(防剧透:莫忘靠玩家挖出)")
+	_check(not ("[[end" in LLM.FINALE_SYSTEM_PROMPT), "终局roleplay不再让老头吐end标签")
+
 	# --- 失败原因翻译(LLM.fail_reason)：调试日志据此告诉玩家是哪种失败 ---
 	var r_429 = LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 429, '{"error":{"type":"engine_overloaded_error"}}')
 	_check("429" in r_429 and ("过载" in r_429 or "限流" in r_429), "fail_reason: 429→过载/限流")
@@ -205,6 +231,24 @@ func _initialize() -> void:
 	_check("401" in r_401 and "鉴权" in r_401, "fail_reason: 401→鉴权失败(key问题)")
 	_check("超时" in LLM.fail_reason(HTTPRequest.RESULT_TIMEOUT, 0, ""), "fail_reason: 超时")
 	_check("解析失败" in LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 200, ""), "fail_reason: 200但响应空→解析失败")
+
+	# --- 终端查询：本地关键词兜底匹配 LLM.terminal_local_match ---
+	_check(LLM.terminal_local_match("他住哪") == "address", "本地匹配: 他住哪→address")
+	_check(LLM.terminal_local_match("他老婆呢") == "wife", "本地匹配: 他老婆→wife")
+	_check(LLM.terminal_local_match("安葬在哪里") == "medical", "本地匹配: 安葬→medical")
+	_check(LLM.terminal_local_match("周明远是谁") == "zhou", "本地匹配: 周明远→zhou")
+	_check(LLM.terminal_local_match("今天天气怎么样") == "", "本地匹配: 无关问题→空")
+	_check(LLM.terminal_local_match("") == "", "本地匹配: 空输入→空")
+
+	# --- 终端查询：从模型输出抠合法 id LLM.parse_terminal_result ---
+	_check(LLM.parse_terminal_result("zhou") == "zhou", "解析: 裸 id")
+	_check(LLM.parse_terminal_result("[wife]") == "wife", "解析: 方括号 id")
+	_check(LLM.parse_terminal_result("id: address") == "address", "解析: 带前缀 id")
+	_check(LLM.parse_terminal_result("应该是 medical 这条") == "medical", "解析: 句中 id")
+	_check(LLM.parse_terminal_result("NONE") == "", "解析: NONE→空")
+	_check(LLM.parse_terminal_result("没有匹配的记录") == "", "解析: 自然语言无→空")
+	_check(LLM.parse_terminal_result("xyz") == "", "解析: 非法 id→空")
+	_check(LLM.parse_terminal_result("") == "", "解析: 空→空")
 
 	# --- 调试日志行格式(Dbg.format_line) ---
 	var ln_fail = Dbg.format_line(2, false, 429, "过载", 0.3)
@@ -232,6 +276,17 @@ func _initialize() -> void:
 	_check("设置key" in fp and "len=" in fp and "sk-abc" in fp, "填了→指纹显示来源/长度/前缀")
 	LLM.set_runtime_key("")   # 复原，别影响其它测试
 
+	# --- 证据手牌 ---
+	_check(Content.EVIDENCE_CARDS.size() == 4, "4 张证据牌")
+	var card_keys := {}
+	for c in Content.EVIDENCE_CARDS:
+		card_keys[c["id"]] = c["key"]
+	_check(card_keys.get("death") == "linxiulan", "死亡证明牌挂 linxiulan")
+	_check(card_keys.get("farewell") == "farewell", "安葬记录牌挂 farewell")
+	_check(card_keys.get("molog") == "molog", "莫忘日志牌挂 molog")
+	_check(card_keys.get("photo") == "photo", "合照牌挂 photo")
+	_check(str(Content.ENDING_FALLBACK).length() > 0, "有结局兜底正文")
+
 	# --- 设置: 背景音乐开关(独立 Music 总线静音/取消静音) ---
 	var mus = load("res://autoload/music.gd").new()
 	get_root().add_child(mus)
@@ -242,6 +297,95 @@ func _initialize() -> void:
 	mus.set_enabled(true)
 	_check(mus.is_enabled(), "开→取消静音")
 	mus.queue_free()
+
+	# --- 裁判 parse_director + build_director_messages ---
+	var d1 := LLM.parse_director('{"end": true, "kind": "truth", "epilogue": "他没再说话。"}')
+	_check(d1["end"] == true and d1["kind"] == "truth" and "没再说话" in d1["epilogue"], "裁判正常JSON解析")
+	var d2 := LLM.parse_director("这不是JSON")
+	_check(d2["end"] == false, "裁判畸形输出当不结束")
+	var d3 := LLM.parse_director('前缀 {"end": false, "kind":"", "epilogue":""} 后缀')
+	_check(d3["end"] == false, "裁判能从噪声里抠出JSON且不结束")
+	var dm := LLM.build_director_messages([{"role":"user","content":"她去世了"}], "（侦探出示了死亡证明）", 4)
+	_check(dm.size() >= 2 and dm[0]["role"] == "system", "裁判messages带系统提示")
+
+	# --- 称号评定 ---
+	_check(LLM.parse_title("「真相揭穿者」") == "真相揭穿者", "剥书名/引号包裹")
+	_check(LLM.parse_title("固执的等待者。").length() <= 10, "截断到≤10字")
+	_check(LLM.parse_title("下一个莫忘\n（解释...）") == "下一个莫忘", "只取第一行")
+	_check(LLM.parse_title("   ") == "", "空白→空串")
+	_check(LLM.parse_title("一二三四五六七八九十十一十二") == "一二三四五六七八九十", "超10字截断到10")
+	var tm := LLM.build_title_messages([{"role":"user","content":"她去世了"}], "truth")
+	_check(tm.size() == 2 and tm[0]["role"] == "system" and "truth" in tm[1]["content"], "称号messages带提示+结局类型")
+
+	# --- 终端查询：检索员提示词与请求构建 ---
+	_check(LLM.TERMINAL_SYSTEM_PROMPT.length() > 0, "终端检索员提示词存在")
+	_check(("NONE" in LLM.TERMINAL_SYSTEM_PROMPT), "提示词要求无匹配时回 NONE")
+	var tmsgs = LLM.build_terminal_messages("他住哪")
+	_check(tmsgs.size() == 2 and tmsgs[0]["role"] == "system" and tmsgs[1]["role"] == "user", "终端messages=system+user")
+	_check(tmsgs[1]["content"] == "他住哪", "终端user消息=玩家原句")
+	_check(("address" in tmsgs[0]["content"]) and ("zhou" in tmsgs[0]["content"]), "系统消息含档案id清单")
+	var tbody = LLM.terminal_request_body("他住哪")
+	var tparsed = JSON.parse_string(tbody)
+	_check(typeof(tparsed) == TYPE_DICTIONARY and tparsed.has("messages") and tparsed.has("model"), "终端请求体含 model/messages")
+
+	# --- Titles 称号收藏 ---
+	var Tt = preload("res://game/titles.gd")
+	var tt = Tt.new()
+	_check(tt._register("真相揭穿者"), "首次注册称号=新")
+	_check(not tt._register("真相揭穿者"), "重复注册同名=非新(去重)")
+	_check(not tt._register("  真相揭穿者  "), "去空格后仍判重复")
+	_check(not tt._register(""), "空称号不注册")
+	_check(tt.count() == 1, "去重后只 1 个")
+	tt._register("下一个莫忘")
+	_check(tt.all_titles() == ["真相揭穿者", "下一个莫忘"], "按获得顺序返回")
+	# 存档 round-trip(临时路径,不污染真实存档)
+	var tmp := "user://_test_ach.cfg"
+	tt._save_to(tmp)
+	var tt2 = Tt.new()
+	tt2._load_from(tmp)
+	_check(tt2.all_titles() == ["真相揭穿者", "下一个莫忘"], "存档读档 round-trip 一致")
+	_check(not tt2._register("真相揭穿者"), "读档后仍去重")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(tmp))
+
+	# --- 证据列表:key→证据卡查询 ---
+	_check(Content.evidence_card_for_key("linxiulan").get("id", "") == "death", "key linxiulan→death 卡")
+	_check(Content.evidence_card_for_key("farewell").get("id", "") == "farewell", "key farewell→farewell 卡")
+	_check(Content.evidence_card_for_key("photo").get("id", "") == "photo", "key photo→photo 卡")
+	_check(Content.evidence_card_for_key("molog").get("id", "") == "molog", "key molog→molog 卡")
+	_check(Content.evidence_card_for_key("home_address").is_empty(), "非证据 key home_address→空字典")
+	_check(Content.evidence_card_for_key("").is_empty(), "空 key→空字典")
+	# --- 证据列表:toast 去重 ---
+	var es := GameState.new()
+	_check(es.evidence_seen.is_empty(), "新局 evidence_seen 为空")
+	_check(es.mark_evidence_seen("death") == true, "首次标记 death→true")
+	_check(es.mark_evidence_seen("death") == false, "重复标记 death→false(去重)")
+	_check(es.mark_evidence_seen("") == false, "空 card_id→false")
+	_check(es.evidence_howto_shown == false, "新局 证据出示提醒未弹")
+	_check(es.mark_evidence_howto() == true, "首次进审讯有证据→弹出示提醒")
+	_check(es.mark_evidence_howto() == false, "证据出示提醒只弹一次")
+
+	# --- 隐藏电话线：触发检测 + 解锁门控 ---
+	_check(LLM.asks_why_calls("你为什么老打电话") == true, "问为什么打电话→解锁命中")
+	_check(LLM.asks_why_calls("你给谁打电话啊") == true, "打给谁→解锁命中")
+	_check(LLM.asks_why_calls("今天天气怎么样") == false, "无关→不解锁")
+	_check(LLM.asks_how_connected("你是怎么打通的") == true, "问怎么打通→触发命中")
+	_check(LLM.asks_how_connected("电话接通了吗") == true, "接通了吗→触发命中")
+	_check(LLM.asks_how_connected("她在哪") == false, "无关→不触发")
+	var ps := GameState.new()
+	_check(ps.phone_line_unlocked == false, "新局 phone_line_unlocked=false")
+	_check((ps.phone_line_unlocked and LLM.asks_how_connected("怎么打通的")) == false, "未解锁→不触发")
+	ps.phone_line_unlocked = true
+	_check((ps.phone_line_unlocked and LLM.asks_how_connected("怎么打通的")) == true, "解锁后→触发")
+
+	# --- 隐藏电话线：提示词与文案 ---
+	_check(LLM.PHONE_EPILOGUE_PROMPT.length() > 0, "电话结局旁白提示词存在")
+	_check(str(Content.ENDING_PHONE_FALLBACK).length() > 0, "电话结局兜底文案存在")
+	_check(("电话" in LLM.SYSTEM_PROMPT) and ("打通" in LLM.SYSTEM_PROMPT), "人设含电话元素")
+	_check(("电话" in LLM.FINALE_SYSTEM_PROMPT) and ("打通" in LLM.FINALE_SYSTEM_PROMPT), "终局人设含电话元素")
+	var pe = LLM.phone_epilogue_request_body([{"role": "user", "content": "hi"}])
+	var pep = JSON.parse_string(pe)
+	_check(typeof(pep) == TYPE_DICTIONARY and pep.has("messages") and pep.has("model"), "电话epilogue请求体含model/messages")
+	_check(LLM.parse_phone_epilogue("  电话接通了。  ") == "电话接通了。", "解析epilogue剥首尾空白")
 
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

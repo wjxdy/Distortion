@@ -40,7 +40,8 @@ func _physics_process(delta: float) -> void:
 		footstep_time = 0.0
 		return
 	var v := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	velocity = v * speed
+	var spd := speed * (1.5 if Input.is_key_pressed(KEY_SHIFT) else 1.0)   # 按住 Shift = 1.5 倍移速
+	velocity = v * spd
 	move_and_slide()
 	if v != Vector2.ZERO:
 		_move_anim(v)
@@ -87,8 +88,17 @@ func _update_footsteps(delta: float) -> void:
 	footstep_player.volume_db = footstep_volume_db + randf_range(-2.0, 1.0)
 	footstep_player.play()
 
-# 场景调用：进门 —— 锁住移动并播放进门(向上)动作
-func enter_door() -> void:
+# 场景调用：进门/出门 —— 锁住移动并播放朝 dir 走的动作("up"上 / "left"左 / "right"右)。
+# 左/右出口用侧面走(walk_right + 翻转)，避免"按左键却向上走"的反直觉。
+func enter_door(dir: String = "up") -> void:
 	locked = true
 	footstep_time = 0.0
-	sprite.play("walk_up")
+	match dir:
+		"left":
+			sprite.flip_h = true
+			sprite.play("walk_right")
+		"right":
+			sprite.flip_h = false
+			sprite.play("walk_right")
+		_:
+			sprite.play("walk_up")

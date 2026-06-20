@@ -25,7 +25,7 @@ func _ready() -> void:
 
 	back_btn.pressed.connect(_back)
 
-	for f in [3, 5, 7, 9]:
+	for f in [1, 3, 5, 7, 9]:
 		var btn := get_node("Floors/F%d" % f) as Button
 		var label := btn.get_node("KeyLabel") as Label
 		var normal_color := label.self_modulate
@@ -123,6 +123,12 @@ func _pick(floor_num: int) -> void:
 		Game.spawn_point = "from_elevator"
 		Sfx.play_door()
 		get_tree().change_scene_to_file(CORRIDOR)
+	elif floor_num == 1:
+		# 一楼 = 出电梯回到小区楼外
+		await get_tree().create_timer(0.8).timeout
+		Game.spawn_point = "from_elevator"
+		Sfx.play_door()
+		get_tree().change_scene_to_file(COMMUNITY)
 	else:
 		await get_tree().create_timer(0.55).timeout
 		info.text = "%d 层……不是他家。（他住 7 层）" % floor_num

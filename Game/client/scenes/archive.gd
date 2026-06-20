@@ -19,6 +19,7 @@ func _ready() -> void:
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从警局走廊进来时，落到入口锚点
+	Game.show_controls_hint_once($Hint)
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -40,7 +41,7 @@ func _update_prompt() -> void:
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 150.0)
 
-# 门按 W/↑ 进出；物品(钥匙)按空格拾取
+# 返回走廊门在前方→只按 ↑/W；物品(钥匙)按空格拾取
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return

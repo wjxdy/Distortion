@@ -22,6 +22,7 @@ func _ready() -> void:
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从街道/审讯室/终端/档案室回来时，落到对应门口锚点
+	Game.show_controls_hint_once($Hint)
 	_update_prompt()
 
 func _process(_delta: float) -> void:
@@ -51,7 +52,7 @@ func _update_prompt() -> void:
 	if prompt.visible:
 		prompt.position = Vector2(player.position.x - prompt.size.x * 0.5, player.position.y - 130.0)
 
-# 走到门口按 W/↑ 进门(按下事件→进新场景时还按着键也不会反跳)
+# 警局四个门(含返回街道)都在前方/墙上，统一按 ↑/W 进出。
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return

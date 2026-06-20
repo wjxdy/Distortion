@@ -22,6 +22,7 @@ func _ready() -> void:
 	Game.reset()   # 开新游戏：清空线索/真相/对话历史
 	Inv.refresh()  # 清空道具栏显示
 	Inv.visible = false   # 序幕(幻灯片)期间不显示道具栏，进主世界再显示
+	Evidence.visible = false
 	fade_overlay.visible = false
 	fade_overlay.color.a = 0.0
 	for c in slides_root.get_children():

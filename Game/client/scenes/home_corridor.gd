@@ -15,6 +15,7 @@ func _ready() -> void:
 	phone.opened.connect(func() -> void: player.locked = true)
 	phone.closed.connect(func() -> void: player.locked = false)
 	Game.place_player(self, player)   # 从电梯/老人家回来时，落到对应入口锚点
+	Game.show_controls_hint_once($Hint)
 
 func _process(_delta: float) -> void:
 	if player.locked:
@@ -29,7 +30,7 @@ func _update_prompt() -> void:
 		prompt.text = "↑ 进入  702 · 周明远家" if Game.state.has_item("home_key") else "702 · 门锁着（去档案室拿钥匙）"
 		prompt.visible = true
 	elif _at(exit_area):
-		prompt.text = "↑ 返回  电梯"
+		prompt.text = "← 返回  电梯"
 		prompt.visible = true
 	else:
 		prompt.visible = false
@@ -40,20 +41,21 @@ func _update_prompt() -> void:
 func _input(event: InputEvent) -> void:
 	if player.locked:
 		return
-	if not event.is_action_pressed("move_up"):
+	# 返回电梯在左边→只按 ←/A
+	if event.is_action_pressed("move_left") and _at(exit_area):
+		_go(ELEVATOR, "", "left")
 		return
-	if _at(home_door):
+	# 老人家门在前方→↑/W
+	if event.is_action_pressed("move_up") and _at(home_door):
 		if Game.state.has_item("home_key"):
 			_go(HOME, "from_corridor")
 		else:
 			Sfx.play_click()
 			prompt.text = "门锁着——去警局档案室拿钥匙"
-	elif _at(exit_area):
-		_go(ELEVATOR, "")
 
-func _go(scene_path: String, entry: String) -> void:
+func _go(scene_path: String, entry: String, dir: String = "up") -> void:
 	Game.spawn_point = entry
-	player.enter_door()
+	player.enter_door(dir)
 	Sfx.play_door()
 	await get_tree().create_timer(0.45).timeout
 	get_tree().change_scene_to_file(scene_path)

@@ -71,6 +71,7 @@ position = Vector2(170, 565)
 scale = Vector2(1.4, 1.4)
 
 [node name="Hint" type="Label" parent="." unique_id=109929472]
+visible = false
 layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0
@@ -126,10 +127,10 @@ text = "▍警局综合终端"
 
 [node name="BackBtn" type="Button" parent="TerminalUI" unique_id=1911236842]
 layout_mode = 0
-offset_left = 1060.0
-offset_top = 22.0
-offset_right = 1244.0
-offset_bottom = 64.0
+offset_left = 1096.0
+offset_top = 12.0
+offset_right = 1268.0
+offset_bottom = 54.0
 theme_override_font_sizes/font_size = 20
 text = "关闭终端"
 
@@ -140,36 +141,6 @@ offset_top = 96.0
 offset_right = 360.0
 offset_bottom = 680.0
 theme_override_constants/separation = 14
-
-[node name="CaseBtn" type="Button" parent="TerminalUI/FileList" unique_id=2044700024]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "📁 案件概要"
-
-[node name="ZhouBtn" type="Button" parent="TerminalUI/FileList" unique_id=1664061554]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "📁 周明远 资料"
-
-[node name="AddressBtn" type="Button" parent="TerminalUI/FileList" unique_id=1060749524]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "📁 户籍 / 住址"
-
-[node name="WifeBtn" type="Button" parent="TerminalUI/FileList" unique_id=324258071]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "📁 林秀兰 死亡记录"
-
-[node name="MedicalBtn" type="Button" parent="TerminalUI/FileList" unique_id=2103991195]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "📁 医疗事故记录"
 
 [node name="SubmitPhoneBtn" type="Button" parent="TerminalUI/FileList" unique_id=1758379244]
 custom_minimum_size = Vector2(0, 64)
@@ -183,24 +154,40 @@ layout_mode = 0
 offset_left = 384.0
 offset_top = 96.0
 offset_right = 1240.0
-offset_bottom = 680.0
+offset_bottom = 612.0
 color = Color(0.03, 0.05, 0.04, 1)
 
-[node name="Display" type="Label" parent="TerminalUI/DisplayBg" unique_id=184679929]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 24.0
-offset_right = -24.0
-offset_bottom = -24.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.75, 0.92, 0.8, 1)
+[node name="Chat" type="RichTextLabel" parent="TerminalUI" unique_id=184679929]
+layout_mode = 0
+offset_left = 384.0
+offset_top = 96.0
+offset_right = 1240.0
+offset_bottom = 612.0
+bbcode_enabled = true
+scroll_active = true
+scroll_following = true
+fit_content = false
+theme_override_colors/default_color = Color(0.75, 0.92, 0.8, 1)
+theme_override_font_sizes/normal_font_size = 20
+text = "▍综合查询终端　输入要查的人或事，回车检索。"
+
+[node name="QueryInput" type="LineEdit" parent="TerminalUI" unique_id=384661234]
+layout_mode = 0
+offset_left = 384.0
+offset_top = 624.0
+offset_right = 1090.0
+offset_bottom = 672.0
 theme_override_font_sizes/font_size = 20
-text = "← 点左侧案卷查看。"
-autowrap_mode = 3
+placeholder_text = "输入要查询的内容，回车发送…"
+
+[node name="QueryBtn" type="Button" parent="TerminalUI" unique_id=294837651]
+layout_mode = 0
+offset_left = 1104.0
+offset_top = 624.0
+offset_right = 1240.0
+offset_bottom = 672.0
+theme_override_font_sizes/font_size = 20
+text = "查询"
 
 [node name="LogView" type="Control" parent="TerminalUI" unique_id=233683675]
 visible = false

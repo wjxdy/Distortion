@@ -72,10 +72,13 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "人会忘。
+text = "这年头，
+人连自己有没有忘事，
+都要先问一遍系统。
 
-所以这座城市发明了
-不会忘的东西。"
+挺方便的。
+
+也挺可笑的。"
 
 [node name="Slide1" type="Control" parent="Slides"]
 visible = false
@@ -113,9 +116,13 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "AI 替人保存生日、病历、遗言、爱情。
+text = "生日、病历、遗言、聊天记录。
 
-也替人保存悔恨。"
+连一句“我爱你”
+都能被备份、归档、标注时间。
+
+好像只要存得够久，
+人就真的不会失去什么。"
 
 [node name="Slide2" type="Control" parent="Slides"]
 visible = false
@@ -153,13 +160,15 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "后来，人们不再问：
+text = "警局也一样。
 
-“我记得对不对？”
+报案人说自己记得。
+档案说不是那样。
+终端弹出一行结论。
 
-他们只问：
+于是所有人都松了口气：
 
-“系统怎么说？”"
+“系统有记录。”"
 
 [node name="Slide3" type="Control" parent="Slides"]
 visible = false
@@ -197,10 +206,13 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "你曾经也相信系统。
+text = "我是一名警探。
 
-直到有一天，
-系统开始替人撒谎。"
+听起来像是追查真相的人。
+
+实际大多数时候，
+我只是在给那些破事
+找一个能盖章的说法。"
 
 [node name="Slide4" type="Control" parent="Slides"]
 visible = false
@@ -238,10 +250,12 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "现在，你只是个落魄警探。
+text = "走失、纠纷、报案、笔录。
 
-靠接一些没人愿意碰的案子，
-维持生活。"
+有人丢了东西。
+有人丢了人。
+也有人只是丢了
+自己还正常的证据。"
 
 [node name="Slide5" type="Control" parent="Slides"]
 visible = false
@@ -279,14 +293,15 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "不追逃犯。
-不找失物。
-不替人抓奸。
+text = "我以前还会认真听。
 
-你只查一种事：
+后来发现，
+人来警局不一定是为了真相。
 
-有人记住了
-不该存在的东西。"
+更多时候，
+只是想听别人说一句：
+
+“你没记错。”"
 
 [node name="Slide6" type="Control" parent="Slides"]
 visible = false
@@ -324,15 +339,14 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "任务会被推送到你的手机。
+text = "周队今天大概又会派活过来。
 
-地点。
-对象。
-报酬。
+希望别又是那种
+说不清、查不完，
+还没人会感谢的破事。
 
-还有一句话：
-
-去问清楚。"
+……不过，
+哪次不是呢？"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env")

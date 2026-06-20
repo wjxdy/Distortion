@@ -18,6 +18,8 @@ const Content = preload("res://game/content.gd")
 @onready var pv_close: Button = $PhoneView/PVPanel/PVClose
 
 var _desc_tween: Tween
+const _TERMINAL_DX := 184.0   # 终端场景里整条 HUD 左移量，给「关闭终端」让出最右
+var _home := {}               # 记住默认(靠右)位置，离开终端时还原
 
 func _ready() -> void:
 	toggle_btn.pressed.connect(_toggle)
@@ -27,7 +29,18 @@ func _ready() -> void:
 	panel.visible = false   # 默认收起，只露右上角按钮
 	phone_view.visible = false
 	desc.visible = false
+	_home = {"bl": toggle_btn.offset_left, "br": toggle_btn.offset_right, "pl": panel.offset_left, "pr": panel.offset_right}
 	refresh()
+
+# 进终端场景时整条 HUD 左移让位(on=true)，离开还原(on=false)；默认靠右位置在 .tscn(可拖)。
+func set_terminal_compact(on: bool) -> void:
+	if _home.is_empty():
+		return
+	var dx: float = -_TERMINAL_DX if on else 0.0
+	toggle_btn.offset_left = _home["bl"] + dx
+	toggle_btn.offset_right = _home["br"] + dx
+	panel.offset_left = _home["pl"] + dx
+	panel.offset_right = _home["pr"] + dx
 
 # 点右上角按钮：展开/收起道具面板。
 func _toggle() -> void:

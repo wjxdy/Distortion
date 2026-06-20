@@ -66,7 +66,7 @@ layout_mode = 0
 offset_left = 935.0
 offset_top = 180.0
 offset_right = 1195.0
-offset_bottom = 610.0
+offset_bottom = 700.0
 theme_override_constants/separation = 12
 
 [node name="F9" type="Button" parent="Floors" unique_id=772951457]
@@ -162,6 +162,32 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 22
 text = "3 层"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="F1" type="Button" parent="Floors" unique_id=100000050]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/normal = SubResource("EmptyStyle")
+theme_override_styles/pressed = SubResource("EmptyStyle")
+theme_override_styles/hover = SubResource("EmptyStyle")
+flat = true
+
+[node name="KeyLabel" type="Label" parent="Floors/F1" unique_id=100000051]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.96, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = "1 楼 ▾出门"
 horizontal_alignment = 1
 vertical_alignment = 1
 

@@ -97,7 +97,7 @@ text = "←
 电梯
 
 走到这
-↑ 返回"
+← 返回"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -106,6 +106,7 @@ position = Vector2(255.00003, 658)
 scale = Vector2(1.4, 1.4)
 
 [node name="Hint" type="Label" parent="." unique_id=266105841]
+visible = false
 layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0

@@ -110,7 +110,7 @@ text = "←
 街道
 
 走到这
-↑ 返回"
+← 返回"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -129,17 +129,18 @@ region_enabled = true
 region_rect = Rect2(0, 0, 234, 384)
 
 [node name="NpcText" type="Label" parent="." unique_id=1898626679]
+z_index = 100
 visible = false
 layout_mode = 0
 offset_left = 170.0
-offset_top = 360.0
+offset_top = 250.0
 offset_right = 540.0
-offset_bottom = 460.0
+offset_bottom = 350.0
 theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 18
-text = "邻居：周老头最近怪得很，好久没回家了……常一个人对着手机说话。"
+text = "周老头啊……他老伴儿早走了好几年喽，他却天天念叨等她回家，还老对着手机打电话，邪门。"
 autowrap_mode = 3
 
 [node name="Walls" type="StaticBody2D" parent="." unique_id=1514010391]
@@ -186,6 +187,7 @@ position = Vector2(464.99997, 594)
 scale = Vector2(1.4, 1.4)
 
 [node name="Hint" type="Label" parent="." unique_id=886099336]
+visible = false
 layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0

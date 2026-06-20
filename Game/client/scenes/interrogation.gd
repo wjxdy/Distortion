@@ -28,6 +28,12 @@ var last_user_msg := ""
 var type_tween: Tween
 var finished := false
 
+# 终局裁判编排
+var _finale_turns := 0       # 终局里老头每次回复后 +1
+var _pending_end := {}       # 裁判返回"结束"时存放裁判结果，等打字机完成后触发
+var _typing_done := false    # 打字机是否已完成（防止打断老头台词直接渐黑）
+var _phone_pending := false   # 电话结局:正在等 AI epilogue,期间不让打字机回调提前收尾
+
 # 失败重试：任何失败都重试，共 MAX_TRIES 次、递增延迟，用尽才出保底沉默「……」。
 const MAX_TRIES := 3
 const RETRY_DELAYS := [0.6, 1.2]   # 第1次失败后等0.6s重试，第2次失败后等1.2s重试
@@ -48,11 +54,18 @@ var _req_start := 0
 @onready var emo_timer: Timer = $EmoTimer
 @onready var http: HTTPRequest = $Http
 @onready var back_btn: Button = $BackBtn
-@onready var leave_btn: Button = $LeaveBtn
+@onready var ev_panel: Panel = $Evidence
+@onready var director_http: HTTPRequest = $DirectorHttp
+var _card_btns := {}   # id -> Button
 @onready var fade_overlay: ColorRect = $FadeOverlay
 @onready var end_slide: Control = $EndSlide
 @onready var end_body: Label = $EndSlide/VBox/Body
 @onready var end_subtitle: Label = $EndSlide/VBox/Subtitle
+@onready var title_label: Label = $EndSlide/VBox/TitleLabel
+@onready var back_menu_btn: Button = $EndSlide/EndButtons/BackToMenuBtn
+@onready var view_achieve_btn: Button = $EndSlide/EndButtons/ViewAchieveBtn
+@onready var title_http: HTTPRequest = $TitleHttp
+@onready var phone_http: HTTPRequest = $PhoneHttp
 
 func _ready() -> void:
 	Music.play_police_ambience()
@@ -77,15 +90,26 @@ func _ready() -> void:
 	http.request_completed.connect(_on_reply)
 	http.timeout = 25.0   # 超时→保底沉默(原后端 14s,直连放宽到 25s 容 Moonshot 偶发慢)
 	back_btn.pressed.connect(_back)   # 返回走廊按钮在 .tscn 里，可在编辑器拖位置
-	leave_btn.pressed.connect(_on_leave)
+	director_http.request_completed.connect(_on_director)
+	title_http.request_completed.connect(_on_title)
+	title_http.timeout = 25.0   # 超时保证：请求挂起也能落到"过客"兜底
+	phone_http.request_completed.connect(_on_phone_epilogue)
+	phone_http.timeout = 14.0
+	back_menu_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
+	view_achieve_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/achievements.tscn"))
 	end_slide.visible = false
 	fade_overlay.visible = false
-	# 进入终局对峙(已拿莫忘日志) → 显示"起身离开"(C 分支)
-	leave_btn.visible = state.in_finale()
 	# 看手机时禁用盘问输入栏（查档案在手机里）
 	phone.opened.connect(func() -> void: _bar_enabled(false))
 	phone.closed.connect(func() -> void: _bar_enabled(not finished))
 	input.grab_focus()
+
+	# 证据手牌：按 state 钥匙点亮对应按钮
+	for c in Content.EVIDENCE_CARDS:
+		var b: Button = ev_panel.get_node("VBox/Card_" + str(c["id"]))
+		_card_btns[c["id"]] = b
+		b.visible = state.has_key(str(c["key"]))
+	_refresh_cards()
 
 	# 开场：首次进来 → 周明远喃喃自语(记忆错乱)；带着历史回访 → 接上他上一句，不重置
 	var last_zhou := ""
@@ -100,6 +124,19 @@ func _ready() -> void:
 
 func _log(_line: String) -> void:
 	pass   # 回看记录功能已移除；保留调用点为空操作，不影响其它逻辑
+
+func _refresh_cards() -> void:
+	var any_unlocked := false
+	for c in Content.EVIDENCE_CARDS:
+		var b: Button = _card_btns.get(c["id"])
+		if b:
+			b.visible = state.has_key(str(c["key"]))
+			if b.visible:
+				any_unlocked = true
+	ev_panel.visible = any_unlocked   # 无证据时隐藏整个面板，不留空盒子
+	# 第一次手里有证据进来对峙 → 提醒一次"可点证据牌、连同你的话一起拍给他看"(整局只一次)
+	if any_unlocked and Game.state.mark_evidence_howto():
+		_banner("提示：点亮下方的【证据】牌，再按【盘问】，就能把它当面拍到他面前。", Color(0.7, 0.9, 1.0), 4.5)
 
 func _bar_enabled(b: bool) -> void:
 	input.editable = b
@@ -142,6 +179,7 @@ func _show_zhou_bubble(text: String, play_sound: bool = true) -> void:
 	zhou_bubble.visible = true
 	zhou_label.text = text
 	zhou_label.visible_ratio = 0.0
+	_typing_done = false   # 新打字机启动，标记未完成
 	_typewriter(zhou_label, text, play_sound)
 
 # play_sound=false 时不播打字机音效——给保底沉默「……」用(他没在打字，别发那声"嘣")。
@@ -155,6 +193,11 @@ func _typewriter(label: Label, full: String, play_sound: bool = true) -> void:
 	type_tween.tween_property(label, "visible_ratio", 1.0, dur)
 	if play_sound:
 		type_tween.tween_callback(Sfx.stop_typing)   # 打完即停
+	# 打字完成后置标记，若裁判已先到则在此触发结局（修"话没说完就跳幻灯片"的打断 bug）
+	type_tween.tween_callback(func() -> void:
+		_typing_done = true
+		_maybe_finish_after_typing()
+	)
 
 # ---------- 对话流程 ----------
 
@@ -162,26 +205,43 @@ func _on_submit(_t: String) -> void:
 	_send()
 
 func _send() -> void:
-	if finished:
-		return
+	if finished: return
+	# 结算已按下(armed)的证据牌
+	var armed := []
+	for c in Content.EVIDENCE_CARDS:
+		var b: Button = _card_btns.get(c["id"])
+		if b and b.visible and b.button_pressed:
+			armed.append(c)
 	var msg := input.text.strip_edges()
-	if msg == "":
+	if msg == "" and armed.is_empty():
 		return
+	if msg == "" and not armed.is_empty():
+		var names := []
+		for c in armed: names.append(str(c["label"]))
+		msg = "（你把%s推到他面前。）" % "、".join(names)
+	# —— 隐藏电话线（在出示证据结算之前判定）——
+	# 已解锁 + 问"怎么打通" → 直接进电话结局；否则若问起打电话 → 解锁，继续正常对话。
+	if not finished and Game.state.phone_line_unlocked and LLM.asks_how_connected(msg):
+		_trigger_phone_ending(msg)
+		return
+	if LLM.asks_why_calls(msg):
+		state.phone_line_unlocked = true
+	for c in armed:
+		state.present_evidence(str(c["id"]))
+		var b: Button = _card_btns.get(c["id"])
+		if b: b.button_pressed = false   # 出示后复位
 	last_user_msg = msg
 	Sfx.play_click()
 	_show_player_bubble(msg)
-	zhou_bubble.visible = false        # 切到新一轮：清掉他上一句气泡
-	_log("[color=#8fd0ff]你：[/color]" + msg)
+	zhou_bubble.visible = false
 	state.add_to_history("user", msg)
 	input.text = ""
 	_set_busy(true)
-	# 直连大模型：非终局把"调查进展"系统旁白拼在历史最前(让老头知道你查到了什么,不写进持久化历史)；
-	# 终局由 LLM.build_messages 自动换成 FINALE 提示，这里不注入旁白。
+	# 整审讯注入 presented 旁白（不分终局）
 	var to_send: Array = []
-	if not state.in_finale():
-		var prog = state.investigation_summary()
-		if prog != "":
-			to_send.append({"role": "system", "content": prog})
+	var prog: String = state.presented_proofs()
+	if prog != "":
+		to_send.append({"role": "system", "content": prog})
 	to_send.append_array(state.history)
 	_req_body = LLM.request_body(to_send, state.in_finale())
 	_attempt = 0
@@ -239,7 +299,12 @@ func _apply_reply(parsed: Dictionary, silent: bool = false) -> void:
 	_check_truths()
 	_handle_hint(parsed)        # 模型吐的 hint 标签
 	_hint_fallback(reply)       # 兜底：按对话内容+进度确定性补发
-	_handle_end(parsed)         # 终局：[[end:reveal/comfort]] → 触发结局
+	# 终局：过 4 轮才让裁判评估是否收尾
+	if state.in_finale():
+		_finale_turns += 1
+		if _finale_turns >= 4:
+			var body := LLM.director_request_body(state.history, state.presented_proofs(), _finale_turns)
+			director_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, body)
 
 # 统一发提醒：去重(整局只一次)后弹右上角小字 + 手机响声红点。
 func _fire_hint(id: String) -> void:
@@ -253,24 +318,18 @@ func _handle_hint(data) -> void:
 	if typeof(data) == TYPE_DICTIONARY and data.has("hint"):
 		_fire_hint(str(data["hint"]))
 
-# 玩家这一句是否在「当面质疑 AI 说法 / 亮证据对质」(用于 visit_community 闸门)：
-# 要么质问 AI 的确定性，要么主张她是自然病逝/查无事故。措辞放宽，尽量覆盖自由输入。
-func _challenges_ai(m: String) -> bool:
-	var mentions_ai: bool = ("AI" in m) or ("Ａｉ" in m) or ("人工智能" in m)
-	var doubts: bool = ("为什么" in m) or ("凭什么" in m) or ("确定" in m) or ("怎么知道" in m) or ("怎么确定" in m) or ("真的" in m)
-	if mentions_ai and doubts:
-		return true
-	return ("病死" in m) or ("病逝" in m) or ("自然" in m) or ("不是AI" in m) or ("不是 AI" in m) \
-		or ("诊断" in m) or ("没有事故" in m) or ("查无" in m) or ("没事故" in m) or ("证据" in m)
+# 玩家这一句是否在「当面主张妻子死亡/不会回来/亮实物证据」(用于 visit_community 闸门)。
+func _challenges_truth(m: String) -> bool:
+	return ("死" in m) or ("去世" in m) or ("病逝" in m) or ("不会回来" in m) or ("回不来" in m) \
+		or ("不在了" in m) or ("走不了" in m) or ("安葬" in m) or ("墓" in m) or ("证据" in m)
 
 # 兜底：模型没吐标签(过载/漏吐/被去重)时，按老头这轮回复 + 玩家问话 + 调查进度确定性补发。
 # fire_hint 自带去重，所以和模型不会重复触发。
 func _hint_fallback(reply: String) -> void:
-	var blames_ai: bool = ("AI" in reply) or ("Ａｉ" in reply) or ("误诊" in reply)
-	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("no_accident")
-	if blames_ai:
-		# 去小区要等你「当面质问 AI 说法」而他仍咬定时才弹——否则你刚查完回来他随口提 AI 就提早触发。
-		if has_evidence and _challenges_ai(last_user_msg):
+	var insists_back: bool = ("回来" in reply) or ("走丢" in reply) or ("出门" in reply) or ("在路上" in reply) or ("等她" in reply)
+	var has_evidence: bool = state.has_key("linxiulan") or state.has_key("farewell")
+	if insists_back:
+		if has_evidence and _challenges_truth(last_user_msg):
 			_fire_hint("visit_community")     # 查过死因 + 当面质问仍咬定 → 去小区
 		elif not has_evidence:
 			_fire_hint("investigate_death")   # 还没查 → 去终端查死因
@@ -278,43 +337,97 @@ func _hint_fallback(reply: String) -> void:
 	if ("莫忘" in m) or ("手机" in m) or ("app" in m) or ("APP" in m) or ("为什么用" in m) or ("天天" in m):
 		_fire_hint("protecting_app")
 
-# 终局：后端用 FINALE_SYSTEM_PROMPT 时模型按玩家态度吐 [[end:reveal/comfort]] → 触发对应结局。
-# leave 由"起身离开"按钮走 _on_leave。(ready 已弃用;若模型偶吐别的值,这里不处理即忽略。)
-func _handle_end(data) -> void:
-	if typeof(data) != TYPE_DICTIONARY:
+# 裁判回调：从服务端解析导演判定，若决定结束则存储并等打字机完成后触发收尾。
+func _on_director(_result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if finished: return
+	if code != 200: return
+	var data = JSON.parse_string(body.get_string_from_utf8())
+	var content := LLM.extract_content(data)
+	var verdict := LLM.parse_director(content)
+	if not verdict.get("end", false): return
+	# 确定性闸：truth 结局必须玩家真的出示过【莫忘日志】(揭穿"是app在骗他、他选择等"这层)。
+	# 没出示 molog 就只崩了"她死了"层、没碰最深的那层——不给 truth 收尾，继续僵持。
+	# comfort(顺从安慰)不需要证据，照常放行。模型有时会无视提示词里的硬性要求，这里用代码兜死。
+	if str(verdict.get("kind", "")) == "truth" and not state.presented.has("molog"):
 		return
-	var e := str(data.get("end", ""))
-	if e == "reveal" or e == "comfort":
-		_trigger_ending(e)
+	_pending_end = verdict
+	_maybe_finish_after_typing()
 
-func _on_leave() -> void:
-	if finished:
+# 等打字机完成 + 裁判结果双双就绪，再停一拍让台词落地，然后触发涌现结局。
+func _maybe_finish_after_typing() -> void:
+	if _pending_end.is_empty(): return
+	if _phone_pending: return   # 电话 epilogue 还没回来 → 先别收尾,等 _on_phone_epilogue 再驱动
+	if not _typing_done:
+		await get_tree().create_timer(0.2).timeout
+		_maybe_finish_after_typing()
 		return
-	Sfx.play_click()
-	_trigger_ending("leave")
+	await get_tree().create_timer(1.2).timeout   # 停一拍，让谢幕台词落地
+	if finished: return
+	var epi := str(_pending_end.get("epilogue", ""))
+	if epi == "": epi = Content.ENDING_FALLBACK
+	_trigger_ending_emergent(epi)
 
-# 渐黑 → 幻灯片(分支正文 + 统一字幕)。结局唯一入口；结束在此锁死。
-func _trigger_ending(branch: String) -> void:
-	if finished:
-		return
+# 隐藏电话结局：玩家追问"怎么打通的" → 老头脚本化收尾台词 → AI 现写诡异 epilogue → 复用涌现结局。
+func _trigger_phone_ending(msg: String) -> void:
+	if finished: return
+	_show_player_bubble(msg)
+	state.add_to_history("user", msg)
+	input.text = ""
+	input.editable = false
+	send_btn.disabled = true
+	# 老头脚本化的瘆人收尾台词（固定，不走模型）
+	var last_line := "你不信？……我拨给你看。（他摸出手机，按下那串号码，把听筒凑到你耳边）……你听。"
+	_show_zhou_bubble(last_line)
+	state.add_to_history("assistant", last_line)
+	# 结局类型给称号用（_trigger_ending_emergent 会读 _pending_end.kind 发称号请求）
+	_pending_end = {"end": true, "kind": "call", "epilogue": ""}
+	_phone_pending = true
+	# AI 现写 epilogue；发不出去就直接兜底进结局
+	var err := phone_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.phone_epilogue_request_body(state.history))
+	if err != OK:
+		_on_phone_epilogue(0, 0, PackedStringArray(), PackedByteArray())
+
+func _on_phone_epilogue(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if finished: return
+	var epi := ""
+	if result == HTTPRequest.RESULT_SUCCESS and code == 200 and body.size() > 0:
+		var data = JSON.parse_string(body.get_string_from_utf8())
+		epi = LLM.parse_phone_epilogue(LLM.extract_content(data))
+	if epi == "":
+		epi = Content.ENDING_PHONE_FALLBACK
+	_pending_end["epilogue"] = epi
+	_phone_pending = false
+	_maybe_finish_after_typing()   # 撤闸后:等打字机也完成(若已完成则立即收尾),用正确的电话 epilogue 渐黑
+
+# 涌现结局入口：渐黑 → 幻灯片(AI 生成的 epilogue + 统一字幕)。
+func _trigger_ending_emergent(epilogue: String) -> void:
+	if finished: return
 	finished = true
 	input.editable = false
 	send_btn.disabled = true
-	leave_btn.visible = false
-	# 渐黑
+	# 结局幻灯片要纯黑+文字：藏掉会盖在上面的 HUD 层(道具栏 Inv / 证据栏 Evidence / 手机)，别让它们露出来
+	Inv.visible = false
+	Evidence.visible = false
+	phone.visible = false
+	# 并行发称号请求（不阻塞渐黑/幻灯片流程）
+	var kind := str(_pending_end.get("kind", ""))
+	title_label.text = ""
+	var terr := title_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.title_request_body(state.history, kind))
+	if terr != OK:
+		# 请求都没发出去：直接走 _on_title 的兜底("过客")，别让称号栏空着
+		_on_title(0, 0, PackedStringArray(), PackedByteArray())
 	fade_overlay.visible = true
 	fade_overlay.modulate.a = 0.0
 	var tw := create_tween()
 	tw.tween_property(fade_overlay, "modulate:a", 1.0, 1.4)
-	tw.tween_callback(func() -> void: _show_end_slide(branch))
+	tw.tween_callback(func() -> void: _show_end_slide(epilogue))
 
-func _show_end_slide(branch: String) -> void:
-	end_body.text = str(Content.ENDING_SLIDES.get(branch, ""))
-	end_subtitle.text = str(Content.ENDING)
+func _show_end_slide(epilogue: String) -> void:
+	end_body.text = epilogue
+	end_subtitle.visible = false   # 去掉固定点题字幕，只留 AI 现写的留白结局正文
 	end_slide.visible = true
 	end_slide.modulate.a = 0.0
-	var tw := create_tween()
-	tw.tween_property(end_slide, "modulate:a", 1.0, 1.2)
+	create_tween().tween_property(end_slide, "modulate:a", 1.0, 1.2)
 
 func _check_truths() -> void:
 	# 静默记录真相(供结局/存档判定)。结束不再绑定"集齐真相"——只由终局对峙的玩家选择触发。
@@ -392,6 +505,16 @@ func _back() -> void:
 # _exit_tree 在节点离树时必触发,兜住所有离场路径。
 func _exit_tree() -> void:
 	Sfx.stop_typing()
+
+func _on_title(_result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	var t := ""
+	if code == 200:
+		var data = JSON.parse_string(body.get_string_from_utf8())
+		t = LLM.parse_title(LLM.extract_content(data))
+	if t == "":
+		t = "过客"
+	var is_new := Titles.add_title(t)
+	title_label.text = "你获得称号：%s%s" % [t, "（新！）" if is_new else ""]
 
 func _input(event: InputEvent) -> void:
 	# ESC 现在专用于打开设置(Settings autoload)；返回走廊用屏幕上的「返回」按钮。
