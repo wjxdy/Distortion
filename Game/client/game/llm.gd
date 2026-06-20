@@ -310,6 +310,11 @@ static func terminal_local_match(query: String) -> String:
 static func parse_terminal_result(content: String) -> String:
 	var files = preload("res://game/content.gd").TERMINAL_FILES
 	var text := str(content)
+	# 先看整段 trim 后是否正好就是一个合法 id（模型正常只回 id 的常见情况，最可靠）
+	var trimmed := text.strip_edges().to_lower()
+	if files.has(trimmed):
+		return trimmed
+	# 兜底：从输出里扫出首个合法 id（容忍 [wife] / id: address / 句中 id 等）
 	var re := RegEx.new()
 	re.compile("[A-Za-z_]+")
 	for m in re.search_all(text):

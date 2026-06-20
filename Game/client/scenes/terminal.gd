@@ -161,6 +161,8 @@ func _on_query_submit() -> void:
 var _pending_query := ""
 
 func _on_query_reply(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if not _querying:
+		return
 	var id := ""
 	if result == HTTPRequest.RESULT_SUCCESS and code == 200:
 		var data = JSON.parse_string(body.get_string_from_utf8())
