@@ -39,6 +39,13 @@ mkdir -p "$OUT"
 
 restore; trap - EXIT   # 导出完立刻还原 llm.gd(占位回来)
 
+# 注入网页音频解锁脚本到 <head>(首次交互唤醒被 autoplay 冻结的 AudioContext)
+SNIP="$ROOT/scripts/audio_unlock.html"
+if [ -f "$SNIP" ] && ! grep -q "Patched.prototype = Real.prototype" "$OUT/index.html"; then
+  perl -0pi -e 'BEGIN{local $/; open(F,"<:raw",$ENV{SNIP}); $s=<F>; close F;} s/(<head>)/$1\n$s/' "$OUT/index.html"
+  echo "[2.5/3] 已注入音频解锁脚本到 index.html"
+fi
+
 echo "[3/3] 打包 zip → $ZIP"
 rm -f "$ZIP"
 ( cd "$OUT" && zip -qr "$ZIP" . )

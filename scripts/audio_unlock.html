@@ -1,0 +1,23 @@
+<script>
+/* 网页音频解锁：浏览器会冻结自动创建的 AudioContext(autoplay 策略),
+   Godot 4.6 网页版有时不会在用户交互时唤醒它 → 全程静音。
+   这里在引擎脚本之前挂钩 AudioContext,记录其创建的所有上下文,
+   并在玩家首次点击/按键/触摸时强制 resume(),让声音恢复。 */
+(function () {
+  var Real = window.AudioContext || window.webkitAudioContext;
+  if (!Real) return;
+  var ctxs = [];
+  function Patched() { var c = Reflect.construct(Real, arguments); ctxs.push(c); return c; }
+  Patched.prototype = Real.prototype;
+  window.AudioContext = Patched;
+  window.webkitAudioContext = Patched;
+  function resumeAll() {
+    for (var i = 0; i < ctxs.length; i++) {
+      try { if (ctxs[i].state !== 'running') ctxs[i].resume(); } catch (e) {}
+    }
+  }
+  ['pointerdown', 'mousedown', 'touchstart', 'keydown', 'click'].forEach(function (ev) {
+    window.addEventListener(ev, resumeAll, { capture: true, passive: true });
+  });
+})();
+</script>
