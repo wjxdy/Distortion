@@ -356,3 +356,18 @@ static func terminal_request_body(query: String) -> String:
 		"messages": build_terminal_messages(query),
 		"temperature": 0.1,
 	})
+
+# —— 隐藏电话线：玩家发言关键词检测(确定性，便于单测) ——
+# 第一步·问起他打电话的事 → 解锁这条线。
+static func asks_why_calls(msg: String) -> bool:
+	for kw in ["打电话", "老打电话", "总打电话", "常打电话", "打给谁", "给谁打", "电话"]:
+		if msg.find(kw) >= 0:
+			return true
+	return false
+
+# 第二步·追问怎么打通的 → (已解锁时)触发电话结局。
+static func asks_how_connected(msg: String) -> bool:
+	for kw in ["打通", "接通", "怎么打的通", "怎么打通", "通了吗", "能打通"]:
+		if msg.find(kw) >= 0:
+			return true
+	return false

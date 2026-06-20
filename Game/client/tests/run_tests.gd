@@ -364,5 +364,18 @@ func _initialize() -> void:
 	_check(es.mark_evidence_howto() == true, "首次进审讯有证据→弹出示提醒")
 	_check(es.mark_evidence_howto() == false, "证据出示提醒只弹一次")
 
+	# --- 隐藏电话线：触发检测 + 解锁门控 ---
+	_check(LLM.asks_why_calls("你为什么老打电话") == true, "问为什么打电话→解锁命中")
+	_check(LLM.asks_why_calls("你给谁打电话啊") == true, "打给谁→解锁命中")
+	_check(LLM.asks_why_calls("今天天气怎么样") == false, "无关→不解锁")
+	_check(LLM.asks_how_connected("你是怎么打通的") == true, "问怎么打通→触发命中")
+	_check(LLM.asks_how_connected("电话接通了吗") == true, "接通了吗→触发命中")
+	_check(LLM.asks_how_connected("她在哪") == false, "无关→不触发")
+	var ps := GameState.new()
+	_check(ps.phone_line_unlocked == false, "新局 phone_line_unlocked=false")
+	_check((ps.phone_line_unlocked and LLM.asks_how_connected("怎么打通的")) == false, "未解锁→不触发")
+	ps.phone_line_unlocked = true
+	_check((ps.phone_line_unlocked and LLM.asks_how_connected("怎么打通的")) == true, "解锁后→触发")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
