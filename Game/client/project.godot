@@ -25,6 +25,10 @@ Evidence="*res://scenes/evidence_log.tscn"
 Dbg="*res://scenes/debug.tscn"
 Settings="*res://scenes/settings.tscn"
 
+[audio]
+
+general/default_playback_type.web=1
+
 [display]
 
 window/size/viewport_width=1280
