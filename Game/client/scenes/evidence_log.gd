@@ -8,7 +8,7 @@ const Content = preload("res://game/content.gd")
 @onready var toggle_btn: Button = $ToggleBtn
 @onready var dot: ColorRect = $ToggleBtn/Dot
 @onready var panel: ColorRect = $Panel
-@onready var entries: Array = [
+@onready var entries: Array[Button] = [
 	$Panel/List/Entry0, $Panel/List/Entry1, $Panel/List/Entry2, $Panel/List/Entry3
 ]
 @onready var empty: Label = $Panel/Empty
@@ -20,7 +20,7 @@ var _toast_tween: Tween
 func _ready() -> void:
 	toggle_btn.pressed.connect(_toggle)
 	for i in entries.size():
-		(entries[i] as Button).pressed.connect(_on_entry.bind(i))
+		entries[i].pressed.connect(_on_entry.bind(i))
 	panel.visible = false
 	detail.visible = false
 	dot.visible = false
@@ -44,17 +44,17 @@ func refresh() -> void:
 	for i in entries.size():
 		var c: Dictionary = Content.EVIDENCE_CARDS[i]
 		var held: bool = Game.state.has_key(str(c["key"]))
-		(entries[i] as Button).visible = held
-		(entries[i] as Button).text = str(c["label"])
+		entries[i].visible = held
+		entries[i].text = str(c["label"])
 		any = any or held
 	empty.visible = not any
 
 func _toggle() -> void:
 	Sfx.play_click()
 	panel.visible = not panel.visible
+	detail.visible = false
 	if panel.visible:
 		dot.visible = false   # 看了就清红点
-		detail.visible = false
 		refresh()
 
 func _on_entry(i: int) -> void:
