@@ -221,6 +221,7 @@ func _initialize() -> void:
 	# --- 提示词新设定 ---
 	_check("走丢" in LLM.SYSTEM_PROMPT or "回来" in LLM.SYSTEM_PROMPT, "人设=她会回来/走丢")
 	_check(not ("误诊" in LLM.SYSTEM_PROMPT), "人设不再有AI误诊旧设定")
+	_check(not ("莫忘说" in LLM.SYSTEM_PROMPT), "人设不再让老头嘴里说'莫忘说…'(防剧透:莫忘靠玩家挖出)")
 	_check(not ("[[end" in LLM.FINALE_SYSTEM_PROMPT), "终局roleplay不再让老头吐end标签")
 
 	# --- 失败原因翻译(LLM.fail_reason)：调试日志据此告诉玩家是哪种失败 ---
