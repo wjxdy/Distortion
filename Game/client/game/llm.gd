@@ -317,3 +317,36 @@ static func parse_terminal_result(content: String) -> String:
 		if files.has(w):
 			return w
 	return ""
+
+const TERMINAL_SYSTEM_PROMPT := """你是一台警局综合查询终端的检索程序。你只做一件事：根据用户的查询，从下面这份【档案清单】里找出最匹配的【一条】档案，然后只输出它的 id。
+
+【档案清单】会在用户消息前由系统给出，每条形如：id | 标签 | 关键词。
+【输出规则·必须严格遵守】
+- 只输出那一条档案的 id（如 zhou），不要输出任何别的字、解释、标点、正文内容。
+- 绝对不要复述、编造或猜测档案的内容；你看不到正文，也不准编造正文。
+- 如果没有任何一条档案匹配用户的查询，只输出：NONE
+- 永远只输出一个 id 或 NONE，不要输出多个。"""
+
+# 拼档案清单（只给 id/标签/关键词，绝不给正文 text），供模型当检索目录。
+static func _terminal_catalog() -> String:
+	var files = preload("res://game/content.gd").TERMINAL_FILES
+	var lines: Array = []
+	for fid in files:
+		var label = str(files[fid].get("label", ""))
+		var kws = files[fid].get("keywords", [])
+		lines.append("%s | %s | %s" % [fid, label, ", ".join(PackedStringArray(kws))])
+	return "【档案清单】\n" + "\n".join(lines)
+
+static func build_terminal_messages(query: String) -> Array:
+	var sys := TERMINAL_SYSTEM_PROMPT + "\n\n" + _terminal_catalog()
+	return [
+		{"role": "system", "content": sys},
+		{"role": "user", "content": query},
+	]
+
+static func terminal_request_body(query: String) -> String:
+	return JSON.stringify({
+		"model": MODEL,
+		"messages": build_terminal_messages(query),
+		"temperature": 0.1,
+	})

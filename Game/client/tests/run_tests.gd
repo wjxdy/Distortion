@@ -316,6 +316,17 @@ func _initialize() -> void:
 	var tm := LLM.build_title_messages([{"role":"user","content":"她去世了"}], "truth")
 	_check(tm.size() == 2 and tm[0]["role"] == "system" and "truth" in tm[1]["content"], "称号messages带提示+结局类型")
 
+	# --- 终端查询：检索员提示词与请求构建 ---
+	_check(LLM.TERMINAL_SYSTEM_PROMPT.length() > 0, "终端检索员提示词存在")
+	_check(("NONE" in LLM.TERMINAL_SYSTEM_PROMPT), "提示词要求无匹配时回 NONE")
+	var tmsgs = LLM.build_terminal_messages("他住哪")
+	_check(tmsgs.size() == 2 and tmsgs[0]["role"] == "system" and tmsgs[1]["role"] == "user", "终端messages=system+user")
+	_check(tmsgs[1]["content"] == "他住哪", "终端user消息=玩家原句")
+	_check(("address" in tmsgs[0]["content"]) and ("zhou" in tmsgs[0]["content"]), "系统消息含档案id清单")
+	var tbody = LLM.terminal_request_body("他住哪")
+	var tparsed = JSON.parse_string(tbody)
+	_check(typeof(tparsed) == TYPE_DICTIONARY and tparsed.has("messages") and tparsed.has("model"), "终端请求体含 model/messages")
+
 	# --- Titles 称号收藏 ---
 	var Tt = preload("res://game/titles.gd")
 	var tt = Tt.new()
