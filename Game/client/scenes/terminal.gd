@@ -55,6 +55,7 @@ func _ready() -> void:
 	# 没拿到老人手机就别显示"接入手机"(也防止已解锁后重复解锁)
 	_refresh_terminal_actions()
 	_update_prompt()
+	_restore_chat()   # 离开终端室再回来：把全局存下的聊天记录重渲染回去
 
 # 离开终端场景时兜底还原全局按钮位置(正常情况由 _close_terminal 还原)。
 func _exit_tree() -> void:
@@ -149,9 +150,19 @@ func _close_log() -> void:
 	log_view.visible = false
 
 # —— 自然语言查询：聊天渲染 ——
+# _append：存进全局(跨场景保留) + 渲染；_render_chat_line：只渲染(重进终端时回放用，不重复存)。
 func _append(who: String, msg: String) -> void:
+	Game.state.add_terminal_chat(who, msg)
+	_render_chat_line(who, msg)
+
+func _render_chat_line(who: String, msg: String) -> void:
 	var color := "9ad6a0" if who == "终端" else "cfe6ff"
 	chat.append_text("\n[color=#%s]%s：[/color]%s\n" % [color, who, msg])
+
+# 重进终端室：把全局存下的聊天记录逐条渲染回聊天窗(不再走 _append，避免重复入库)。
+func _restore_chat() -> void:
+	for line in Game.state.terminal_chat:
+		_render_chat_line(str(line.get("who", "")), str(line.get("msg", "")))
 
 func _on_query_submit() -> void:
 	if _querying:
