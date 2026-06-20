@@ -251,7 +251,7 @@ func _send() -> void:
 func _do_request() -> void:
 	_attempt += 1
 	_req_start = Time.get_ticks_msec()
-	var err := http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, _req_body)
+	var err := http.request(LLM.chat_url(), LLM.headers(), HTTPClient.METHOD_POST, _req_body)
 	if err != OK:
 		# 连请求都发不出去：当作一次失败，交给统一的失败/重试处理
 		_on_reply(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedStringArray(), PackedByteArray())
@@ -304,7 +304,7 @@ func _apply_reply(parsed: Dictionary, silent: bool = false) -> void:
 		_finale_turns += 1
 		if _finale_turns >= 4:
 			var body := LLM.director_request_body(state.history, state.presented_proofs(), _finale_turns)
-			director_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, body)
+			director_http.request(LLM.chat_url(), LLM.headers(), HTTPClient.METHOD_POST, body)
 
 # 统一发提醒：去重(整局只一次)后弹右上角小字 + 手机响声红点。
 func _fire_hint(id: String) -> void:
@@ -383,7 +383,7 @@ func _trigger_phone_ending(msg: String) -> void:
 	_pending_end = {"end": true, "kind": "call", "epilogue": ""}
 	_phone_pending = true
 	# AI 现写 epilogue；发不出去就直接兜底进结局
-	var err := phone_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.phone_epilogue_request_body(state.history))
+	var err := phone_http.request(LLM.chat_url(), LLM.headers(), HTTPClient.METHOD_POST, LLM.phone_epilogue_request_body(state.history))
 	if err != OK:
 		_on_phone_epilogue(0, 0, PackedStringArray(), PackedByteArray())
 
@@ -412,7 +412,7 @@ func _trigger_ending_emergent(epilogue: String) -> void:
 	# 并行发称号请求（不阻塞渐黑/幻灯片流程）
 	var kind := str(_pending_end.get("kind", ""))
 	title_label.text = ""
-	var terr := title_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.title_request_body(state.history, kind))
+	var terr := title_http.request(LLM.chat_url(), LLM.headers(), HTTPClient.METHOD_POST, LLM.title_request_body(state.history, kind))
 	if terr != OK:
 		# 请求都没发出去：直接走 _on_title 的兜底("过客")，别让称号栏空着
 		_on_title(0, 0, PackedStringArray(), PackedByteArray())

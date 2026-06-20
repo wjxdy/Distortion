@@ -9,6 +9,9 @@ const BASE_URL := "https://api.moonshot.cn/v1"
 const MODEL := "moonshot-v1-32k"
 const TEMPERATURE := 0.6
 const CHAT_URL := BASE_URL + "/chat/completions"
+# 网页版(HTML5)走同源云函数代理：避免浏览器 CORS 拦截 api.moonshot.cn，且 key
+# 由 EdgeOne 服务端注入、永不下发到前端。桌面/编辑器版仍直连 Moonshot(无 CORS)。
+const PROXY_PATH := "/api/chat"
 
 # 运行时 key 覆盖：设置界面填了就用填的，没填(空)用内置 API_KEY。
 # Settings autoload 在启动/修改时调 set_runtime_key 推进来。
@@ -160,7 +163,25 @@ static func build_messages(history: Array, finale: bool) -> Array:
 	msgs.append_array(history)
 	return msgs
 
+# 请求地址：网页版→同源代理 <origin>/api/chat；桌面/编辑器版→直连 Moonshot。
+static func chat_url() -> String:
+	if OS.has_feature("web"):
+		var origin := _web_origin()
+		return (origin + PROXY_PATH) if origin != "" else PROXY_PATH
+	return CHAT_URL
+
+# 网页版取页面来源(https://xxx.edgeone.app)，拼成绝对地址给 HTTPRequest。
+static func _web_origin() -> String:
+	if OS.has_feature("web"):
+		var o = JavaScriptBridge.eval("window.location.origin", true)
+		if typeof(o) == TYPE_STRING and o != "":
+			return o
+	return ""
+
 static func headers() -> PackedStringArray:
+	# 网页版不带 key：由 EdgeOne 云函数服务端注入 Authorization，前端不暴露 key。
+	if OS.has_feature("web"):
+		return PackedStringArray(["Content-Type: application/json"])
 	return PackedStringArray([
 		"Content-Type: application/json",
 		"Authorization: Bearer " + active_key(),

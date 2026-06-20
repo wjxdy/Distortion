@@ -232,6 +232,15 @@ func _initialize() -> void:
 	_check("超时" in LLM.fail_reason(HTTPRequest.RESULT_TIMEOUT, 0, ""), "fail_reason: 超时")
 	_check("解析失败" in LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 200, ""), "fail_reason: 200但响应空→解析失败")
 
+	# --- 网页版走同源代理(/api/chat)，桌面版仍直连 Moonshot ---
+	# 网页版直连 api.moonshot.cn 会被 CORS 拦 + 暴露 key；改走 EdgeOne 云函数代理。
+	# 平台分流靠 OS.has_feature("web")；headless 测试环境=非 web，应保持桌面老行为不变。
+	_check(LLM.PROXY_PATH == "/api/chat", "代理路径常量=/api/chat")
+	_check(LLM.chat_url() == LLM.CHAT_URL, "桌面/编辑器 chat_url() 仍直连 Moonshot(不回归)")
+	var _hdr := LLM.headers()
+	_check("Content-Type: application/json" in _hdr, "headers 含 Content-Type")
+	_check("Authorization: Bearer " in "\n".join(_hdr), "桌面/编辑器 headers() 仍带 Authorization(key 直发)")
+
 	# --- 终端查询：本地关键词兜底匹配 LLM.terminal_local_match ---
 	_check(LLM.terminal_local_match("他住哪") == "address", "本地匹配: 他住哪→address")
 	_check(LLM.terminal_local_match("他老婆呢") == "wife", "本地匹配: 他老婆→wife")
