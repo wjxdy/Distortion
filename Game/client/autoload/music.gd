@@ -24,7 +24,10 @@ func _ready() -> void:
 	set_enabled(true)
 	_ensure_player()
 
-# 运行时建一条 "Music" 音频总线(发送到 Master)，BGM/雨声 player 都走它。
+# "Music" 总线由静态 default_bus_layout.tres 在启动时提供(Master + Music)。
+# ⚠️ 禁止运行时 AudioServer.add_bus()：实测 Godot 4.6.3 网页版下运行时新建总线
+# 会让整个音频输出哑掉(连 Master 也哑)。这里只兜底：万一布局没加载到 Music,
+# 才补建一条(桌面端安全;网页端正常情况下走静态布局不会进这分支)。
 func _setup_bus() -> void:
 	if AudioServer.get_bus_index(MUSIC_BUS) != -1:
 		return
