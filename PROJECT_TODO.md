@@ -1,7 +1,7 @@
 # 项目待办
 
 ## 下一步
-- [ ] **【EdgeOne 部署·收尾·待用户执行】**（代码改造已提交 cee2a3a，详见 PROGRESS 同日条）。AI 沙箱无外网，以下由用户在本机终端跑：① `edgeone login --site china`（浏览器登录国内站）；② `bash scripts/deploy_edgeone.sh`（导出 Web+组装云函数+部署，得公开链接）；③ EdgeOne 控制台 → 本项目 → 环境变量，设 `MOONSHOT_API_KEY=<key>`（key 不入仓库），再重部署/控制台重发；④ 打开线上链接实测审讯/终端/结局 LLM 调通(看 /api/chat 不 500)。**风险**：pck 83M 可能撞 EdgeOne 单文件/总量上限，撞了拆资源或外链。桌面/编辑器版不受影响(仍直连 Moonshot+设置页 key)。
+- [ ] **【itch.io 部署·收尾·待用户执行】**（方案已落地 6a58889，详见 PROGRESS 同日条；EdgeOne 方案已弃用——25MB限制+3h过期+ICP备案）。`build/distortion_web.zip`(97MB) 已生成。待用户：① **Moonshot 后台设消费上限**(key 会嵌入公开包)；② 上传 zip 到 **itch.io**(New project → Kind=HTML → 上传 zip → 勾 "This file will be played in the browser"；视口建议 1280×720 左右 → 拿到公开链接给评委)；③ 线上实测能玩 + 老头/终端 LLM 正常回话(Moonshot 已验证允许浏览器 CORS)；④ **demo 后轮换 key**；⑤ 删 EdgeOne 测试项目 `distortion`/`distortion-api`/`distortion-sizetest`(控制台手删,CLI 无删除命令)。重新打包随时跑 `bash scripts/package_itch.sh`。桌面/编辑器版不受影响。
 - [x] **【证据列表 HUD·整支完成】**（分支 feat/finale-emergent-ending；spec/plan=`docs/superpowers/specs|plans/2026-06-20-evidence-list-hud*`）：常驻 HUD「📁 证据」按钮+红点,获得证据弹 toast「已将【XX】添加到证据列表」,点开读 proof 详情;列表内容由 has_key 派生不新增数据模型;与审讯室出示开关解耦。SDD 3 任务 TDD 164/164 + 结构15/15 + 5场景冒烟。提交 0066f50..7111240。⚠️ 编辑器需重启/Reload(新增 autoload)。**待用户 F5 看 toast+列表+审讯室能开 → 合并 main**。
 - [x] **【终端机自然语言查询机·整支完成】**（分支 feat/finale-emergent-ending；spec/plan=`docs/superpowers/specs|plans/2026-06-20-terminal-llm-query*`）：终端从点按钮看静态全文 → 打字提问一问一答聊天窗；模型只检索回 id、客户端取写死正文、本地关键词兜底；只换机制不碰剧情(TERMINAL_FILES 加 keywords)。SDD 6 任务 TDD 154/154 + 真key实测8查询全符合预期(有的命中正确id/没有的NONE/不瞎编)。提交 cebf69d..7592d02。⚠️ 编辑器需 Reload terminal.tscn。**待用户 F5 实机看打字查询手感 → 合并 main**。
   - [ ] **延后·终端机后续(留接口)**：手机解锁解谜(问老头要密码→他只给"我和秀兰结婚那天"逻辑→终端查具体婚姻登记日→解锁手机看莫忘日志)；蓝裙子钩子剧情改版；"打通了"电话接通恐怖结局(莫忘合成亡妻语音)。
