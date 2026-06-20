@@ -22,6 +22,11 @@ var presented := {}   # {card_id: true} 已当面出示过的证据牌
 var evidence_seen := {}   # 已弹过"获得证据"toast 的卡 id，去重(随新游戏=新 GameState 自动重置)
 var evidence_howto_shown := false   # 是否已弹过"可点证据牌出示给老头"的一次性操作提醒
 var phone_line_unlocked := false   # 隐藏电话线：玩家问过"他为什么打电话"后解锁；随新游戏=新 GameState 重置
+var terminal_chat: Array = []   # 终端查询机的聊天记录 [{who,msg}…]，跨场景保留(离开终端室再回来仍在)；随新游戏重置
+
+# 终端聊天追加一条(查询机每问/每答各一条)，离开终端室再回来时据此重渲染。
+func add_terminal_chat(who: String, msg: String) -> void:
+	terminal_chat.append({"who": who, "msg": msg})
 
 func add_item(id: String) -> void:
 	items[id] = true

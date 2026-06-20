@@ -381,6 +381,12 @@ func _initialize() -> void:
 	_check(LLM.asks_how_connected("给我看死亡证明") == false, "给我看证据→不触发电话结局")
 	var ps := GameState.new()
 	_check(ps.phone_line_unlocked == false, "新局 phone_line_unlocked=false")
+	# 终端聊天记录跨场景保留(离开终端室再回来仍在)
+	_check(ps.terminal_chat.is_empty(), "新局 终端聊天记录为空")
+	ps.add_terminal_chat("你", "他住哪")
+	ps.add_terminal_chat("终端", "晚晴小区 2 号楼")
+	_check(ps.terminal_chat.size() == 2, "终端聊天追加两条")
+	_check(ps.terminal_chat[0]["who"] == "你" and ps.terminal_chat[1]["msg"] == "晚晴小区 2 号楼", "终端聊天记录内容正确")
 	_check((ps.phone_line_unlocked and LLM.asks_how_connected("怎么打通的")) == false, "未解锁→不触发")
 	ps.phone_line_unlocked = true
 	_check((ps.phone_line_unlocked and LLM.asks_how_connected("怎么打通的")) == true, "解锁后→触发")
