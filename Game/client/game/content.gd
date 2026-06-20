@@ -186,3 +186,10 @@ const EVIDENCE_CARDS := [
 
 # 结局兜底正文：裁判没给 epilogue 时用，仍落统一字幕。
 const ENDING_FALLBACK := "他没有再说话。\n屏幕暗下去的时候，那个名字还停在他嘴边。"
+
+# 按 key 找对应证据卡;不是证据 key(如 home_address)返回空字典。
+static func evidence_card_for_key(key: String) -> Dictionary:
+	for c in EVIDENCE_CARDS:
+		if str(c["key"]) == key:
+			return c
+	return {}

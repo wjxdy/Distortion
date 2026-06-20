@@ -346,5 +346,19 @@ func _initialize() -> void:
 	_check(not tt2._register("真相揭穿者"), "读档后仍去重")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(tmp))
 
+	# --- 证据列表:key→证据卡查询 ---
+	_check(Content.evidence_card_for_key("linxiulan").get("id", "") == "death", "key linxiulan→death 卡")
+	_check(Content.evidence_card_for_key("farewell").get("id", "") == "farewell", "key farewell→farewell 卡")
+	_check(Content.evidence_card_for_key("photo").get("id", "") == "photo", "key photo→photo 卡")
+	_check(Content.evidence_card_for_key("molog").get("id", "") == "molog", "key molog→molog 卡")
+	_check(Content.evidence_card_for_key("home_address").is_empty(), "非证据 key home_address→空字典")
+	_check(Content.evidence_card_for_key("").is_empty(), "空 key→空字典")
+	# --- 证据列表:toast 去重 ---
+	var es := GameState.new()
+	_check(es.evidence_seen.is_empty(), "新局 evidence_seen 为空")
+	_check(es.mark_evidence_seen("death") == true, "首次标记 death→true")
+	_check(es.mark_evidence_seen("death") == false, "重复标记 death→false(去重)")
+	_check(es.mark_evidence_seen("") == false, "空 card_id→false")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

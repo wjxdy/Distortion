@@ -19,6 +19,7 @@ var task_unread := true
 var items := {}    # {item_id: true}
 
 var presented := {}   # {card_id: true} 已当面出示过的证据牌
+var evidence_seen := {}   # 已弹过"获得证据"toast 的卡 id，去重(随新游戏=新 GameState 自动重置)
 
 func add_item(id: String) -> void:
 	items[id] = true
@@ -39,6 +40,13 @@ func presented_proofs() -> String:
 	if lines.is_empty():
 		return ""
 	return "【系统旁白·仅你(周明远扮演者)可知，玩家看不到】侦探此刻已经把这些摆到你面前：" + "；".join(lines) + "。这些是他真的拿出来、你正看着的东西；没在这上面的，你当他没有、也不知道他有。"
+
+# 首次见该证据 → true(该弹 toast)；已弹过或空 → false。
+func mark_evidence_seen(card_id: String) -> bool:
+	if card_id == "" or evidence_seen.has(card_id):
+		return false
+	evidence_seen[card_id] = true
+	return true
 
 func add_key(k: String) -> void:
 	keys[k] = true
