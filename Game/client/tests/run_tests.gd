@@ -360,6 +360,9 @@ func _initialize() -> void:
 	_check(es.mark_evidence_seen("death") == true, "首次标记 death→true")
 	_check(es.mark_evidence_seen("death") == false, "重复标记 death→false(去重)")
 	_check(es.mark_evidence_seen("") == false, "空 card_id→false")
+	_check(es.evidence_howto_shown == false, "新局 证据出示提醒未弹")
+	_check(es.mark_evidence_howto() == true, "首次进审讯有证据→弹出示提醒")
+	_check(es.mark_evidence_howto() == false, "证据出示提醒只弹一次")
 
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

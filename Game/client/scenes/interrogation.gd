@@ -130,6 +130,9 @@ func _refresh_cards() -> void:
 			if b.visible:
 				any_unlocked = true
 	ev_panel.visible = any_unlocked   # 无证据时隐藏整个面板，不留空盒子
+	# 第一次手里有证据进来对峙 → 提醒一次"可点证据牌、连同你的话一起拍给他看"(整局只一次)
+	if any_unlocked and Game.state.mark_evidence_howto():
+		_banner("提示：点亮下方的【证据】牌，再按【盘问】，就能把它当面拍到他面前。", Color(0.7, 0.9, 1.0), 4.5)
 
 func _bar_enabled(b: bool) -> void:
 	input.editable = b

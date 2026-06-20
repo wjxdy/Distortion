@@ -20,6 +20,7 @@ var items := {}    # {item_id: true}
 
 var presented := {}   # {card_id: true} 已当面出示过的证据牌
 var evidence_seen := {}   # 已弹过"获得证据"toast 的卡 id，去重(随新游戏=新 GameState 自动重置)
+var evidence_howto_shown := false   # 是否已弹过"可点证据牌出示给老头"的一次性操作提醒
 
 func add_item(id: String) -> void:
 	items[id] = true
@@ -46,6 +47,13 @@ func mark_evidence_seen(card_id: String) -> bool:
 	if card_id == "" or evidence_seen.has(card_id):
 		return false
 	evidence_seen[card_id] = true
+	return true
+
+# 进审讯室、手里第一次有证据时调：首次 → true(该弹"可出示证据"提醒)，之后 → false(只提醒一次)。
+func mark_evidence_howto() -> bool:
+	if evidence_howto_shown:
+		return false
+	evidence_howto_shown = true
 	return true
 
 func add_key(k: String) -> void:
