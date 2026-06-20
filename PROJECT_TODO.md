@@ -1,6 +1,7 @@
 # 项目待办
 
 ## 下一步
+- [x] **【证据列表 HUD·整支完成】**（分支 feat/finale-emergent-ending；spec/plan=`docs/superpowers/specs|plans/2026-06-20-evidence-list-hud*`）：常驻 HUD「📁 证据」按钮+红点,获得证据弹 toast「已将【XX】添加到证据列表」,点开读 proof 详情;列表内容由 has_key 派生不新增数据模型;与审讯室出示开关解耦。SDD 3 任务 TDD 164/164 + 结构15/15 + 5场景冒烟。提交 0066f50..7111240。⚠️ 编辑器需重启/Reload(新增 autoload)。**待用户 F5 看 toast+列表+审讯室能开 → 合并 main**。
 - [x] **【终端机自然语言查询机·整支完成】**（分支 feat/finale-emergent-ending；spec/plan=`docs/superpowers/specs|plans/2026-06-20-terminal-llm-query*`）：终端从点按钮看静态全文 → 打字提问一问一答聊天窗；模型只检索回 id、客户端取写死正文、本地关键词兜底；只换机制不碰剧情(TERMINAL_FILES 加 keywords)。SDD 6 任务 TDD 154/154 + 真key实测8查询全符合预期(有的命中正确id/没有的NONE/不瞎编)。提交 cebf69d..7592d02。⚠️ 编辑器需 Reload terminal.tscn。**待用户 F5 实机看打字查询手感 → 合并 main**。
   - [ ] **延后·终端机后续(留接口)**：手机解锁解谜(问老头要密码→他只给"我和秀兰结婚那天"逻辑→终端查具体婚姻登记日→解锁手机看莫忘日志)；蓝裙子钩子剧情改版；"打通了"电话接通恐怖结局(莫忘合成亡妻语音)。
 - [x] **Task 1**（cb7679e）：Titles autoload 称号去重持久化 `game/titles.gd` + `project.godot` autoload 注册 + `run_tests.gd` 断言（TDD 120/120）
