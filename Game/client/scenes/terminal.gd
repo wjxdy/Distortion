@@ -55,6 +55,13 @@ func _ready() -> void:
 	# 没拿到老人手机就别显示"接入手机"(也防止已解锁后重复解锁)
 	_refresh_terminal_actions()
 	_update_prompt()
+	# 终端场景里把全局证据/道具按钮左移，给「关闭终端」让出最右；离开本场景(_exit_tree)还原。
+	Inv.set_terminal_compact(true)
+	Evidence.set_terminal_compact(true)
+
+func _exit_tree() -> void:
+	Inv.set_terminal_compact(false)
+	Evidence.set_terminal_compact(false)
 
 func _process(_delta: float) -> void:
 	if player.locked:

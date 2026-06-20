@@ -16,6 +16,8 @@ const Content = preload("res://game/content.gd")
 @onready var toast: Label = $Toast
 
 var _toast_tween: Tween
+const _TERMINAL_DX := 184.0   # 终端场景里整条 HUD 左移量，给「关闭终端」让出最右
+var _home := {}               # 记住默认(靠右)位置，离开终端时还原
 
 func _ready() -> void:
 	toggle_btn.pressed.connect(_toggle)
@@ -25,6 +27,7 @@ func _ready() -> void:
 	detail.visible = false
 	dot.visible = false
 	toast.visible = false
+	_home = {"bl": toggle_btn.offset_left, "br": toggle_btn.offset_right, "pl": panel.offset_left, "pr": panel.offset_right}
 	refresh()
 
 # 获得证据时调用(发完 key 后)：非证据 key 忽略；去重；弹 toast + 点红点。
@@ -37,6 +40,16 @@ func note(key: String) -> void:
 	_show_toast("已将【%s】添加到证据列表" % str(card["label"]))
 	dot.visible = true
 	refresh()
+
+# 进终端场景时整条 HUD 左移让位(on=true)，离开还原(on=false)；默认靠右位置在 .tscn(可拖)。
+func set_terminal_compact(on: bool) -> void:
+	if _home.is_empty():
+		return
+	var dx: float = -_TERMINAL_DX if on else 0.0
+	toggle_btn.offset_left = _home["bl"] + dx
+	toggle_btn.offset_right = _home["br"] + dx
+	panel.offset_left = _home["pl"] + dx
+	panel.offset_right = _home["pr"] + dx
 
 # 重建列表:每张卡按 has_key 显隐;无证据显示 Empty。
 func refresh() -> void:

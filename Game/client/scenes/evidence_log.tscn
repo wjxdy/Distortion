@@ -7,9 +7,9 @@ layer = 4
 script = ExtResource("1_ev")
 
 [node name="ToggleBtn" type="Button" parent="."]
-offset_left = 808.0
+offset_left = 988.0
 offset_top = 12.0
-offset_right = 940.0
+offset_right = 1120.0
 offset_bottom = 52.0
 theme_override_font_sizes/font_size = 18
 text = "📁 证据"
@@ -24,9 +24,9 @@ color = Color(0.9, 0.2, 0.2, 1)
 
 [node name="Panel" type="ColorRect" parent="."]
 visible = false
-offset_left = 716.0
+offset_left = 900.0
 offset_top = 58.0
-offset_right = 1084.0
+offset_right = 1268.0
 offset_bottom = 430.0
 color = Color(0, 0, 0, 0.6)
 
