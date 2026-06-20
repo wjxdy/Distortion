@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # 《失真 Distortion》一键部署到 EdgeOne Makers(Pages)。
 #
-# 做三件事：① 导出 Godot 网页版 → build/web；② 把 cloud-functions(LLM 代理)
-# 组装进部署根；③ edgeone makers deploy 上传。产出一个公开访问链接给评委试玩。
+# 做三件事：① 导出 Godot 网页版 → build/web；② 把 edge-functions(LLM 代理,
+# V8 边缘运行时,免构建)组装进部署根；③ edgeone makers deploy 上传。
+# 产出一个公开访问链接给评委试玩。
 #
 # 前置(只做一次)：
 #   1) 安装 CLI：  npm install -g edgeone@latest      (需 ≥1.2.30)
@@ -23,9 +24,9 @@ echo "[1/3] 导出 Godot 网页版 → $OUT"
 mkdir -p "$OUT"
 "$GODOT" --headless --path "$ROOT/Game/client" --export-release "Web" "$OUT/index.html"
 
-echo "[2/3] 组装 cloud-functions(LLM 代理) → 部署根"
-rm -rf "$OUT/cloud-functions"
-cp -R "$ROOT/cloud-functions" "$OUT/cloud-functions"
+echo "[2/3] 组装 edge-functions(LLM 代理) → 部署根"
+rm -rf "$OUT/edge-functions" "$OUT/cloud-functions"
+cp -R "$ROOT/edge-functions" "$OUT/edge-functions"
 
 echo "[3/3] 部署到 EdgeOne Makers (project=$NAME)"
 cd "$OUT"
