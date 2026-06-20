@@ -148,12 +148,13 @@ func _on_query_submit() -> void:
 	if q == "":
 		return
 	query_input.text = ""
+	Sfx.play_click()
 	_append("你", q)
 	_querying = true
 	query_btn.disabled = true
 	chat.append_text("\n[color=#6f8f78]检索中…[/color]\n")
-	var err := _http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.terminal_request_body(q))
 	_pending_query = q
+	var err := _http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.terminal_request_body(q))
 	if err != OK:
 		_resolve_query(LLM.terminal_local_match(q))
 
