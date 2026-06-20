@@ -358,7 +358,7 @@ func _trigger_ending_emergent(epilogue: String) -> void:
 	finished = true
 	input.editable = false
 	send_btn.disabled = true
-	# 结局幻灯片要纯黑+文字：藏掉会盖在上面的 HUD 层(道具栏 Inv / 手机)，别让它们露出来
+	# 结局幻灯片要纯黑+文字：藏掉会盖在上面的 HUD 层(道具栏 Inv / 证据栏 Evidence / 手机)，别让它们露出来
 	Inv.visible = false
 	Evidence.visible = false
 	phone.visible = false

@@ -7,6 +7,8 @@ const MENU := "res://scenes/main_menu.tscn"
 @onready var back_btn: Button = $BackBtn
 
 func _ready() -> void:
+	Inv.visible = false
+	Evidence.visible = false
 	var titles := Titles.all_titles()
 	count_label.text = "已获得 %d 个称号" % titles.size()
 	list_label.text = "暂无称号，去玩一局吧。" if titles.is_empty() else "\n".join(PackedStringArray(titles))

@@ -9,6 +9,8 @@ const ACHIEVE := "res://scenes/achievements.tscn"
 
 func _ready() -> void:
 	Music.play_opening()
+	Inv.visible = false
+	Evidence.visible = false
 	start_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file(OPENING))
 	achieve_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file(ACHIEVE))
 	quit_btn.pressed.connect(func() -> void: get_tree().quit())
