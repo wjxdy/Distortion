@@ -32,6 +32,7 @@ var finished := false
 var _finale_turns := 0       # 终局里老头每次回复后 +1
 var _pending_end := {}       # 裁判返回"结束"时存放裁判结果，等打字机完成后触发
 var _typing_done := false    # 打字机是否已完成（防止打断老头台词直接渐黑）
+var _phone_pending := false   # 电话结局:正在等 AI epilogue,期间不让打字机回调提前收尾
 
 # 失败重试：任何失败都重试，共 MAX_TRIES 次、递增延迟，用尽才出保底沉默「……」。
 const MAX_TRIES := 3
@@ -355,6 +356,7 @@ func _on_director(_result: int, code: int, _h: PackedStringArray, body: PackedBy
 # 等打字机完成 + 裁判结果双双就绪，再停一拍让台词落地，然后触发涌现结局。
 func _maybe_finish_after_typing() -> void:
 	if _pending_end.is_empty(): return
+	if _phone_pending: return   # 电话 epilogue 还没回来 → 先别收尾,等 _on_phone_epilogue 再驱动
 	if not _typing_done:
 		await get_tree().create_timer(0.2).timeout
 		_maybe_finish_after_typing()
@@ -379,6 +381,7 @@ func _trigger_phone_ending(msg: String) -> void:
 	state.add_to_history("assistant", last_line)
 	# 结局类型给称号用（_trigger_ending_emergent 会读 _pending_end.kind 发称号请求）
 	_pending_end = {"end": true, "kind": "call", "epilogue": ""}
+	_phone_pending = true
 	# AI 现写 epilogue；发不出去就直接兜底进结局
 	var err := phone_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.phone_epilogue_request_body(state.history))
 	if err != OK:
@@ -393,7 +396,8 @@ func _on_phone_epilogue(result: int, code: int, _h: PackedStringArray, body: Pac
 	if epi == "":
 		epi = Content.ENDING_PHONE_FALLBACK
 	_pending_end["epilogue"] = epi
-	_trigger_ending_emergent(epi)
+	_phone_pending = false
+	_maybe_finish_after_typing()   # 撤闸后:等打字机也完成(若已完成则立即收尾),用正确的电话 epilogue 渐黑
 
 # 涌现结局入口：渐黑 → 幻灯片(AI 生成的 epilogue + 统一字幕)。
 func _trigger_ending_emergent(epilogue: String) -> void:
