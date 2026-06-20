@@ -24,6 +24,13 @@ func _initialize() -> void:
 		_check(root.has_node("TerminalUI"), "终端查询界面被包成 TerminalUI")
 		if root.has_node("TerminalUI"):
 			_check(not root.get_node("TerminalUI").visible, "TerminalUI 默认隐藏")
+			_check(root.has_node("TerminalUI/Chat"), "终端有聊天记录区 Chat")
+			_check(root.has_node("TerminalUI/QueryInput"), "终端有查询输入框 QueryInput")
+			_check(root.has_node("TerminalUI/QueryBtn"), "终端有查询按钮 QueryBtn")
+			_check(root.has_node("TerminalUI/BackBtn"), "终端保留关闭按钮")
+			_check(root.has_node("TerminalUI/FileList/SubmitPhoneBtn"), "终端保留接入手机按钮")
+			_check(root.has_node("TerminalUI/LogView"), "终端保留莫忘日志面板")
+			_check(not root.has_node("TerminalUI/FileList/CaseBtn"), "旧案卷按钮已移除")
 		root.free()
 	print("\n终端室测试: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)
