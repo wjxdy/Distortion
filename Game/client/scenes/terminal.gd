@@ -55,10 +55,8 @@ func _ready() -> void:
 	# 没拿到老人手机就别显示"接入手机"(也防止已解锁后重复解锁)
 	_refresh_terminal_actions()
 	_update_prompt()
-	# 终端场景里把全局证据/道具按钮左移，给「关闭终端」让出最右；离开本场景(_exit_tree)还原。
-	Inv.set_terminal_compact(true)
-	Evidence.set_terminal_compact(true)
 
+# 离开终端场景时兜底还原全局按钮位置(正常情况由 _close_terminal 还原)。
 func _exit_tree() -> void:
 	Inv.set_terminal_compact(false)
 	Evidence.set_terminal_compact(false)
@@ -98,6 +96,9 @@ func _open_terminal() -> void:
 	terminal_ui.visible = true
 	player.locked = true
 	prompt.visible = false
+	# 仅在终端查询界面打开时，全局证据/道具左移，给「关闭终端」让出最右。
+	Inv.set_terminal_compact(true)
+	Evidence.set_terminal_compact(true)
 
 func _close_terminal() -> void:
 	Sfx.play_click()
@@ -105,6 +106,9 @@ func _close_terminal() -> void:
 	terminal_ui.visible = false
 	player.locked = false
 	_update_prompt()
+	# 关掉查询界面 → 证据/道具按钮还原靠右。
+	Inv.set_terminal_compact(false)
+	Evidence.set_terminal_compact(false)
 
 func _refresh_terminal_actions() -> void:
 	# 有老人手机就一直显示该按钮；翻完日志(molog)后仍可重看历史，不再一关就消失。
