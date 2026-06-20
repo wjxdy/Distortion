@@ -88,6 +88,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Hint" type="Label" parent="." unique_id=1080100661]
+visible = false
 layout_mode = 0
 offset_left = 40.0
 offset_top = 28.0
