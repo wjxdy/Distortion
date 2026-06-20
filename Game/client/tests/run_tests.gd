@@ -377,5 +377,15 @@ func _initialize() -> void:
 	ps.phone_line_unlocked = true
 	_check((ps.phone_line_unlocked and LLM.asks_how_connected("怎么打通的")) == true, "解锁后→触发")
 
+	# --- 隐藏电话线：提示词与文案 ---
+	_check(LLM.PHONE_EPILOGUE_PROMPT.length() > 0, "电话结局旁白提示词存在")
+	_check(str(Content.ENDING_PHONE_FALLBACK).length() > 0, "电话结局兜底文案存在")
+	_check(("电话" in LLM.SYSTEM_PROMPT) and ("打通" in LLM.SYSTEM_PROMPT), "人设含电话元素")
+	_check(("电话" in LLM.FINALE_SYSTEM_PROMPT) and ("打通" in LLM.FINALE_SYSTEM_PROMPT), "终局人设含电话元素")
+	var pe = LLM.phone_epilogue_request_body([{"role": "user", "content": "hi"}])
+	var pep = JSON.parse_string(pe)
+	_check(typeof(pep) == TYPE_DICTIONARY and pep.has("messages") and pep.has("model"), "电话epilogue请求体含model/messages")
+	_check(LLM.parse_phone_epilogue("  电话接通了。  ") == "电话接通了。", "解析epilogue剥首尾空白")
+
 	print("\n结果: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

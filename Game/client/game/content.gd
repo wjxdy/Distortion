@@ -187,6 +187,9 @@ const EVIDENCE_CARDS := [
 # 结局兜底正文：裁判没给 epilogue 时用，仍落统一字幕。
 const ENDING_FALLBACK := "他没有再说话。\n屏幕暗下去的时候，那个名字还停在他嘴边。"
 
+# 隐藏电话结局的兜底正文：AI 不可用时用。诡异、留白，不点破是谁接的。
+const ENDING_PHONE_FALLBACK := "电话接通了。\n听筒里很静，又好像有谁，在很远的地方，轻轻应了一声。\n他笑了，把听筒贴得更紧。"
+
 # 按 key 找对应证据卡;不是证据 key(如 home_address)返回空字典。
 static func evidence_card_for_key(key: String) -> Dictionary:
 	for c in EVIDENCE_CARDS:
