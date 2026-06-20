@@ -62,8 +62,8 @@ var _card_btns := {}   # id -> Button
 @onready var end_body: Label = $EndSlide/VBox/Body
 @onready var end_subtitle: Label = $EndSlide/VBox/Subtitle
 @onready var title_label: Label = $EndSlide/VBox/TitleLabel
-@onready var back_menu_btn: Button = $EndSlide/VBox/EndButtons/BackToMenuBtn
-@onready var view_achieve_btn: Button = $EndSlide/VBox/EndButtons/ViewAchieveBtn
+@onready var back_menu_btn: Button = $EndSlide/EndButtons/BackToMenuBtn
+@onready var view_achieve_btn: Button = $EndSlide/EndButtons/ViewAchieveBtn
 @onready var title_http: HTTPRequest = $TitleHttp
 @onready var phone_http: HTTPRequest = $PhoneHttp
 
