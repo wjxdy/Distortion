@@ -31,6 +31,21 @@ func _initialize() -> void:
 			_check(root.has_node("TerminalUI/FileList/SubmitPhoneBtn"), "终端保留接入手机按钮")
 			_check(root.has_node("TerminalUI/LogView"), "终端保留莫忘日志面板")
 			_check(not root.has_node("TerminalUI/FileList/CaseBtn"), "旧案卷按钮已移除")
-		root.free()
+
+		# --- 防"幽灵按键"(终端版)：关闭终端必须清掉打字时残留的方向键 ---
+		# 复现：查询界面打开时 player.locked=true、焦点在输入框，按 ↑↓←→ 移光标→
+		# move_* 被 Input 记成"按住"、释放被输入框吞掉；关终端不重载场景→
+		# clear_movement_input(只在 _ready 跑)不触发→残留留着→解锁后玩家自动走。
+		# 修复=_close_terminal 调 player.clear_movement_input() 清残留。
+		get_root().add_child(root)
+		await process_frame
+		root._open_terminal()
+		Input.action_press("move_right")
+		_check(Input.is_action_pressed("move_right"), "终端打字残留方向键已注入(复现前置)")
+		root._close_terminal()
+		_check(not Input.is_action_pressed("move_right"), "关闭终端→清除残留方向键(防关掉后玩家自动走)")
+		Input.action_release("move_right")   # 清理，避免污染后续
+		root.queue_free()
+		await process_frame
 	print("\n终端室测试: %d 通过, %d 失败" % [_pass, _fail])
 	quit(1 if _fail > 0 else 0)

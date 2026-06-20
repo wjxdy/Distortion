@@ -5,6 +5,7 @@ extends Control
 const POLICE := "res://scenes/police.tscn"
 const Content = preload("res://game/content.gd")
 const LLM = preload("res://game/llm.gd")
+const PlayerScript = preload("res://scenes/player.gd")
 
 # 查到某案卷 → 莫忘弹一条提醒引导回去问老头(确定性双向提示)
 const FILE_HINTS := {
@@ -106,6 +107,10 @@ func _close_terminal() -> void:
 	log_view.visible = false
 	terminal_ui.visible = false
 	player.locked = false
+	# 防"幽灵按键"：在查询界面里打字时按了 ↑↓←→ 移光标，方向键也绑定 move_* 动作，
+	# 释放事件被输入框吞掉→残留成"按住"。关终端不重载场景，clear_movement_input(只在
+	# _ready 跑)不触发→解锁后玩家被残留键带着自动走。这里主动清掉残留。
+	PlayerScript.clear_movement_input()
 	_update_prompt()
 	# 关掉查询界面 → 证据/道具按钮还原靠右。
 	Inv.set_terminal_compact(false)
