@@ -21,11 +21,12 @@
   - [x] **Task D1**（186bdce）：interrogation.tscn 删 LeaveBtn + 加 Evidence 面板(4 toggle Button) + DirectorHttp；interrogation.gd 删 leave_btn 全部引用；新建 test_interrogation_struct.gd（TDD 115/115）
   - [x] **Task D2**（77b5f6b）：interrogation.gd 证据手牌点亮/出示结算 + _send 重写 + presented旁白整审讯注入；_refresh_cards() 含空面板隐藏；test_interrogation_struct.gd 补全4张牌断言（TDD 115/115）
   - [x] **Task D3**（c1da615）：终局裁判双调用编排 + 打字机完成后再渐黑(修打断bug) + hint_fallback改失踪妻子逻辑 + 删ENDING_SLIDES（TDD 113/113）
-  - **延后第二阶段·电话线(进行中)**：
-    - [x] **Task 1**（已完成于前序会话）：`asks_why_calls`/`asks_how_connected`/`phone_line_unlocked` 触发门控（TDD 183/183）
-    - [x] **Task 2**（a4efcb7）：SYSTEM_PROMPT + FINALE_SYSTEM_PROMPT 各加电话人设段落；`PHONE_EPILOGUE_PROMPT`/`build_phone_epilogue_messages`/`phone_epilogue_request_body`/`parse_phone_epilogue`；`content.ENDING_PHONE_FALLBACK`（TDD 183/183）
-    - [ ] **Task 3（待做）**：`game_state.gd` 加 `phone_epilogue_pending`/`phone_epilogue_result`；审讯室接线——检测 asks_why_calls(解锁)→asks_how_connected(已解锁时)→发 phone_epilogue_request_body→`parse_phone_epilogue`/兜底 ENDING_PHONE_FALLBACK→专属结局幻灯片/旁白展示。
-    - [ ] **Task 4（可选·延后）**：AI 合成亡妻语音；莫忘合成语音接通效果。
+  - **隐藏电话结局线·整支完成**（spec/plan=`docs/superpowers/specs|plans/2026-06-20-hidden-phone-call-ending*`；SDD 4 任务,真key实测通过）：
+    - [x] **Task 1**（f406610）：`asks_why_calls`/`asks_how_connected`/`phone_line_unlocked` 两步触发门控（TDD 177/177）
+    - [x] **Task 2**（a4efcb7）：SYSTEM_PROMPT + FINALE_SYSTEM_PROMPT 各加电话人设段落（只被问到才提）；`PHONE_EPILOGUE_PROMPT`(后 1d…收紧为冷峻短句)/`build_phone_epilogue_messages`/`phone_epilogue_request_body`/`parse_phone_epilogue`；`content.ENDING_PHONE_FALLBACK`（TDD 183/183）
+    - [x] **Task 3**（5c77783）：interrogation.tscn 加 PhoneHttp 节点；interrogation.gd 两步门控接线 + `_trigger_phone_ending`(老头脚本化收尾台词→AI epilogue→复用 `_trigger_ending_emergent` 渐黑/称号/结局画面,kind="call") + `_on_phone_epilogue`(兜底闭环)（结构OK+183/183+冒烟干净）
+    - [x] **Task 4**：真key实测 AI epilogue——诡异留白、不点破是谁接的、无金句,符合预期(收紧后冷峻)。⚠️ 编辑器需 Reload interrogation.tscn(新增 PhoneHttp)。**待用户 F5 实机走这条线**(问电话→问怎么打通→老头台词→渐黑→AI结局+称号)。
+    - [ ] **延后(未做)**：AI 合成亡妻语音/接通音效(用户明确没时间做语音,本轮纯文字)。
 - [ ] **【下一步】合并终局分支**：`feat/finale-emergent-ending`（A1~D3 全部完成，11 个任务提交）合回 main。合并前确认 main 无冲突改动；合并后在编辑器 Reload Saved Scene(interrogation.tscn)，F5 实机走终局流程（拿到 molog → 终局 → 出示证据 4 轮 → 等裁判 → 谢幕台词打完 → 渐黑 → 幻灯片）。
 - [ ] **合并旧分支**：`feat/final-confrontation-ending`(10 提交，用户 F5 确认 OK) 也已有全量替代，确认是否还需合并或可直接丢弃。
 - [x] ~~剧情去邪教版【客户端】全流程落地~~（已完成）：步骤A数据→手机中枢→phone复用→警局终端→小区支线→道具栏/钥匙→**终局对峙+三分支结局**(A戳破/B顺着他=模型 [[end:reveal/comfort]]/C沉默按钮，结束已解耦)。
