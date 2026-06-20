@@ -283,6 +283,8 @@ text = "莫忘日志"
 
 [node name="DirectorHttp" type="HTTPRequest" parent="." unique_id=1093424529]
 
+[node name="PhoneHttp" type="HTTPRequest" parent="."]
+
 [node name="FadeOverlay" type="ColorRect" parent="." unique_id=1791613675]
 visible = false
 z_index = 100

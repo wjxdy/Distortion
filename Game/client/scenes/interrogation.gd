@@ -64,6 +64,7 @@ var _card_btns := {}   # id -> Button
 @onready var back_menu_btn: Button = $EndSlide/VBox/EndButtons/BackToMenuBtn
 @onready var view_achieve_btn: Button = $EndSlide/VBox/EndButtons/ViewAchieveBtn
 @onready var title_http: HTTPRequest = $TitleHttp
+@onready var phone_http: HTTPRequest = $PhoneHttp
 
 func _ready() -> void:
 	Music.play_police_ambience()
@@ -91,6 +92,8 @@ func _ready() -> void:
 	director_http.request_completed.connect(_on_director)
 	title_http.request_completed.connect(_on_title)
 	title_http.timeout = 25.0   # 超时保证：请求挂起也能落到"过客"兜底
+	phone_http.request_completed.connect(_on_phone_epilogue)
+	phone_http.timeout = 14.0
 	back_menu_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
 	view_achieve_btn.pressed.connect(func() -> void: Sfx.play_click(); get_tree().change_scene_to_file("res://scenes/achievements.tscn"))
 	end_slide.visible = false
@@ -215,6 +218,13 @@ func _send() -> void:
 		var names := []
 		for c in armed: names.append(str(c["label"]))
 		msg = "（你把%s推到他面前。）" % "、".join(names)
+	# —— 隐藏电话线（在出示证据结算之前判定）——
+	# 已解锁 + 问"怎么打通" → 直接进电话结局；否则若问起打电话 → 解锁，继续正常对话。
+	if not finished and Game.state.phone_line_unlocked and LLM.asks_how_connected(msg):
+		_trigger_phone_ending(msg)
+		return
+	if LLM.asks_why_calls(msg):
+		state.phone_line_unlocked = true
 	for c in armed:
 		state.present_evidence(str(c["id"]))
 		var b: Button = _card_btns.get(c["id"])
@@ -353,6 +363,36 @@ func _maybe_finish_after_typing() -> void:
 	if finished: return
 	var epi := str(_pending_end.get("epilogue", ""))
 	if epi == "": epi = Content.ENDING_FALLBACK
+	_trigger_ending_emergent(epi)
+
+# 隐藏电话结局：玩家追问"怎么打通的" → 老头脚本化收尾台词 → AI 现写诡异 epilogue → 复用涌现结局。
+func _trigger_phone_ending(msg: String) -> void:
+	if finished: return
+	_show_player_bubble(msg)
+	state.add_to_history("user", msg)
+	input.text = ""
+	input.editable = false
+	send_btn.disabled = true
+	# 老头脚本化的瘆人收尾台词（固定，不走模型）
+	var last_line := "你不信？……我拨给你看。（他摸出手机，按下那串号码，把听筒凑到你耳边）……你听。"
+	_show_zhou_bubble(last_line)
+	state.add_to_history("assistant", last_line)
+	# 结局类型给称号用（_trigger_ending_emergent 会读 _pending_end.kind 发称号请求）
+	_pending_end = {"end": true, "kind": "call", "epilogue": ""}
+	# AI 现写 epilogue；发不出去就直接兜底进结局
+	var err := phone_http.request(LLM.CHAT_URL, LLM.headers(), HTTPClient.METHOD_POST, LLM.phone_epilogue_request_body(state.history))
+	if err != OK:
+		_on_phone_epilogue(0, 0, PackedStringArray(), PackedByteArray())
+
+func _on_phone_epilogue(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if finished: return
+	var epi := ""
+	if result == HTTPRequest.RESULT_SUCCESS and code == 200 and body.size() > 0:
+		var data = JSON.parse_string(body.get_string_from_utf8())
+		epi = LLM.parse_phone_epilogue(LLM.extract_content(data))
+	if epi == "":
+		epi = Content.ENDING_PHONE_FALLBACK
+	_pending_end["epilogue"] = epi
 	_trigger_ending_emergent(epi)
 
 # 涌现结局入口：渐黑 → 幻灯片(AI 生成的 epilogue + 统一字幕)。
