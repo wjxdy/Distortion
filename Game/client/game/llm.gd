@@ -286,3 +286,22 @@ static func parse_reply(content: String) -> Dictionary:
 	text = text.strip_edges()
 
 	return {"reply": text, "emotion": emotion, "hint": hint}
+
+# —— 终端查询机：本地关键词兜底（模型不可用时用，确定性、可单测）——
+# 把玩家这句问与各案卷 keywords 做子串包含匹配，返回首个命中的档案 id；无命中返回 ""。
+static func terminal_local_match(query: String) -> String:
+	var q := query.strip_edges()
+	if q == "":
+		return ""
+	var files = preload("res://game/content.gd").TERMINAL_FILES
+	var best_match_fid := ""
+	var best_match_length := 0
+	for fid in files:
+		var kws = files[fid].get("keywords", [])
+		for kw in kws:
+			if str(kw) != "" and q.find(str(kw)) >= 0:
+				var kw_len := str(kw).length()
+				if kw_len > best_match_length:
+					best_match_length = kw_len
+					best_match_fid = str(fid)
+	return best_match_fid

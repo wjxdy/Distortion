@@ -231,6 +231,14 @@ func _initialize() -> void:
 	_check("超时" in LLM.fail_reason(HTTPRequest.RESULT_TIMEOUT, 0, ""), "fail_reason: 超时")
 	_check("解析失败" in LLM.fail_reason(HTTPRequest.RESULT_SUCCESS, 200, ""), "fail_reason: 200但响应空→解析失败")
 
+	# --- 终端查询：本地关键词兜底匹配 LLM.terminal_local_match ---
+	_check(LLM.terminal_local_match("他住哪") == "address", "本地匹配: 他住哪→address")
+	_check(LLM.terminal_local_match("他老婆呢") == "wife", "本地匹配: 他老婆→wife")
+	_check(LLM.terminal_local_match("安葬在哪里") == "medical", "本地匹配: 安葬→medical")
+	_check(LLM.terminal_local_match("周明远是谁") == "zhou", "本地匹配: 周明远→zhou")
+	_check(LLM.terminal_local_match("今天天气怎么样") == "", "本地匹配: 无关问题→空")
+	_check(LLM.terminal_local_match("") == "", "本地匹配: 空输入→空")
+
 	# --- 调试日志行格式(Dbg.format_line) ---
 	var ln_fail = Dbg.format_line(2, false, 429, "过载", 0.3)
 	_check("第2次" in ln_fail and "FAIL" in ln_fail and "code=429" in ln_fail, "format_line: 失败行含 第2次/FAIL/code")
