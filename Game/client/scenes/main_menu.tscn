@@ -1,6 +1,29 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/main_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/main_menu_bg.png" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleMenuNormal"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_color = Color(0.55, 0.08, 0.08, 0.65)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 18.0
+content_margin_right = 18.0
+
+[sub_resource type="StyleBoxFlat" id="StyleMenuHover"]
+bg_color = Color(0.05, 0.06, 0.05, 0.2)
+border_width_left = 4
+border_color = Color(0.78, 0.12, 0.12, 0.9)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 18.0
+content_margin_right = 18.0
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -11,53 +34,138 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="BG" type="ColorRect" parent="."]
+[node name="BG" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05, 0.05, 0.1, 1)
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="Title" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -200.0
-offset_top = 160.0
-offset_right = 200.0
-offset_bottom = 230.0
-grow_horizontal = 2
-text = "失真 Distortion"
-horizontal_alignment = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 92.0
+offset_top = -218.0
+offset_right = 492.0
+offset_bottom = -118.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.88, 0.9, 0.84, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 76
+text = "审查室"
 vertical_alignment = 1
-theme_override_font_sizes/font_size = 48
+
+[node name="Subtitle" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 104.0
+offset_top = -108.0
+offset_right = 488.0
+offset_bottom = -70.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.48, 0.68, 0.7, 0.9)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "REVIEW ROOM"
 
 [node name="Buttons" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -120.0
-offset_top = 300.0
-offset_right = 120.0
-offset_bottom = 440.0
-grow_horizontal = 2
-theme_override_constants/separation = 16
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 108.0
+offset_top = -26.0
+offset_right = 396.0
+offset_bottom = 202.0
+grow_vertical = 2
+theme_override_constants/separation = 14
 
 [node name="StartBtn" type="Button" parent="Buttons"]
 layout_mode = 2
-custom_minimum_size = Vector2(240, 40)
+custom_minimum_size = Vector2(288, 46)
+focus_neighbor_top = NodePath("../QuitBtn")
+focus_neighbor_bottom = NodePath("../SettingsBtn")
+theme_override_colors/font_color = Color(0.9, 0.91, 0.82, 1)
+theme_override_colors/font_hover_color = Color(1, 0.96, 0.78, 1)
+theme_override_colors/font_pressed_color = Color(0.98, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleMenuNormal")
+theme_override_styles/hover = SubResource("StyleMenuHover")
+theme_override_styles/focus = SubResource("StyleMenuHover")
+theme_override_styles/pressed = SubResource("StyleMenuHover")
 text = "开始游戏"
+alignment = 0
+
+[node name="SettingsBtn" type="Button" parent="Buttons"]
+layout_mode = 2
+custom_minimum_size = Vector2(288, 46)
+focus_neighbor_top = NodePath("../StartBtn")
+focus_neighbor_bottom = NodePath("../AchieveBtn")
+theme_override_colors/font_color = Color(0.72, 0.76, 0.68, 1)
+theme_override_colors/font_hover_color = Color(1, 0.96, 0.78, 1)
+theme_override_colors/font_pressed_color = Color(0.98, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleMenuNormal")
+theme_override_styles/hover = SubResource("StyleMenuHover")
+theme_override_styles/focus = SubResource("StyleMenuHover")
+theme_override_styles/pressed = SubResource("StyleMenuHover")
+text = "设置"
+alignment = 0
 
 [node name="AchieveBtn" type="Button" parent="Buttons"]
 layout_mode = 2
-custom_minimum_size = Vector2(240, 40)
-text = "成就"
+custom_minimum_size = Vector2(288, 46)
+focus_neighbor_top = NodePath("../SettingsBtn")
+focus_neighbor_bottom = NodePath("../QuitBtn")
+theme_override_colors/font_color = Color(0.72, 0.76, 0.68, 1)
+theme_override_colors/font_hover_color = Color(1, 0.96, 0.78, 1)
+theme_override_colors/font_pressed_color = Color(0.98, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleMenuNormal")
+theme_override_styles/hover = SubResource("StyleMenuHover")
+theme_override_styles/focus = SubResource("StyleMenuHover")
+theme_override_styles/pressed = SubResource("StyleMenuHover")
+text = "称号"
+alignment = 0
 
 [node name="QuitBtn" type="Button" parent="Buttons"]
 layout_mode = 2
-custom_minimum_size = Vector2(240, 40)
-text = "退出"
+custom_minimum_size = Vector2(288, 46)
+focus_neighbor_top = NodePath("../AchieveBtn")
+focus_neighbor_bottom = NodePath("../StartBtn")
+theme_override_colors/font_color = Color(0.62, 0.64, 0.58, 1)
+theme_override_colors/font_hover_color = Color(1, 0.96, 0.78, 1)
+theme_override_colors/font_pressed_color = Color(0.98, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleMenuNormal")
+theme_override_styles/hover = SubResource("StyleMenuHover")
+theme_override_styles/focus = SubResource("StyleMenuHover")
+theme_override_styles/pressed = SubResource("StyleMenuHover")
+text = "退出游戏"
+alignment = 0
+
+[node name="Hint" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 112.0
+offset_top = 286.0
+offset_right = 490.0
+offset_bottom = 316.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.45, 0.5, 0.44, 0.85)
+theme_override_font_sizes/font_size = 18
+text = "Enter 确认  /  Esc 设置"
